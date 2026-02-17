@@ -1,0 +1,43 @@
+# Binaries
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+/iam
+/gateway
+/competition
+
+# Test binaries
+*.test
+*.prof
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# External dependencies
+vendor/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+*.out
+cover.out
+
+# Temporary files
+tmp/
+bin/

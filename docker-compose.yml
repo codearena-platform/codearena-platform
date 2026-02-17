@@ -1,0 +1,74 @@
+version: '3.8'
+
+services:
+  gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile.gateway
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - IAM_URL=http://iam:7000
+      - REALTIME_URL=http://realtime:8081
+    depends_on:
+      - iam
+
+  iam:
+    build:
+      context: .
+      dockerfile: Dockerfile.iam
+    ports:
+      - "7000:7000"
+    environment:
+      - PORT=7000
+      - DB_URI=mongodb://mongo:27017
+      - REDIS_ADDR=redis:6379
+    depends_on:
+      - mongo
+      - redis
+
+  competition:
+    build:
+      context: .
+      dockerfile: Dockerfile.competition
+    ports:
+      - "50052:50052"
+      - "7001:7001"
+    environment:
+      - PORT=7001
+      - DATABASE_URL=postgres://user:password@postgres:5432/competition?sslmode=disable
+      - MONGO_URI=mongodb://mongo:27017
+    depends_on:
+      - mongo
+      - postgres
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  postgres:
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=competition
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  mongo_data:
+  redis_data:
+  postgres_data:

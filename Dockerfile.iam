@@ -1,0 +1,27 @@
+FROM golang:1.22-alpine AS builder
+
+WORKDIR /app
+
+# Copy go mod and sum files
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source code
+COPY . .
+
+# Build the binary
+RUN CGO_ENABLED=0 GOOS=linux go build -o iam ./cmd/iam
+
+# Final Stage
+FROM alpine:latest
+
+WORKDIR /root/
+
+COPY --from=builder /app/iam .
+# Copy IAM configs/docs if needed
+COPY internal/iam/docs ./docs
+# COPY internal/iam/config ./config # If used at runtime
+
+EXPOSE 7000
+
+CMD ["./iam"]

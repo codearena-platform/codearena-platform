@@ -1,0 +1,135 @@
+package main
+
+import (
+	"fmt"
+	"log"
+	"net"
+	"os"
+
+	"github.com/codearena-platform/codearena-platform/internal/competition/db/mongo"
+	"github.com/codearena-platform/codearena-platform/internal/competition/db/postgres"
+	"github.com/codearena-platform/codearena-platform/internal/competition/routes"
+	"github.com/codearena-platform/codearena-platform/internal/competition/services"
+	"github.com/codearena-platform/codearena-platform/internal/competition/services/repository"
+	"github.com/gofiber/fiber/v2"
+	"google.golang.org/grpc"
+
+	pb "github.com/codearena-platform/codearena-core/pkg/api/v1"
+)
+
+func main() {
+	fmt.Println("CodeArena Competition Manager starting...")
+
+	// Configuration (Envs)
+	pgDSN := os.Getenv("POSTGRES_DSN")
+	if pgDSN == "" {
+		pgDSN = "postgres://codearena:codearena_password@postgres:5432/codearena_db?sslmode=disable"
+	}
+
+	mongoURI := os.Getenv("MONGO_URI")
+	if mongoURI == "" {
+		mongoURI = "mongodb://codearena:codearena_password@mongodb:27017"
+	}
+
+	// Initialize Postgres
+	db, err := postgres.InitPostgres(pgDSN)
+	if err != nil {
+		log.Printf("Warning: Failed to connect to Postgres: %v. Falling back to Memory (for dev/test without docker)", err)
+		// For robustness in this dev env, if DB fails, we could fatal or fallback.
+		// Let's Fatal to encourage correct setup, or handle gracefully.
+		// log.Fatal(err)
+	} else {
+		log.Println("Connected to PostgreSQL")
+	}
+
+	// Initialize Mongo
+	mongoClient, err := mongo.InitMongo(mongoURI)
+	if err != nil {
+		log.Printf("Warning: Failed to connect to Mongo: %v. Match replays might not execute.", err)
+	} else {
+		log.Println("Connected to MongoDB")
+	}
+
+	// Repositories
+	var matchRepo repository.MatchRepository
+	var botRepo repository.BotRepository
+	var scoreRepo repository.ScoreRepository
+	var tournamentRepo repository.TournamentRepository
+	var leagueRepo repository.LeagueRepository
+	var hubRepo repository.HubRepository
+
+	if db != nil && mongoClient != nil {
+		botRepo = postgres.NewPGBotRepository(db)
+		scoreRepo = postgres.NewPGScoreRepository(db)
+		matchRepo = mongo.NewMongoMatchRepository(mongoClient, "codearena")
+		tournamentRepo = postgres.NewPGTournamentRepository(db)
+		leagueRepo = postgres.NewPGLeagueRepository(db)
+		hubRepo = postgres.NewPGHubRepository(db)
+		log.Println("Using Persistent Repositories (Postgres + Mongo)")
+	} else {
+		log.Println("Using In-Memory Repositories (Fallback)")
+		tournamentRepo = repository.NewMemoryTournamentRepository()
+		leagueRepo = repository.NewMemoryLeagueRepository()
+		matchRepo = repository.NewMemoryMatchRepository()
+		botRepo = repository.NewMemoryBotRepository()
+		scoreRepo = repository.NewMemoryScoreRepository()
+		hubRepo = repository.NewMemoryHubRepository()
+		log.Println("Memory Repositories Initialized")
+	}
+
+	// Initialize Usecases & Services
+	simAddr := os.Getenv("SIMULATION_URL")
+	if simAddr == "" {
+		simAddr = "simulation:50051"
+	}
+	judgeService := services.NewJudgeService(matchRepo, simAddr)
+
+	matchUsecase := services.NewMatchUsecase(matchRepo, scoreRepo, botRepo, leagueRepo, judgeService)
+	tournamentUsecase := services.NewTournamentUsecase(tournamentRepo, matchRepo)
+	leagueUsecase := services.NewLeagueUsecase(leagueRepo, botRepo)
+	scoreboardService := services.NewScoreboardService(tournamentRepo, leagueRepo, botRepo)
+	historyUsecase := services.NewHistoryUsecase(matchRepo, botRepo)
+	analyticsUsecase := services.NewAnalyticsUsecase(matchRepo, botRepo)
+	hubUsecase := services.NewHubUsecase(hubRepo, tournamentRepo)
+	// metricsService := services.NewMetricsService(matchRepo) // Planned but initialized inside scoreboard if needed
+
+	// Run gRPC Server
+	go StartMatchServer(":50052", matchUsecase)
+
+	// Run HTTP Server
+	StartHTTPServer(":7001", matchUsecase, tournamentUsecase, leagueUsecase, scoreboardService, historyUsecase, analyticsUsecase, hubUsecase)
+}
+
+func StartHTTPServer(addr string, mu *services.MatchUsecase, tu *services.TournamentUsecase, lu *services.LeagueUsecase, ss *services.ScoreboardService, hu *services.HistoryUsecase, au *services.AnalyticsUsecase, hbu *services.HubUsecase) {
+	app := fiber.New(fiber.Config{
+		AppName: "CodeArena Competition Manager v1.0.0",
+	})
+
+	// Health check
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.Status(fiber.StatusOK).JSON(fiber.Map{
+			"status":  "UP",
+			"version": "1.0.0",
+		})
+	})
+
+	routes.RegisterCompetitionRoutes(app, mu, tu, lu, ss, hu, au, hbu)
+
+	log.Printf("Competition HTTP Server listening at %s", addr)
+	log.Fatal(app.Listen(addr))
+}
+
+func StartMatchServer(addr string, u *services.MatchUsecase) {
+	lis, err := net.Listen("tcp", addr)
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	s := grpc.NewServer()
+	srv := routes.NewMatchGRPCServer(u, "simulation:50051")
+	pb.RegisterMatchServiceServer(s, srv)
+
+	log.Printf("Match gRPC Server listening at %v", lis.Addr())
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
+}
