@@ -33,7 +33,7 @@ func TestFromModelListToSdk(t *testing.T) {
 				Tags:                  []string{"tag1", "tag2"},
 				RedirectURLs:          []string{"https://example.com/callback"},
 				DefaultAuthProviderId: "provider1",
-				GoIamClient:           true,
+				IAMClient:             true,
 				ProjectId:             "project1",
 				Scopes:                []string{"read", "write"},
 				Enabled:               true,
@@ -57,7 +57,7 @@ func TestFromModelListToSdk(t *testing.T) {
 		assert.Equal(t, []string{"tag1", "tag2"}, client.Tags)
 		assert.Equal(t, []string{"https://example.com/callback"}, client.RedirectURLs)
 		assert.Equal(t, "provider1", client.DefaultAuthProviderId)
-		assert.True(t, client.GoIamClient)
+		assert.True(t, client.IAMClient)
 		assert.Equal(t, "project1", client.ProjectId)
 		assert.Equal(t, []string{"read", "write"}, client.Scopes)
 		assert.True(t, client.Enabled)
@@ -82,7 +82,7 @@ func TestFromModelListToSdk(t *testing.T) {
 				Tags:                  []string{"tag1"},
 				RedirectURLs:          []string{"https://first.com/callback"},
 				DefaultAuthProviderId: "provider1",
-				GoIamClient:           true,
+				IAMClient:             true,
 				ProjectId:             "project1",
 				Scopes:                []string{"read"},
 				Enabled:               true,
@@ -99,7 +99,7 @@ func TestFromModelListToSdk(t *testing.T) {
 				Tags:                  []string{"tag2", "tag3"},
 				RedirectURLs:          []string{"https://second.com/callback", "https://second.com/alt"},
 				DefaultAuthProviderId: "provider2",
-				GoIamClient:           false,
+				IAMClient:             false,
 				ProjectId:             "project2",
 				Scopes:                []string{"read", "write", "admin"},
 				Enabled:               false,
@@ -124,7 +124,7 @@ func TestFromModelListToSdk(t *testing.T) {
 		assert.Equal(t, []string{"tag1"}, client1.Tags)
 		assert.Equal(t, []string{"https://first.com/callback"}, client1.RedirectURLs)
 		assert.Equal(t, "provider1", client1.DefaultAuthProviderId)
-		assert.True(t, client1.GoIamClient)
+		assert.True(t, client1.IAMClient)
 		assert.Equal(t, "project1", client1.ProjectId)
 		assert.Equal(t, []string{"read"}, client1.Scopes)
 		assert.True(t, client1.Enabled)
@@ -142,7 +142,7 @@ func TestFromModelListToSdk(t *testing.T) {
 		assert.Equal(t, []string{"tag2", "tag3"}, client2.Tags)
 		assert.Equal(t, []string{"https://second.com/callback", "https://second.com/alt"}, client2.RedirectURLs)
 		assert.Equal(t, "provider2", client2.DefaultAuthProviderId)
-		assert.False(t, client2.GoIamClient)
+		assert.False(t, client2.IAMClient)
 		assert.Equal(t, "project2", client2.ProjectId)
 		assert.Equal(t, []string{"read", "write", "admin"}, client2.Scopes)
 		assert.False(t, client2.Enabled)
@@ -236,7 +236,7 @@ func TestFromModelListToSdk(t *testing.T) {
 				Description:           "",
 				Secret:                "",
 				DefaultAuthProviderId: "",
-				GoIamClient:           false,
+				IAMClient:             false,
 				ProjectId:             "",
 				Enabled:               false,
 				CreatedBy:             "",
@@ -255,7 +255,7 @@ func TestFromModelListToSdk(t *testing.T) {
 		assert.Empty(t, client.Description)
 		assert.Empty(t, client.Secret)
 		assert.Empty(t, client.DefaultAuthProviderId)
-		assert.False(t, client.GoIamClient)
+		assert.False(t, client.IAMClient)
 		assert.Empty(t, client.ProjectId)
 		assert.False(t, client.Enabled)
 		assert.Empty(t, client.CreatedBy)
@@ -276,7 +276,7 @@ func TestFromModelToSdk(t *testing.T) {
 			Tags:                  []string{"tag1", "tag2"},
 			RedirectURLs:          []string{"https://example.com/callback"},
 			DefaultAuthProviderId: "provider1",
-			GoIamClient:           true,
+			IAMClient:             true,
 			ProjectId:             "project1",
 			Scopes:                []string{"read", "write"},
 			Enabled:               true,
@@ -296,7 +296,7 @@ func TestFromModelToSdk(t *testing.T) {
 		assert.Equal(t, []string{"tag1", "tag2"}, result.Tags)
 		assert.Equal(t, []string{"https://example.com/callback"}, result.RedirectURLs)
 		assert.Equal(t, "provider1", result.DefaultAuthProviderId)
-		assert.True(t, result.GoIamClient)
+		assert.True(t, result.IAMClient)
 		assert.Equal(t, "project1", result.ProjectId)
 		assert.Equal(t, []string{"read", "write"}, result.Scopes)
 		assert.True(t, result.Enabled)
@@ -329,7 +329,7 @@ func TestFromModelToSdk(t *testing.T) {
 		assert.Nil(t, result.Tags)
 		assert.Nil(t, result.RedirectURLs)
 		assert.Empty(t, result.DefaultAuthProviderId)
-		assert.False(t, result.GoIamClient)
+		assert.False(t, result.IAMClient)
 		assert.Empty(t, result.ProjectId)
 		assert.Nil(t, result.Scopes)
 		assert.False(t, result.Enabled)
@@ -353,7 +353,7 @@ func TestFromSdkToModel(t *testing.T) {
 			Tags:                  []string{"tag1", "tag2"},
 			RedirectURLs:          []string{"https://example.com/callback"},
 			DefaultAuthProviderId: "provider1",
-			GoIamClient:           true,
+			IAMClient:             true,
 			ProjectId:             "project1",
 			Scopes:                []string{"read", "write"},
 			Enabled:               true,
@@ -372,7 +372,7 @@ func TestFromSdkToModel(t *testing.T) {
 		assert.Equal(t, []string{"tag1", "tag2"}, result.Tags)
 		assert.Equal(t, []string{"https://example.com/callback"}, result.RedirectURLs)
 		assert.Equal(t, "provider1", result.DefaultAuthProviderId)
-		assert.True(t, result.GoIamClient)
+		assert.True(t, result.IAMClient)
 		assert.Equal(t, "project1", result.ProjectId)
 		assert.Equal(t, []string{"read", "write"}, result.Scopes)
 		assert.True(t, result.Enabled)
@@ -394,7 +394,7 @@ func TestFromSdkToModel(t *testing.T) {
 		assert.Nil(t, result.Tags)
 		assert.Nil(t, result.RedirectURLs)
 		assert.Empty(t, result.DefaultAuthProviderId)
-		assert.False(t, result.GoIamClient)
+		assert.False(t, result.IAMClient)
 		assert.Empty(t, result.ProjectId)
 		assert.Nil(t, result.Scopes)
 		assert.False(t, result.Enabled)

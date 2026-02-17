@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -16,9 +16,9 @@ type MockEvent struct {
 	mock.Mock
 }
 
-func (m *MockEvent) Name() goiamuniverse.Event {
+func (m *MockEvent) Name() constants.Event {
 	args := m.Called()
-	return args.Get(0).(goiamuniverse.Event)
+	return args.Get(0).(constants.Event)
 }
 
 func (m *MockEvent) Payload() interface{} {
@@ -38,13 +38,13 @@ func (m *MockEvent) Context() context.Context {
 
 // Simple concrete Event implementation for testing
 type TestEvent struct {
-	name     goiamuniverse.Event
+	name     constants.Event
 	payload  string
 	metadata sdk.Metadata
 	ctx      context.Context
 }
 
-func (e *TestEvent) Name() goiamuniverse.Event {
+func (e *TestEvent) Name() constants.Event {
 	return e.name
 }
 
@@ -90,7 +90,7 @@ func TestEmitter_Subscribe(t *testing.T) {
 	emitter := NewEmitter[Event[string], string]()
 	subscriber := &MockSubscriber{}
 
-	eventName := goiamuniverse.Event("test-event")
+	eventName := constants.Event("test-event")
 
 	// Subscribe to event - should not panic
 	assert.NotPanics(t, func() {
@@ -104,7 +104,7 @@ func TestEmitter_Subscribe_MultipleSubscribers(t *testing.T) {
 	subscriber2 := &MockSubscriber{}
 	subscriber3 := &MockSubscriber{}
 
-	eventName := goiamuniverse.Event("test-event")
+	eventName := constants.Event("test-event")
 
 	// Subscribe multiple subscribers to same event - should not panic
 	assert.NotPanics(t, func() {
@@ -119,8 +119,8 @@ func TestEmitter_Subscribe_DifferentEvents(t *testing.T) {
 	subscriber1 := &MockSubscriber{}
 	subscriber2 := &MockSubscriber{}
 
-	event1 := goiamuniverse.Event("event-1")
-	event2 := goiamuniverse.Event("event-2")
+	event1 := constants.Event("event-1")
+	event2 := constants.Event("event-2")
 
 	// Subscribe to different events - should not panic
 	assert.NotPanics(t, func() {
@@ -133,7 +133,7 @@ func TestEmitter_Emit_WithSubscribers(t *testing.T) {
 	emitter := NewEmitter[Event[string], string]()
 	subscriber := &MockSubscriber{}
 
-	eventName := goiamuniverse.Event("test-event")
+	eventName := constants.Event("test-event")
 	event := &TestEvent{
 		name:     eventName,
 		payload:  "test-payload",
@@ -157,7 +157,7 @@ func TestEmitter_Emit_WithSubscribers(t *testing.T) {
 func TestEmitter_Emit_NoSubscribers(t *testing.T) {
 	emitter := NewEmitter[Event[string], string]()
 
-	eventName := goiamuniverse.Event("test-event")
+	eventName := constants.Event("test-event")
 	event := &TestEvent{
 		name:     eventName,
 		payload:  "test-payload",
@@ -177,7 +177,7 @@ func TestEmitter_Emit_MultipleSubscribers(t *testing.T) {
 	subscriber2 := &MockSubscriber{}
 	subscriber3 := &MockSubscriber{}
 
-	eventName := goiamuniverse.Event("test-event")
+	eventName := constants.Event("test-event")
 	event := &TestEvent{
 		name:     eventName,
 		payload:  "test-payload",
@@ -210,8 +210,8 @@ func TestEmitter_Emit_WrongEventName(t *testing.T) {
 	emitter := NewEmitter[Event[string], string]()
 	subscriber := &MockSubscriber{}
 
-	subscribeEventName := goiamuniverse.Event("subscribe-event")
-	emitEventName := goiamuniverse.Event("emit-event")
+	subscribeEventName := constants.Event("subscribe-event")
+	emitEventName := constants.Event("emit-event")
 
 	event := &TestEvent{
 		name:     emitEventName,
@@ -233,7 +233,7 @@ func TestEmitter_Emit_WrongEventName(t *testing.T) {
 type testContextKey string
 
 func TestEvent_Interface_Methods(t *testing.T) {
-	eventName := goiamuniverse.Event("test-event")
+	eventName := constants.Event("test-event")
 	payload := "test-payload"
 	metadata := sdk.Metadata{
 		ProjectIds: []string{"project1", "project2"},
@@ -262,8 +262,8 @@ func TestEmitter_ComplexScenario(t *testing.T) {
 	roleSubscriber := &MockSubscriber{}
 	allEventsSubscriber := &MockSubscriber{}
 
-	userEvent := goiamuniverse.Event("user:created")
-	roleEvent := goiamuniverse.Event("role:updated")
+	userEvent := constants.Event("user:created")
+	roleEvent := constants.Event("role:updated")
 
 	userEventData := &TestEvent{
 		name:     userEvent,
@@ -310,7 +310,7 @@ func TestEmitter_EmptyEventName(t *testing.T) {
 	emitter := NewEmitter[Event[string], string]()
 	subscriber := &MockSubscriber{}
 
-	emptyEventName := goiamuniverse.Event("")
+	emptyEventName := constants.Event("")
 	event := &TestEvent{
 		name:     emptyEventName,
 		payload:  "test-payload",
@@ -334,7 +334,7 @@ func TestEmitter_NilContext(t *testing.T) {
 	emitter := NewEmitter[Event[string], string]()
 	subscriber := &MockSubscriber{}
 
-	eventName := goiamuniverse.Event("test-event")
+	eventName := constants.Event("test-event")
 	event := &TestEvent{
 		name:     eventName,
 		payload:  "test-payload",
@@ -359,7 +359,7 @@ func TestEmitter_EmptyMetadata(t *testing.T) {
 	emitter := NewEmitter[Event[string], string]()
 	subscriber := &MockSubscriber{}
 
-	eventName := goiamuniverse.Event("test-event")
+	eventName := constants.Event("test-event")
 	event := &TestEvent{
 		name:     eventName,
 		payload:  "test-payload",
@@ -384,7 +384,7 @@ func TestEmitter_NilMetadata(t *testing.T) {
 	emitter := NewEmitter[Event[string], string]()
 	subscriber := &MockSubscriber{}
 
-	eventName := goiamuniverse.Event("test-event")
+	eventName := constants.Event("test-event")
 	event := &TestEvent{
 		name:     eventName,
 		payload:  "test-payload",
@@ -412,13 +412,13 @@ type ComplexPayload struct {
 }
 
 type ComplexEvent struct {
-	name     goiamuniverse.Event
+	name     constants.Event
 	payload  ComplexPayload
 	metadata sdk.Metadata
 	ctx      context.Context
 }
 
-func (e *ComplexEvent) Name() goiamuniverse.Event {
+func (e *ComplexEvent) Name() constants.Event {
 	return e.name
 }
 
@@ -448,7 +448,7 @@ func TestEmitter_ComplexPayload(t *testing.T) {
 	emitter := NewEmitter[Event[ComplexPayload], ComplexPayload]()
 	subscriber := &ComplexSubscriber{}
 
-	eventName := goiamuniverse.Event("complex-event")
+	eventName := constants.Event("complex-event")
 	payload := ComplexPayload{
 		ID: "test-id",
 		Data: map[string]interface{}{
@@ -483,7 +483,7 @@ func TestEmitter_ConcurrentAccess(t *testing.T) {
 	emitter := NewEmitter[Event[string], string]()
 	subscriber := &MockSubscriber{}
 
-	eventName := goiamuniverse.Event("concurrent-event")
+	eventName := constants.Event("concurrent-event")
 
 	// Set up mock expectations for multiple events
 	subscriber.On("HandleEvent", mock.AnythingOfType("*utils.TestEvent")).Return().Times(10)

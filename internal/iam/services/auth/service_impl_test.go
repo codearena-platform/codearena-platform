@@ -17,7 +17,7 @@ import (
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/user"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils/test/services"
 )
 
@@ -2154,7 +2154,7 @@ func TestHandleEvent(t *testing.T) {
 
 	// Create a mock event
 	mockEvent := &MockEvent{
-		name: goiamuniverse.EventClientCreated,
+		name: constants.EventClientCreated,
 		payload: sdk.Client{
 			Id:     "test-client",
 			Secret: "test-secret",
@@ -2176,7 +2176,7 @@ func TestHandleEvent(t *testing.T) {
 		{
 			name: "client updated event",
 			event: &MockEvent{
-				name: goiamuniverse.EventClientUpdated,
+				name: constants.EventClientUpdated,
 				payload: sdk.Client{
 					Id:     "test-client",
 					Secret: "updated-secret",
@@ -2189,7 +2189,7 @@ func TestHandleEvent(t *testing.T) {
 		{
 			name: "unknown event - should be ignored",
 			event: &MockEvent{
-				name: goiamuniverse.Event("unknown-event"),
+				name: constants.Event("unknown-event"),
 				payload: sdk.Client{
 					Id:     "test-client",
 					Secret: "test-secret",
@@ -2217,13 +2217,13 @@ func TestHandleEvent(t *testing.T) {
 
 // Mock Event implementation for testing
 type MockEvent struct {
-	name     goiamuniverse.Event
+	name     constants.Event
 	payload  sdk.Client
 	metadata sdk.Metadata
 	context  context.Context
 }
 
-func (m *MockEvent) Name() goiamuniverse.Event {
+func (m *MockEvent) Name() constants.Event {
 	return m.name
 }
 

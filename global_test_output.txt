@@ -1,0 +1,2644 @@
+﻿?   	github.com/codearena-platform/codearena-platform/internal/iam/bootstrap	[no test files]
+=== RUN   TestNewAppConfig
+2026/02/17 17:44:52.262535 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:44:52.460647 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+--- PASS: TestNewAppConfig (0.20s)
+=== RUN   TestAppConfig_Handle
+--- PASS: TestAppConfig_Handle (0.01s)
+=== RUN   TestGetAppConfig
+--- PASS: TestGetAppConfig (0.00s)
+=== RUN   TestAppConfig_LoadServerConfig
+=== RUN   TestAppConfig_LoadServerConfig/Default_values
+2026/02/17 17:44:52.476065 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+=== RUN   TestAppConfig_LoadServerConfig/Custom_host_and_port
+2026/02/17 17:44:52.477079 config.go:140: [Info] Loaded Server Configurations host=0.0.0.0 port=8080 enable_redis=false token_cache_ttl=1440
+=== RUN   TestAppConfig_LoadServerConfig/Enable_Redis
+2026/02/17 17:44:52.478085 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=true token_cache_ttl=1440
+=== RUN   TestAppConfig_LoadServerConfig/Custom_TTL_and_intervals
+2026/02/17 17:44:52.478085 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=720
+--- PASS: TestAppConfig_LoadServerConfig (0.00s)
+    --- PASS: TestAppConfig_LoadServerConfig/Default_values (0.00s)
+    --- PASS: TestAppConfig_LoadServerConfig/Custom_host_and_port (0.00s)
+    --- PASS: TestAppConfig_LoadServerConfig/Enable_Redis (0.00s)
+    --- PASS: TestAppConfig_LoadServerConfig/Custom_TTL_and_intervals (0.00s)
+=== RUN   TestAppConfig_LoadServerConfig_InvalidTTL
+--- PASS: TestAppConfig_LoadServerConfig_InvalidTTL (0.00s)
+=== RUN   TestAppConfig_LoadServerConfig_InvalidInterval
+--- PASS: TestAppConfig_LoadServerConfig_InvalidInterval (0.00s)
+=== RUN   TestAppConfig_LoadDeploymentConfig
+=== RUN   TestAppConfig_LoadDeploymentConfig/Default_values
+=== RUN   TestAppConfig_LoadDeploymentConfig/Custom_values
+=== RUN   TestAppConfig_LoadDeploymentConfig/Only_environment
+=== RUN   TestAppConfig_LoadDeploymentConfig/Only_name
+--- PASS: TestAppConfig_LoadDeploymentConfig (0.00s)
+    --- PASS: TestAppConfig_LoadDeploymentConfig/Default_values (0.00s)
+    --- PASS: TestAppConfig_LoadDeploymentConfig/Custom_values (0.00s)
+    --- PASS: TestAppConfig_LoadDeploymentConfig/Only_environment (0.00s)
+    --- PASS: TestAppConfig_LoadDeploymentConfig/Only_name (0.00s)
+=== RUN   TestAppConfig_LoadLoggerConfig
+=== RUN   TestAppConfig_LoadLoggerConfig/Default_level
+=== RUN   TestAppConfig_LoadLoggerConfig/Debug_level
+=== RUN   TestAppConfig_LoadLoggerConfig/Error_level
+=== RUN   TestAppConfig_LoadLoggerConfig/Invalid_level_falls_back_to_default
+--- PASS: TestAppConfig_LoadLoggerConfig (0.00s)
+    --- PASS: TestAppConfig_LoadLoggerConfig/Default_level (0.00s)
+    --- PASS: TestAppConfig_LoadLoggerConfig/Debug_level (0.00s)
+    --- PASS: TestAppConfig_LoadLoggerConfig/Error_level (0.00s)
+    --- PASS: TestAppConfig_LoadLoggerConfig/Invalid_level_falls_back_to_default (0.00s)
+=== RUN   TestAppConfig_LoadDBConfig
+=== RUN   TestAppConfig_LoadDBConfig/Default_host
+=== RUN   TestAppConfig_LoadDBConfig/Custom_host
+--- PASS: TestAppConfig_LoadDBConfig (0.00s)
+    --- PASS: TestAppConfig_LoadDBConfig/Default_host (0.00s)
+    --- PASS: TestAppConfig_LoadDBConfig/Custom_host (0.00s)
+=== RUN   TestAppConfig_LoadEncrypterConfig
+=== RUN   TestAppConfig_LoadEncrypterConfig/Default_key
+=== RUN   TestAppConfig_LoadEncrypterConfig/Custom_valid_key
+=== RUN   TestAppConfig_LoadEncrypterConfig/Invalid_hex_key
+--- PASS: TestAppConfig_LoadEncrypterConfig (0.00s)
+    --- PASS: TestAppConfig_LoadEncrypterConfig/Default_key (0.00s)
+    --- PASS: TestAppConfig_LoadEncrypterConfig/Custom_valid_key (0.00s)
+    --- PASS: TestAppConfig_LoadEncrypterConfig/Invalid_hex_key (0.00s)
+=== RUN   TestAppConfig_LoadRedisConfig
+=== RUN   TestAppConfig_LoadRedisConfig/Default_values
+=== RUN   TestAppConfig_LoadRedisConfig/Custom_host_and_DB
+=== RUN   TestAppConfig_LoadRedisConfig/With_password
+--- PASS: TestAppConfig_LoadRedisConfig (0.00s)
+    --- PASS: TestAppConfig_LoadRedisConfig/Default_values (0.00s)
+    --- PASS: TestAppConfig_LoadRedisConfig/Custom_host_and_DB (0.00s)
+    --- PASS: TestAppConfig_LoadRedisConfig/With_password (0.00s)
+=== RUN   TestAppConfig_LoadRedisConfig_InvalidDB
+--- PASS: TestAppConfig_LoadRedisConfig_InvalidDB (0.00s)
+=== RUN   TestAppConfig_LoadJwtConfig
+=== RUN   TestAppConfig_LoadJwtConfig/Valid_JWT_secret
+=== RUN   TestAppConfig_LoadJwtConfig/Missing_JWT_secret
+--- PASS: TestAppConfig_LoadJwtConfig (0.00s)
+    --- PASS: TestAppConfig_LoadJwtConfig/Valid_JWT_secret (0.00s)
+    --- PASS: TestAppConfig_LoadJwtConfig/Missing_JWT_secret (0.00s)
+=== RUN   TestAppConfig_Load
+2026/02/17 17:44:52.489916 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:44:52.489916 config.go:140: [Info] Loaded Server Configurations host=testhost port=9000 enable_redis=false token_cache_ttl=1440
+--- PASS: TestAppConfig_Load (0.00s)
+=== RUN   TestDB_Host
+--- PASS: TestDB_Host (0.00s)
+=== RUN   TestEncrypter_Key
+--- PASS: TestEncrypter_Key (0.00s)
+=== RUN   TestJwt_Secret
+--- PASS: TestJwt_Secret (0.00s)
+=== RUN   TestNewLogger
+--- PASS: TestNewLogger (0.00s)
+=== RUN   TestMapperConstants
+--- PASS: TestMapperConstants (0.00s)
+=== RUN   TestAppConfig_GetAppConfig_Panic
+--- PASS: TestAppConfig_GetAppConfig_Panic (0.00s)
+=== RUN   TestAppConfig_Integration
+2026/02/17 17:44:52.557511 config.go:140: [Info] Loaded Server Configurations host=envhost port=8080 enable_redis=false token_cache_ttl=1440
+--- PASS: TestAppConfig_Integration (0.07s)
+=== RUN   TestAppConfig_LoadServiceAccountConfig
+=== RUN   TestAppConfig_LoadServiceAccountConfig/Default_values
+=== RUN   TestAppConfig_LoadServiceAccountConfig/Custom_access_token_TTL
+=== RUN   TestAppConfig_LoadServiceAccountConfig/Custom_refresh_token_TTL
+=== RUN   TestAppConfig_LoadServiceAccountConfig/Both_custom_values
+=== RUN   TestAppConfig_LoadServiceAccountConfig/Invalid_access_token_TTL_falls_back_to_default
+=== RUN   TestAppConfig_LoadServiceAccountConfig/Invalid_refresh_token_TTL_falls_back_to_default
+--- PASS: TestAppConfig_LoadServiceAccountConfig (0.00s)
+    --- PASS: TestAppConfig_LoadServiceAccountConfig/Default_values (0.00s)
+    --- PASS: TestAppConfig_LoadServiceAccountConfig/Custom_access_token_TTL (0.00s)
+    --- PASS: TestAppConfig_LoadServiceAccountConfig/Custom_refresh_token_TTL (0.00s)
+    --- PASS: TestAppConfig_LoadServiceAccountConfig/Both_custom_values (0.00s)
+    --- PASS: TestAppConfig_LoadServiceAccountConfig/Invalid_access_token_TTL_falls_back_to_default (0.00s)
+    --- PASS: TestAppConfig_LoadServiceAccountConfig/Invalid_refresh_token_TTL_falls_back_to_default (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/config	1.983s
+?   	github.com/codearena-platform/codearena-platform/internal/iam/constants	[no test files]
+=== RUN   TestMongoConnection_SetDbInContext
+--- PASS: TestMongoConnection_SetDbInContext (0.00s)
+=== RUN   TestGetDbFromContext_Success
+--- PASS: TestGetDbFromContext_Success (0.00s)
+=== RUN   TestGetDbFromContext_Panic
+--- PASS: TestGetDbFromContext_Panic (0.00s)
+=== RUN   TestMongoConnection_Disconnect
+--- PASS: TestMongoConnection_Disconnect (0.00s)
+=== RUN   TestMockCollection
+--- PASS: TestMockCollection (0.00s)
+=== RUN   TestMockDB_InsertOne
+--- PASS: TestMockDB_InsertOne (0.00s)
+=== RUN   TestMockDB_UpdateOne
+--- PASS: TestMockDB_UpdateOne (0.00s)
+=== RUN   TestMockDB_DeleteOne
+--- PASS: TestMockDB_DeleteOne (0.00s)
+=== RUN   TestMockDB_CountDocuments
+--- PASS: TestMockDB_CountDocuments (0.00s)
+=== RUN   TestMockDB_UpdateMany
+--- PASS: TestMockDB_UpdateMany (0.00s)
+=== RUN   TestMockDB_SetDbInContext
+--- PASS: TestMockDB_SetDbInContext (0.00s)
+=== RUN   TestMockDB_Disconnect
+--- PASS: TestMockDB_Disconnect (0.18s)
+=== RUN   TestMongoConnection_DatabaseOperations
+=== RUN   TestMongoConnection_DatabaseOperations/InsertOne_and_FindOne
+=== RUN   TestMongoConnection_DatabaseOperations/UpdateOne
+=== RUN   TestMongoConnection_DatabaseOperations/Find_multiple_documents
+=== RUN   TestMongoConnection_DatabaseOperations/CountDocuments
+=== RUN   TestMongoConnection_DatabaseOperations/UpdateMany
+=== RUN   TestMongoConnection_DatabaseOperations/DeleteOne
+=== RUN   TestMongoConnection_DatabaseOperations/Aggregate
+=== RUN   TestMongoConnection_DatabaseOperations/BulkWrite
+--- PASS: TestMongoConnection_DatabaseOperations (0.00s)
+    --- PASS: TestMongoConnection_DatabaseOperations/InsertOne_and_FindOne (0.00s)
+    --- PASS: TestMongoConnection_DatabaseOperations/UpdateOne (0.00s)
+    --- PASS: TestMongoConnection_DatabaseOperations/Find_multiple_documents (0.00s)
+    --- PASS: TestMongoConnection_DatabaseOperations/CountDocuments (0.00s)
+    --- PASS: TestMongoConnection_DatabaseOperations/UpdateMany (0.00s)
+    --- PASS: TestMongoConnection_DatabaseOperations/DeleteOne (0.00s)
+    --- PASS: TestMongoConnection_DatabaseOperations/Aggregate (0.00s)
+    --- PASS: TestMongoConnection_DatabaseOperations/BulkWrite (0.00s)
+=== RUN   TestMongoConnection_WithMocks
+=== RUN   TestMongoConnection_WithMocks/InsertOne_with_mock
+=== RUN   TestMongoConnection_WithMocks/FindOne_with_mock
+=== RUN   TestMongoConnection_WithMocks/UpdateOne_with_mock
+=== RUN   TestMongoConnection_WithMocks/DeleteOne_with_mock
+=== RUN   TestMongoConnection_WithMocks/CountDocuments_with_mock
+=== RUN   TestMongoConnection_WithMocks/Aggregate_with_mock
+--- PASS: TestMongoConnection_WithMocks (0.00s)
+    --- PASS: TestMongoConnection_WithMocks/InsertOne_with_mock (0.00s)
+    --- PASS: TestMongoConnection_WithMocks/FindOne_with_mock (0.00s)
+    --- PASS: TestMongoConnection_WithMocks/UpdateOne_with_mock (0.00s)
+    --- PASS: TestMongoConnection_WithMocks/DeleteOne_with_mock (0.00s)
+    --- PASS: TestMongoConnection_WithMocks/CountDocuments_with_mock (0.00s)
+    --- PASS: TestMongoConnection_WithMocks/Aggregate_with_mock (0.00s)
+=== RUN   TestMongoConnection_ErrorHandlingWithMocks
+=== RUN   TestMongoConnection_ErrorHandlingWithMocks/InsertOne_error_handling
+=== RUN   TestMongoConnection_ErrorHandlingWithMocks/FindOne_error_handling
+--- PASS: TestMongoConnection_ErrorHandlingWithMocks (0.00s)
+    --- PASS: TestMongoConnection_ErrorHandlingWithMocks/InsertOne_error_handling (0.00s)
+    --- PASS: TestMongoConnection_ErrorHandlingWithMocks/FindOne_error_handling (0.00s)
+=== RUN   TestMongoConnection_NewMongoConnection
+=== RUN   TestMongoConnection_NewMongoConnection/validates_connection_URL_format
+=== RUN   TestMongoConnection_NewMongoConnection/handles_invalid_connection_URL
+=== RUN   TestMongoConnection_NewMongoConnection/validates_connection_parameters
+--- PASS: TestMongoConnection_NewMongoConnection (0.00s)
+    --- PASS: TestMongoConnection_NewMongoConnection/validates_connection_URL_format (0.00s)
+    --- PASS: TestMongoConnection_NewMongoConnection/handles_invalid_connection_URL (0.00s)
+    --- PASS: TestMongoConnection_NewMongoConnection/validates_connection_parameters (0.00s)
+=== RUN   TestMongoConnection_DisconnectValidation
+=== RUN   TestMongoConnection_DisconnectValidation/validates_disconnect_context
+=== RUN   TestMongoConnection_DisconnectValidation/handles_disconnect_with_timeout
+--- PASS: TestMongoConnection_DisconnectValidation (0.00s)
+    --- PASS: TestMongoConnection_DisconnectValidation/validates_disconnect_context (0.00s)
+    --- PASS: TestMongoConnection_DisconnectValidation/handles_disconnect_with_timeout (0.00s)
+=== RUN   TestMongoConnection_DatabaseOperations_Extended
+=== RUN   TestMongoConnection_DatabaseOperations_Extended/FindOne_operation_validation
+=== RUN   TestMongoConnection_DatabaseOperations_Extended/Find_operation_validation
+=== RUN   TestMongoConnection_DatabaseOperations_Extended/Aggregate_operation_validation
+=== RUN   TestMongoConnection_DatabaseOperations_Extended/BulkWrite_operation_validation
+--- PASS: TestMongoConnection_DatabaseOperations_Extended (0.00s)
+    --- PASS: TestMongoConnection_DatabaseOperations_Extended/FindOne_operation_validation (0.00s)
+    --- PASS: TestMongoConnection_DatabaseOperations_Extended/Find_operation_validation (0.00s)
+    --- PASS: TestMongoConnection_DatabaseOperations_Extended/Aggregate_operation_validation (0.00s)
+    --- PASS: TestMongoConnection_DatabaseOperations_Extended/BulkWrite_operation_validation (0.00s)
+=== RUN   TestRegisterMigration
+--- PASS: TestRegisterMigration (0.00s)
+=== RUN   TestCheckAndRunMigrations_NewMigration
+2026/02/17 17:44:52.728124 migrate.go:53: [Info] Checking database migrations...
+2026/02/17 17:44:52.728635 migrate.go:65: [Info] Applying migration 001: test_migration
+2026/02/17 17:44:52.728635 migrate.go:89: [Info] Successfully applied migration 001
+2026/02/17 17:44:52.728635 migrate.go:97: [Info] All migrations checked and applied successfully
+--- PASS: TestCheckAndRunMigrations_NewMigration (0.00s)
+=== RUN   TestCheckAndRunMigrations_ExistingMigration
+2026/02/17 17:44:52.729143 migrate.go:53: [Info] Checking database migrations...
+2026/02/17 17:44:52.729143 migrate.go:93: [Debug] Migration 001 already applied
+2026/02/17 17:44:52.729143 migrate.go:97: [Info] All migrations checked and applied successfully
+--- PASS: TestCheckAndRunMigrations_ExistingMigration (0.00s)
+=== RUN   TestCheckAndRunMigrations_MigrationUpFails
+2026/02/17 17:44:52.729143 migrate.go:53: [Info] Checking database migrations...
+2026/02/17 17:44:52.730156 migrate.go:65: [Info] Applying migration 001: test_migration
+--- PASS: TestCheckAndRunMigrations_MigrationUpFails (0.00s)
+=== RUN   TestCheckAndRunMigrations_FindOneFails
+2026/02/17 17:44:52.730156 migrate.go:53: [Info] Checking database migrations...
+--- PASS: TestCheckAndRunMigrations_FindOneFails (0.00s)
+=== RUN   TestCheckAndRunMigrations_InsertOneFails
+2026/02/17 17:44:52.730156 migrate.go:53: [Info] Checking database migrations...
+2026/02/17 17:44:52.730156 migrate.go:65: [Info] Applying migration 001: test_migration
+--- PASS: TestCheckAndRunMigrations_InsertOneFails (0.00s)
+=== RUN   TestCheckAndRunMigrations_MultipleMigrations
+2026/02/17 17:44:52.730156 migrate.go:53: [Info] Checking database migrations...
+2026/02/17 17:44:52.730156 migrate.go:65: [Info] Applying migration 001: first_migration
+2026/02/17 17:44:52.731157 migrate.go:89: [Info] Successfully applied migration 001
+2026/02/17 17:44:52.731157 migrate.go:93: [Debug] Migration 002 already applied
+2026/02/17 17:44:52.731157 migrate.go:97: [Info] All migrations checked and applied successfully
+--- PASS: TestCheckAndRunMigrations_MultipleMigrations (0.00s)
+=== RUN   TestIsMigrationApplied_Exists
+--- PASS: TestIsMigrationApplied_Exists (0.00s)
+=== RUN   TestIsMigrationApplied_NotExists
+--- PASS: TestIsMigrationApplied_NotExists (0.06s)
+=== RUN   TestIsMigrationApplied_Error
+--- PASS: TestIsMigrationApplied_Error (0.00s)
+=== RUN   TestCheckAndRunMigrations_EmptyMigrations
+2026/02/17 17:44:52.788555 migrate.go:53: [Info] Checking database migrations...
+2026/02/17 17:44:52.788555 migrate.go:97: [Info] All migrations checked and applied successfully
+--- PASS: TestCheckAndRunMigrations_EmptyMigrations (0.00s)
+=== RUN   TestMigrationInfo_Structure
+--- PASS: TestMigrationInfo_Structure (0.00s)
+=== RUN   TestGetMigrations
+--- PASS: TestGetMigrations (0.00s)
+=== RUN   TestResetMigrations
+--- PASS: TestResetMigrations (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/db	1.761s
+=== RUN   TestMigration_UpdateUserPolicies
+=== RUN   TestMigration_UpdateUserPolicies/validates_migration_structure
+=== RUN   TestMigration_UpdateUserPolicies/validates_migration_metadata
+=== RUN   TestMigration_UpdateUserPolicies/validates_user_model_structure
+=== RUN   TestMigration_UpdateUserPolicies/validates_access_policy_creation
+=== RUN   TestMigration_UpdateUserPolicies/validates_policy_data_structure
+--- PASS: TestMigration_UpdateUserPolicies (0.00s)
+    --- PASS: TestMigration_UpdateUserPolicies/validates_migration_structure (0.00s)
+    --- PASS: TestMigration_UpdateUserPolicies/validates_migration_metadata (0.00s)
+    --- PASS: TestMigration_UpdateUserPolicies/validates_user_model_structure (0.00s)
+    --- PASS: TestMigration_UpdateUserPolicies/validates_access_policy_creation (0.00s)
+    --- PASS: TestMigration_UpdateUserPolicies/validates_policy_data_structure (0.00s)
+=== RUN   TestMigration_UpdateUserPoliciesUp
+=== RUN   TestMigration_UpdateUserPoliciesUp/validates_migration_context
+=== RUN   TestMigration_UpdateUserPoliciesUp/validates_batch_processing_parameters
+=== RUN   TestMigration_UpdateUserPoliciesUp/validates_filter_construction
+=== RUN   TestMigration_UpdateUserPoliciesUp/validates_update_operation_structure
+--- PASS: TestMigration_UpdateUserPoliciesUp (0.00s)
+    --- PASS: TestMigration_UpdateUserPoliciesUp/validates_migration_context (0.00s)
+    --- PASS: TestMigration_UpdateUserPoliciesUp/validates_batch_processing_parameters (0.00s)
+    --- PASS: TestMigration_UpdateUserPoliciesUp/validates_filter_construction (0.00s)
+    --- PASS: TestMigration_UpdateUserPoliciesUp/validates_update_operation_structure (0.00s)
+=== RUN   TestMigration_UpdateUserPoliciesDown
+=== RUN   TestMigration_UpdateUserPoliciesDown/validates_down_migration_context
+=== RUN   TestMigration_UpdateUserPoliciesDown/validates_policy_removal_filter
+=== RUN   TestMigration_UpdateUserPoliciesDown/validates_policy_removal_update
+--- PASS: TestMigration_UpdateUserPoliciesDown (0.00s)
+    --- PASS: TestMigration_UpdateUserPoliciesDown/validates_down_migration_context (0.00s)
+    --- PASS: TestMigration_UpdateUserPoliciesDown/validates_policy_removal_filter (0.00s)
+    --- PASS: TestMigration_UpdateUserPoliciesDown/validates_policy_removal_update (0.00s)
+=== RUN   TestMigration_WithMocks
+=== RUN   TestMigration_WithMocks/tests_error_handling_in_migration
+=== RUN   TestMigration_WithMocks/tests_migration_batch_processing
+=== RUN   TestMigration_WithMocks/tests_migration_validation_logic
+--- PASS: TestMigration_WithMocks (0.00s)
+    --- PASS: TestMigration_WithMocks/tests_error_handling_in_migration (0.00s)
+    --- PASS: TestMigration_WithMocks/tests_migration_batch_processing (0.00s)
+    --- PASS: TestMigration_WithMocks/tests_migration_validation_logic (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/db/migrations	1.372s
+=== RUN   TestUserModel
+=== RUN   TestUserModel/Name_returns_correct_collection_name
+=== RUN   TestUserModel/GetUserModel_returns_correct_field_keys
+--- PASS: TestUserModel (0.00s)
+    --- PASS: TestUserModel/Name_returns_correct_collection_name (0.00s)
+    --- PASS: TestUserModel/GetUserModel_returns_correct_field_keys (0.00s)
+=== RUN   TestRoleModel
+=== RUN   TestRoleModel/Name_returns_correct_collection_name
+=== RUN   TestRoleModel/GetRoleModel_returns_correct_field_keys
+--- PASS: TestRoleModel (0.00s)
+    --- PASS: TestRoleModel/Name_returns_correct_collection_name (0.00s)
+    --- PASS: TestRoleModel/GetRoleModel_returns_correct_field_keys (0.00s)
+=== RUN   TestPolicyModel
+=== RUN   TestPolicyModel/Name_returns_correct_collection_name
+=== RUN   TestPolicyModel/GetPolicyModel_returns_correct_field_keys
+--- PASS: TestPolicyModel (0.00s)
+    --- PASS: TestPolicyModel/Name_returns_correct_collection_name (0.00s)
+    --- PASS: TestPolicyModel/GetPolicyModel_returns_correct_field_keys (0.00s)
+=== RUN   TestProjectModel
+=== RUN   TestProjectModel/Name_returns_correct_collection_name
+=== RUN   TestProjectModel/GetProjectModel_returns_correct_field_keys
+--- PASS: TestProjectModel (0.00s)
+    --- PASS: TestProjectModel/Name_returns_correct_collection_name (0.00s)
+    --- PASS: TestProjectModel/GetProjectModel_returns_correct_field_keys (0.00s)
+=== RUN   TestResourceModel
+=== RUN   TestResourceModel/Name_returns_correct_collection_name
+=== RUN   TestResourceModel/GetResourceModel_returns_correct_field_keys
+--- PASS: TestResourceModel (0.00s)
+    --- PASS: TestResourceModel/Name_returns_correct_collection_name (0.00s)
+    --- PASS: TestResourceModel/GetResourceModel_returns_correct_field_keys (0.00s)
+=== RUN   TestClientModel
+=== RUN   TestClientModel/Name_returns_correct_collection_name
+=== RUN   TestClientModel/GetClientModel_returns_correct_field_keys
+--- PASS: TestClientModel (0.00s)
+    --- PASS: TestClientModel/Name_returns_correct_collection_name (0.00s)
+    --- PASS: TestClientModel/GetClientModel_returns_correct_field_keys (0.00s)
+=== RUN   TestAuthProviderModel
+=== RUN   TestAuthProviderModel/Name_returns_correct_collection_name
+=== RUN   TestAuthProviderModel/GetAuthProviderModel_returns_correct_field_keys
+--- PASS: TestAuthProviderModel (0.00s)
+    --- PASS: TestAuthProviderModel/Name_returns_correct_collection_name (0.00s)
+    --- PASS: TestAuthProviderModel/GetAuthProviderModel_returns_correct_field_keys (0.00s)
+=== RUN   TestMigrationModel
+=== RUN   TestMigrationModel/Name_returns_correct_collection_name
+=== RUN   TestMigrationModel/GetMigrationModel_returns_correct_field_keys
+--- PASS: TestMigrationModel (0.00s)
+    --- PASS: TestMigrationModel/Name_returns_correct_collection_name (0.00s)
+    --- PASS: TestMigrationModel/GetMigrationModel_returns_correct_field_keys (0.00s)
+=== RUN   TestRoleMapModel
+=== RUN   TestRoleMapModel/Name_returns_correct_collection_name
+=== RUN   TestRoleMapModel/GetRoleMap_returns_correct_field_keys
+--- PASS: TestRoleMapModel (0.00s)
+    --- PASS: TestRoleMapModel/Name_returns_correct_collection_name (0.00s)
+    --- PASS: TestRoleMapModel/GetRoleMap_returns_correct_field_keys (0.00s)
+=== RUN   TestAllModelsDbName
+=== RUN   TestAllModelsDbName/All_models_return_correct_database_name
+--- PASS: TestAllModelsDbName (0.00s)
+    --- PASS: TestAllModelsDbName/All_models_return_correct_database_name (0.00s)
+=== RUN   TestModelStructs
+=== RUN   TestModelStructs/User_struct_initialization
+=== RUN   TestModelStructs/UserRoles_struct_initialization
+=== RUN   TestModelStructs/UserResource_struct_initialization
+=== RUN   TestModelStructs/UserPolicy_struct_initialization
+--- PASS: TestModelStructs (0.00s)
+    --- PASS: TestModelStructs/User_struct_initialization (0.00s)
+    --- PASS: TestModelStructs/UserRoles_struct_initialization (0.00s)
+    --- PASS: TestModelStructs/UserResource_struct_initialization (0.00s)
+    --- PASS: TestModelStructs/UserPolicy_struct_initialization (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/db/models	0.916s
+?   	github.com/codearena-platform/codearena-platform/internal/iam/entity	[no test files]
+=== RUN   TestGetProjects_WithProjects
+--- PASS: TestGetProjects_WithProjects (0.00s)
+=== RUN   TestGetProjects_EmptyProjects
+--- PASS: TestGetProjects_EmptyProjects (0.00s)
+=== RUN   TestGetProjects_SingleProject
+--- PASS: TestGetProjects_SingleProject (0.00s)
+=== RUN   TestGetProjects_ReturnsNilForWrongType
+--- PASS: TestGetProjects_ReturnsNilForWrongType (0.00s)
+=== RUN   TestGetUser_WithUser
+--- PASS: TestGetUser_WithUser (0.00s)
+=== RUN   TestGetUser_NoUser
+--- PASS: TestGetUser_NoUser (0.00s)
+=== RUN   TestGetUser_NilUser
+--- PASS: TestGetUser_NilUser (0.00s)
+=== RUN   TestGetUser_WrongType
+--- PASS: TestGetUser_WrongType (0.00s)
+=== RUN   TestGetUser_EmptyUser
+--- PASS: TestGetUser_EmptyUser (0.00s)
+=== RUN   TestGetMetadata_WithFullMetadata
+--- PASS: TestGetMetadata_WithFullMetadata (0.00s)
+=== RUN   TestGetMetadata_WithUserOnly
+--- PASS: TestGetMetadata_WithUserOnly (0.00s)
+=== RUN   TestGetMetadata_WithProjectsOnly
+--- PASS: TestGetMetadata_WithProjectsOnly (0.00s)
+=== RUN   TestGetMetadata_EmptyContext
+--- PASS: TestGetMetadata_EmptyContext (0.00s)
+=== RUN   TestGetMetadata_EmptyValues
+--- PASS: TestGetMetadata_EmptyValues (0.00s)
+=== RUN   TestAddMetadata_WithFullMetadata
+--- PASS: TestAddMetadata_WithFullMetadata (0.00s)
+=== RUN   TestAddMetadata_WithNilUser
+--- PASS: TestAddMetadata_WithNilUser (0.00s)
+=== RUN   TestAddMetadata_WithEmptyProjects
+--- PASS: TestAddMetadata_WithEmptyProjects (0.00s)
+=== RUN   TestAddMetadata_EmptyMetadata
+--- PASS: TestAddMetadata_EmptyMetadata (0.00s)
+=== RUN   TestAddMetadata_OverwriteExisting
+--- PASS: TestAddMetadata_OverwriteExisting (0.00s)
+=== RUN   TestAddMetadata_ContextChaining
+--- PASS: TestAddMetadata_ContextChaining (0.00s)
+=== RUN   TestContextKeys_AreUnique
+--- PASS: TestContextKeys_AreUnique (0.00s)
+=== RUN   TestComplexScenarios
+=== RUN   TestComplexScenarios/Multiple_context_operations
+=== RUN   TestComplexScenarios/Large_project_lists
+--- PASS: TestComplexScenarios (0.00s)
+    --- PASS: TestComplexScenarios/Multiple_context_operations (0.00s)
+    --- PASS: TestComplexScenarios/Large_project_lists (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/middlewares	1.127s
+=== RUN   TestNewMiddlewares
+--- PASS: TestNewMiddlewares (0.00s)
+=== RUN   TestNewMiddlewares_NoAuthClient
+2026/02/17 17:45:20.482966 fetch.go:19: [Warn] IAM running in insecure mode. Create a client for Go IAM to make the application secure
+--- PASS: TestNewMiddlewares_NoAuthClient (0.21s)
+=== RUN   TestNewMiddlewares_GetIAMClientsError
+--- PASS: TestNewMiddlewares_GetIAMClientsError (0.00s)
+=== RUN   TestMiddlewares_User_Success
+--- PASS: TestMiddlewares_User_Success (0.07s)
+=== RUN   TestMiddlewares_User_NoAuthClient
+2026/02/17 17:45:20.766300 fetch.go:19: [Warn] IAM running in insecure mode. Create a client for Go IAM to make the application secure
+--- PASS: TestMiddlewares_User_NoAuthClient (0.00s)
+=== RUN   TestMiddlewares_User_AuthError
+2026/02/17 17:45:20.766300 auth.go:73: [Warn] failed to fetch user error=failed to fetch identity: invalid token
+--- PASS: TestMiddlewares_User_AuthError (0.00s)
+=== RUN   TestMiddlewares_DashboardUser_Success
+--- PASS: TestMiddlewares_DashboardUser_Success (0.00s)
+=== RUN   TestMiddlewares_DashboardUser_NoAuthClient
+2026/02/17 17:45:20.770360 fetch.go:19: [Warn] IAM running in insecure mode. Create a client for Go IAM to make the application secure
+--- PASS: TestMiddlewares_DashboardUser_NoAuthClient (0.00s)
+=== RUN   TestMiddlewares_DashboardUser_AuthError
+2026/02/17 17:45:20.771884 auth.go:110: [Warn] failed to fetch user error=failed to fetch identity: invalid token
+--- PASS: TestMiddlewares_DashboardUser_AuthError (0.00s)
+=== RUN   TestMiddlewares_GetUser_Success
+--- PASS: TestMiddlewares_GetUser_Success (0.00s)
+=== RUN   TestMiddlewares_GetUser_NoAuthHeader
+--- PASS: TestMiddlewares_GetUser_NoAuthHeader (0.00s)
+=== RUN   TestMiddlewares_GetUser_InvalidAuthHeader
+=== RUN   TestMiddlewares_GetUser_InvalidAuthHeader/Too_short
+=== RUN   TestMiddlewares_GetUser_InvalidAuthHeader/No_token
+=== RUN   TestMiddlewares_GetUser_InvalidAuthHeader/Empty_token
+=== RUN   TestMiddlewares_GetUser_InvalidAuthHeader/Wrong_scheme
+--- PASS: TestMiddlewares_GetUser_InvalidAuthHeader (0.00s)
+    --- PASS: TestMiddlewares_GetUser_InvalidAuthHeader/Too_short (0.00s)
+    --- PASS: TestMiddlewares_GetUser_InvalidAuthHeader/No_token (0.00s)
+    --- PASS: TestMiddlewares_GetUser_InvalidAuthHeader/Empty_token (0.00s)
+    --- PASS: TestMiddlewares_GetUser_InvalidAuthHeader/Wrong_scheme (0.00s)
+=== RUN   TestMiddlewares_GetUser_AuthServiceError
+--- PASS: TestMiddlewares_GetUser_AuthServiceError (0.01s)
+=== RUN   TestMiddlewares_User_MissingAuthHeader
+2026/02/17 17:45:20.794348 auth.go:73: [Warn] failed to fetch user error=`Authorization` not found in header
+--- PASS: TestMiddlewares_User_MissingAuthHeader (0.00s)
+=== RUN   TestMiddlewares_DashboardUser_MissingAuthHeader
+2026/02/17 17:45:20.795438 auth.go:110: [Warn] failed to fetch user error=`Authorization` not found in header
+--- PASS: TestMiddlewares_DashboardUser_MissingAuthHeader (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/middlewares/auth	4.247s
+=== RUN   TestNewMiddlewares
+--- PASS: TestNewMiddlewares (0.00s)
+=== RUN   TestMiddlewares_Projects_WithProjectIds
+=== RUN   TestMiddlewares_Projects_WithProjectIds/Single_Project_ID
+=== RUN   TestMiddlewares_Projects_WithProjectIds/Multiple_Project_IDs
+--- PASS: TestMiddlewares_Projects_WithProjectIds (0.00s)
+    --- PASS: TestMiddlewares_Projects_WithProjectIds/Single_Project_ID (0.00s)
+    --- PASS: TestMiddlewares_Projects_WithProjectIds/Multiple_Project_IDs (0.00s)
+=== RUN   TestMiddlewares_Projects_WithoutProjectIds
+--- PASS: TestMiddlewares_Projects_WithoutProjectIds (0.00s)
+=== RUN   TestMiddlewares_Projects_WithEmptyProjectIds
+=== RUN   TestMiddlewares_Projects_WithEmptyProjectIds/EmptyString
+=== RUN   TestMiddlewares_Projects_WithEmptyProjectIds/OnlyComma
+=== RUN   TestMiddlewares_Projects_WithEmptyProjectIds/MultipleCommas
+=== RUN   TestMiddlewares_Projects_WithEmptyProjectIds/Whitespace
+--- PASS: TestMiddlewares_Projects_WithEmptyProjectIds (0.00s)
+    --- PASS: TestMiddlewares_Projects_WithEmptyProjectIds/EmptyString (0.00s)
+    --- PASS: TestMiddlewares_Projects_WithEmptyProjectIds/OnlyComma (0.00s)
+    --- PASS: TestMiddlewares_Projects_WithEmptyProjectIds/MultipleCommas (0.00s)
+    --- PASS: TestMiddlewares_Projects_WithEmptyProjectIds/Whitespace (0.00s)
+=== RUN   TestMiddlewares_Projects_ProjectIdsWithSpaces
+--- PASS: TestMiddlewares_Projects_ProjectIdsWithSpaces (0.00s)
+=== RUN   TestMiddlewares_Projects_HeaderCaseInsensitive
+=== RUN   TestMiddlewares_Projects_HeaderCaseInsensitive/Lowercase
+=== RUN   TestMiddlewares_Projects_HeaderCaseInsensitive/Uppercase
+=== RUN   TestMiddlewares_Projects_HeaderCaseInsensitive/MixedCase
+=== RUN   TestMiddlewares_Projects_HeaderCaseInsensitive/StandardCase
+--- PASS: TestMiddlewares_Projects_HeaderCaseInsensitive (0.00s)
+    --- PASS: TestMiddlewares_Projects_HeaderCaseInsensitive/Lowercase (0.00s)
+    --- PASS: TestMiddlewares_Projects_HeaderCaseInsensitive/Uppercase (0.00s)
+    --- PASS: TestMiddlewares_Projects_HeaderCaseInsensitive/MixedCase (0.00s)
+    --- PASS: TestMiddlewares_Projects_HeaderCaseInsensitive/StandardCase (0.00s)
+=== RUN   TestMiddlewares_Projects_MultipleHeaderValues
+--- PASS: TestMiddlewares_Projects_MultipleHeaderValues (0.00s)
+=== RUN   TestMiddlewares_Projects_ContextIntegration
+--- PASS: TestMiddlewares_Projects_ContextIntegration (0.00s)
+=== RUN   TestMiddlewares_Projects_SpecialCharacters
+--- PASS: TestMiddlewares_Projects_SpecialCharacters (0.00s)
+=== RUN   TestMiddlewares_Projects_UnicodeCharacters
+--- PASS: TestMiddlewares_Projects_UnicodeCharacters (0.00s)
+=== RUN   TestMiddlewares_Projects_ManyProjects
+--- PASS: TestMiddlewares_Projects_ManyProjects (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/middlewares/projects	1.463s
+=== RUN   TestHandle
+--- PASS: TestHandle (0.00s)
+=== RUN   TestInjectDefaultProviders
+2026/02/17 17:45:21.914895 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.284513 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+=== RUN   TestInjectDefaultProviders/successful_provider_injection
+=== RUN   TestInjectDefaultProviders/validates_configuration_structure
+2026/02/17 17:45:22.285227 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.285227 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+=== RUN   TestInjectDefaultProviders/validates_JWT_configuration
+2026/02/17 17:45:22.286263 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.286916 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+=== RUN   TestInjectDefaultProviders/validates_encryption_configuration
+2026/02/17 17:45:22.287272 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.287272 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+=== RUN   TestInjectDefaultProviders/validates_server_configuration
+2026/02/17 17:45:22.287272 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.287272 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+=== RUN   TestInjectDefaultProviders/validates_Redis_configuration
+2026/02/17 17:45:22.289290 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.289290 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+=== RUN   TestInjectDefaultProviders/validates_deployment_configuration
+2026/02/17 17:45:22.289958 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.289958 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+--- PASS: TestInjectDefaultProviders (0.38s)
+    --- PASS: TestInjectDefaultProviders/successful_provider_injection (0.00s)
+    --- PASS: TestInjectDefaultProviders/validates_configuration_structure (0.00s)
+    --- PASS: TestInjectDefaultProviders/validates_JWT_configuration (0.00s)
+    --- PASS: TestInjectDefaultProviders/validates_encryption_configuration (0.00s)
+    --- PASS: TestInjectDefaultProviders/validates_server_configuration (0.00s)
+    --- PASS: TestInjectDefaultProviders/validates_Redis_configuration (0.00s)
+    --- PASS: TestInjectDefaultProviders/validates_deployment_configuration (0.00s)
+=== RUN   TestNewServices
+=== RUN   TestNewServices/creates_services_with_mock_dependencies
+--- PASS: TestNewServices (0.00s)
+    --- PASS: TestNewServices/creates_services_with_mock_dependencies (0.00s)
+=== RUN   TestNewDBConnection
+=== RUN   TestNewDBConnection/creates_database_connection_with_mock
+2026/02/17 17:45:22.289958 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.289958 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+=== RUN   TestNewDBConnection/validates_database_configuration
+2026/02/17 17:45:22.293599 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.294595 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+=== RUN   TestNewDBConnection/handles_database_configuration_errors
+2026/02/17 17:45:22.294595 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.294595 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+--- PASS: TestNewDBConnection (0.01s)
+    --- PASS: TestNewDBConnection/creates_database_connection_with_mock (0.00s)
+    --- PASS: TestNewDBConnection/validates_database_configuration (0.00s)
+    --- PASS: TestNewDBConnection/handles_database_configuration_errors (0.00s)
+=== RUN   TestProvider_HandleEvent
+=== RUN   TestProvider_HandleEvent/ignores_non-client_events
+=== RUN   TestProvider_HandleEvent/ignores_non-go-iam_clients
+--- PASS: TestProvider_HandleEvent (0.01s)
+    --- PASS: TestProvider_HandleEvent/ignores_non-client_events (0.01s)
+    --- PASS: TestProvider_HandleEvent/ignores_non-go-iam_clients (0.00s)
+=== RUN   TestProviderStruct
+=== RUN   TestProviderStruct/Provider_struct_initialization
+=== RUN   TestProviderStruct/Provider_struct_with_all_fields
+--- PASS: TestProviderStruct (0.00s)
+    --- PASS: TestProviderStruct/Provider_struct_initialization (0.00s)
+    --- PASS: TestProviderStruct/Provider_struct_with_all_fields (0.00s)
+=== RUN   TestNewDBConnection_Extended
+=== RUN   TestNewDBConnection_Extended/validates_database_configuration_structure
+2026/02/17 17:45:22.304731 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.304731 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+=== RUN   TestNewDBConnection_Extended/validates_database_connection_parameters
+2026/02/17 17:45:22.305243 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.305243 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+=== RUN   TestNewDBConnection_Extended/validates_database_configuration_loading
+2026/02/17 17:45:22.306260 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.306260 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+2026/02/17 17:45:22.306868 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.307971 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+--- PASS: TestNewDBConnection_Extended (0.01s)
+    --- PASS: TestNewDBConnection_Extended/validates_database_configuration_structure (0.00s)
+    --- PASS: TestNewDBConnection_Extended/validates_database_connection_parameters (0.00s)
+    --- PASS: TestNewDBConnection_Extended/validates_database_configuration_loading (0.00s)
+=== RUN   TestInjectDefaultProviders_Extended
+=== RUN   TestInjectDefaultProviders_Extended/validates_configuration_loading_process
+2026/02/17 17:45:22.312430 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.312430 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+=== RUN   TestInjectDefaultProviders_Extended/validates_configuration_field_access
+2026/02/17 17:45:22.313895 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.313895 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+=== RUN   TestInjectDefaultProviders_Extended/validates_configuration_consistency
+2026/02/17 17:45:22.314914 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.314914 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+2026/02/17 17:45:22.314914 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:22.314914 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+--- PASS: TestInjectDefaultProviders_Extended (0.01s)
+    --- PASS: TestInjectDefaultProviders_Extended/validates_configuration_loading_process (0.00s)
+    --- PASS: TestInjectDefaultProviders_Extended/validates_configuration_field_access (0.00s)
+    --- PASS: TestInjectDefaultProviders_Extended/validates_configuration_consistency (0.00s)
+=== RUN   TestCheckAndAddDefaultProject
+=== RUN   TestCheckAndAddDefaultProject/default_project_already_exists
+=== RUN   TestCheckAndAddDefaultProject/default_project_does_not_exist,_create_it
+2026/02/17 17:45:22.316450 default_project.go:42: [Info] Default project not found, creating it...
+--- FAIL: TestCheckAndAddDefaultProject (0.00s)
+    --- PASS: TestCheckAndAddDefaultProject/default_project_already_exists (0.00s)
+    --- FAIL: TestCheckAndAddDefaultProject/default_project_does_not_exist,_create_it (0.00s)
+panic: 
+	
+	mock: Unexpected Method Call
+	-----------------------------
+	
+	Create(context.backgroundCtx,*entity.Project)
+			0: context.backgroundCtx{emptyCtx:context.emptyCtx{}}
+			1: &entity.Project{Id:"", Name:"Default Project", Tags:[]string{"default", "system"}, Description:"This is the default project created by go-iam.", CreatedAt:time.Date(2026, time.February, 17, 17, 45, 22, 316450100, time.Local), CreatedBy:"system", UpdatedAt:time.Date(2026, time.February, 17, 17, 45, 22, 316450100, time.Local), UpdatedBy:"system"}
+	
+	The closest call I have is: 
+	
+	Create(context.backgroundCtx,mock.anythingOfTypeArgument)
+			0: context.backgroundCtx{emptyCtx:context.emptyCtx{}}
+			1: "*sdk.Project"
+	
+	
+	Diff: 0: PASS:  (context.backgroundCtx=context.Background) == (context.backgroundCtx=context.Background)
+		1: FAIL:  type *sdk.Project != type  - (*entity.Project=&{ Default Project [default system] This is the default project created by go-iam. 2026-02-17 17:45:22.3164501 -0300 -03 m=+0.738235201 system 2026-02-17 17:45:22.3164501 -0300 -03 m=+0.738235201 system})
+	at: [C:/Users/JacksonWendelSantosS/Project/codearena/codearena-platform/internal/iam/utils/test/services/project.go:24 C:/Users/JacksonWendelSantosS/Project/codearena/codearena-platform/internal/iam/providers/default_project.go:55 C:/Users/JacksonWendelSantosS/Project/codearena/codearena-platform/internal/iam/providers/providers_test.go:321]
+	 [recovered, repanicked]
+
+goroutine 26 [running]:
+testing.tRunner.func1.2({0x7ff621967b60, 0xc00027c250})
+	C:/Program Files/Go/src/testing/testing.go:1872 +0x239
+testing.tRunner.func1()
+	C:/Program Files/Go/src/testing/testing.go:1875 +0x35b
+panic({0x7ff621967b60?, 0xc00027c250?})
+	C:/Program Files/Go/src/runtime/panic.go:783 +0x132
+github.com/stretchr/testify/mock.(*Mock).fail(0xc0001a4f00, {0x7ff621b39178?, 0x4?}, {0xc0001a4f50?, 0x2?, 0x2?})
+	C:/Users/JacksonWendelSantosS/go/pkg/mod/github.com/stretchr/testify@v1.11.1/mock/mock.go:359 +0x125
+github.com/stretchr/testify/mock.(*Mock).MethodCalled(0xc0001a4f00, {0x7ff621dc9653, 0x6}, {0xc000185280, 0x2, 0x2})
+	C:/Users/JacksonWendelSantosS/go/pkg/mod/github.com/stretchr/testify@v1.11.1/mock/mock.go:519 +0x5c7
+github.com/stretchr/testify/mock.(*Mock).Called(0xc0001a4f00, {0xc000185280, 0x2, 0x2})
+	C:/Users/JacksonWendelSantosS/go/pkg/mod/github.com/stretchr/testify@v1.11.1/mock/mock.go:491 +0x125
+github.com/codearena-platform/codearena-platform/internal/iam/utils/test/services.(*MockProjectService).Create(0xc0001a4f00, {0x7ff621c52528, 0x7ff6223b5260}, 0xc00019f600)
+	C:/Users/JacksonWendelSantosS/Project/codearena/codearena-platform/internal/iam/utils/test/services/project.go:24 +0xa5
+github.com/codearena-platform/codearena-platform/internal/iam/providers.CheckAndAddDefaultProject({0x7ff621c54b20, 0xc0001a4f00})
+	C:/Users/JacksonWendelSantosS/Project/codearena/codearena-platform/internal/iam/providers/default_project.go:55 +0x25c
+github.com/codearena-platform/codearena-platform/internal/iam/providers.TestCheckAndAddDefaultProject.func2(0xc00026a1c0)
+	C:/Users/JacksonWendelSantosS/Project/codearena/codearena-platform/internal/iam/providers/providers_test.go:321 +0x17c
+testing.tRunner(0xc00026a1c0, 0x7ff621b43638)
+	C:/Program Files/Go/src/testing/testing.go:1934 +0xc3
+created by testing.(*T).Run in goroutine 24
+	C:/Program Files/Go/src/testing/testing.go:1997 +0x44b
+FAIL	github.com/codearena-platform/codearena-platform/internal/iam/providers	5.004s
+?   	github.com/codearena-platform/codearena-platform/internal/iam/repository	[no test files]
+=== RUN   TestRegisterRoutes
+2026/02/17 17:45:28.250512 config.go:78: [Info] No .env file found. Using default environment values
+2026/02/17 17:45:28.559379 config.go:140: [Info] Loaded Server Configurations host=localhost port=3000 enable_redis=false token_cache_ttl=1440
+2026/02/17 17:45:28.562692 fetch.go:19: [Warn] IAM running in insecure mode. Create a client for Go IAM to make the application secure
+2026/02/17 17:45:28.600845 fetch.go:19: [Warn] IAM running in insecure mode. Create a client for Go IAM to make the application secure
+--- PASS: TestRegisterRoutes (0.36s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/routes	4.492s
+=== RUN   TestUser
+=== RUN   TestUser/User_struct_initialization
+--- PASS: TestUser (0.00s)
+    --- PASS: TestUser/User_struct_initialization (0.00s)
+=== RUN   TestClient
+=== RUN   TestClient/IsServiceAccount_returns_true_for_IAM_client_with_linked_user
+=== RUN   TestClient/IsServiceAccount_returns_false_for_client_without_linked_user
+=== RUN   TestClient/HasIAMAuthProvider_returns_true_when_DefaultAuthProviderId_is_empty
+=== RUN   TestClient/HasIAMAuthProvider_returns_false_when_DefaultAuthProviderId_is_set
+--- PASS: TestClient (0.00s)
+    --- PASS: TestClient/IsServiceAccount_returns_true_for_IAM_client_with_linked_user (0.00s)
+    --- PASS: TestClient/IsServiceAccount_returns_false_for_client_without_linked_user (0.00s)
+    --- PASS: TestClient/HasIAMAuthProvider_returns_true_when_DefaultAuthProviderId_is_empty (0.00s)
+    --- PASS: TestClient/HasIAMAuthProvider_returns_false_when_DefaultAuthProviderId_is_set (0.00s)
+=== RUN   TestClientErrorResponses
+=== RUN   TestClientErrorResponses/NewErrorClientResponse
+=== RUN   TestClientErrorResponses/ClientBadRequest
+=== RUN   TestClientErrorResponses/ClientNotFound
+=== RUN   TestClientErrorResponses/ClientInternalServerError
+=== RUN   TestClientErrorResponses/ClientsInternalServerError
+--- PASS: TestClientErrorResponses (0.00s)
+    --- PASS: TestClientErrorResponses/NewErrorClientResponse (0.00s)
+    --- PASS: TestClientErrorResponses/ClientBadRequest (0.00s)
+    --- PASS: TestClientErrorResponses/ClientNotFound (0.00s)
+    --- PASS: TestClientErrorResponses/ClientInternalServerError (0.00s)
+    --- PASS: TestClientErrorResponses/ClientsInternalServerError (0.00s)
+=== RUN   TestErrors
+=== RUN   TestErrors/ErrUserNotFound
+=== RUN   TestErrors/ErrClientNotFound
+--- PASS: TestErrors (0.00s)
+    --- PASS: TestErrors/ErrUserNotFound (0.00s)
+    --- PASS: TestErrors/ErrClientNotFound (0.00s)
+=== RUN   TestUserTypeVal
+=== RUN   TestUserTypeVal/UserTypeVal_is_initialized
+--- PASS: TestUserTypeVal (0.00s)
+    --- PASS: TestUserTypeVal/UserTypeVal_is_initialized (0.00s)
+=== RUN   TestMaskedBytes
+=== RUN   TestMaskedBytes/MarshalJSON_returns_masked_bytes
+=== RUN   TestMaskedBytes/String_returns_masked_string
+--- PASS: TestMaskedBytes (0.00s)
+    --- PASS: TestMaskedBytes/MarshalJSON_returns_masked_bytes (0.00s)
+    --- PASS: TestMaskedBytes/String_returns_masked_string (0.00s)
+=== RUN   TestAuthProviderErrorResponses
+=== RUN   TestAuthProviderErrorResponses/NewErrorAuthProviderResponse
+=== RUN   TestAuthProviderErrorResponses/AuthProviderBadRequest
+=== RUN   TestAuthProviderErrorResponses/AuthProviderNotFound
+=== RUN   TestAuthProviderErrorResponses/AuthProviderInternalServerError
+=== RUN   TestAuthProviderErrorResponses/AuthProvidersInternalServerError
+--- PASS: TestAuthProviderErrorResponses (0.00s)
+    --- PASS: TestAuthProviderErrorResponses/NewErrorAuthProviderResponse (0.00s)
+    --- PASS: TestAuthProviderErrorResponses/AuthProviderBadRequest (0.00s)
+    --- PASS: TestAuthProviderErrorResponses/AuthProviderNotFound (0.00s)
+    --- PASS: TestAuthProviderErrorResponses/AuthProviderInternalServerError (0.00s)
+    --- PASS: TestAuthProviderErrorResponses/AuthProvidersInternalServerError (0.00s)
+=== RUN   TestAuthIdentity
+=== RUN   TestAuthIdentity/UpdateUserDetails_calls_metadata_UpdateUserDetails
+--- PASS: TestAuthIdentity (0.00s)
+    --- PASS: TestAuthIdentity/UpdateUserDetails_calls_metadata_UpdateUserDetails (0.00s)
+=== RUN   TestAuthProvider_GetParam
+=== RUN   TestAuthProvider_GetParam/returns_value_for_existing_key
+=== RUN   TestAuthProvider_GetParam/returns_empty_string_for_non-existing_key
+=== RUN   TestAuthProvider_GetParam/returns_empty_string_for_empty_params
+--- PASS: TestAuthProvider_GetParam (0.00s)
+    --- PASS: TestAuthProvider_GetParam/returns_value_for_existing_key (0.00s)
+    --- PASS: TestAuthProvider_GetParam/returns_empty_string_for_non-existing_key (0.00s)
+    --- PASS: TestAuthProvider_GetParam/returns_empty_string_for_empty_params (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/sdk	0.852s
+=== RUN   TestNewService
+--- PASS: TestNewService (0.00s)
+=== RUN   TestCacheClientSecret
+--- PASS: TestCacheClientSecret (0.00s)
+=== RUN   TestCacheClientSecretError
+2026/02/17 17:45:25.403978 helpers.go:18: [Error] failed to cache client secret: %!w(*errors.errorString=&{cache error})
+--- PASS: TestCacheClientSecretError (0.35s)
+=== RUN   TestGetClientSecret
+=== RUN   TestGetClientSecret/success_-_from_cache
+=== RUN   TestGetClientSecret/success_-_from_database
+=== RUN   TestGetClientSecret/success_-_from_database_with_cache_error
+2026/02/17 17:45:25.756714 helpers.go:33: [Error] failed to cache client secret: %!w(*errors.errorString=&{cache error})
+=== RUN   TestGetClientSecret/error_-_client_not_found
+--- PASS: TestGetClientSecret (0.00s)
+    --- PASS: TestGetClientSecret/success_-_from_cache (0.00s)
+    --- PASS: TestGetClientSecret/success_-_from_database (0.00s)
+    --- PASS: TestGetClientSecret/success_-_from_database_with_cache_error (0.00s)
+    --- PASS: TestGetClientSecret/error_-_client_not_found (0.00s)
+=== RUN   TestHandlePrivateClient
+=== RUN   TestHandlePrivateClient/success
+=== RUN   TestHandlePrivateClient/error_-_invalid_client_secret
+=== RUN   TestHandlePrivateClient/error_-_client_not_found
+--- PASS: TestHandlePrivateClient (0.00s)
+    --- PASS: TestHandlePrivateClient/success (0.00s)
+    --- PASS: TestHandlePrivateClient/error_-_invalid_client_secret (0.00s)
+    --- PASS: TestHandlePrivateClient/error_-_client_not_found (0.00s)
+=== RUN   TestGenerateCodeChallengeS256
+=== RUN   TestGenerateCodeChallengeS256/basic_test
+=== RUN   TestGenerateCodeChallengeS256/empty_string
+=== RUN   TestGenerateCodeChallengeS256/long_string
+=== RUN   TestGenerateCodeChallengeS256/special_characters
+--- PASS: TestGenerateCodeChallengeS256 (0.00s)
+    --- PASS: TestGenerateCodeChallengeS256/basic_test (0.00s)
+    --- PASS: TestGenerateCodeChallengeS256/empty_string (0.00s)
+    --- PASS: TestGenerateCodeChallengeS256/long_string (0.00s)
+    --- PASS: TestGenerateCodeChallengeS256/special_characters (0.00s)
+=== RUN   TestGenerateCodeChallengeS256EdgeCases
+=== RUN   TestGenerateCodeChallengeS256EdgeCases/unicode_characters
+=== RUN   TestGenerateCodeChallengeS256EdgeCases/very_long_input
+--- PASS: TestGenerateCodeChallengeS256EdgeCases (0.58s)
+    --- PASS: TestGenerateCodeChallengeS256EdgeCases/unicode_characters (0.00s)
+    --- PASS: TestGenerateCodeChallengeS256EdgeCases/very_long_input (0.58s)
+=== RUN   TestHandlePublicClient
+=== RUN   TestHandlePublicClient/success
+=== RUN   TestHandlePublicClient/error_-_invalid_code_challenge_method
+=== RUN   TestHandlePublicClient/error_-_invalid_code_verifier
+2026/02/17 17:45:26.341877 helpers.go:58: [Debug] invalid code verifier calculated_verifier=LHKy4-q59ocwlltGr-0vD9UbiHBsIU09drZuupn1ghs code_challenge=wrong-hash
+=== RUN   TestHandlePublicClient/error_-_invalid_client_id
+--- PASS: TestHandlePublicClient (0.00s)
+    --- PASS: TestHandlePublicClient/success (0.00s)
+    --- PASS: TestHandlePublicClient/error_-_invalid_code_challenge_method (0.00s)
+    --- PASS: TestHandlePublicClient/error_-_invalid_code_verifier (0.00s)
+    --- PASS: TestHandlePublicClient/error_-_invalid_client_id (0.00s)
+=== RUN   TestGetLoginUrl
+=== RUN   TestGetLoginUrl/error_-_client_not_found_when_no_auth_provider_specified
+=== RUN   TestGetLoginUrl/error_-_auth_provider_not_found
+=== RUN   TestGetLoginUrl/error_-_auth_provider_not_found_with_default_provider_lookup
+=== RUN   TestGetLoginUrl/error_-_service_provider_creation_fails
+=== RUN   TestGetLoginUrl/error_-_state_caching_fails_due_to_encryption_failure
+=== RUN   TestGetLoginUrl/error_-_state_caching_fails_due_to_cache_set_failure
+=== RUN   TestGetLoginUrl/success_-_with_explicit_auth_provider
+=== RUN   TestGetLoginUrl/success_-_with_default_auth_provider_lookup
+=== RUN   TestGetLoginUrl/success_-_without_code_challenge
+--- PASS: TestGetLoginUrl (0.01s)
+    --- PASS: TestGetLoginUrl/error_-_client_not_found_when_no_auth_provider_specified (0.00s)
+    --- PASS: TestGetLoginUrl/error_-_auth_provider_not_found (0.00s)
+    --- PASS: TestGetLoginUrl/error_-_auth_provider_not_found_with_default_provider_lookup (0.00s)
+    --- PASS: TestGetLoginUrl/error_-_service_provider_creation_fails (0.00s)
+    --- PASS: TestGetLoginUrl/error_-_state_caching_fails_due_to_encryption_failure (0.00s)
+    --- PASS: TestGetLoginUrl/error_-_state_caching_fails_due_to_cache_set_failure (0.00s)
+    --- PASS: TestGetLoginUrl/success_-_with_explicit_auth_provider (0.00s)
+    --- PASS: TestGetLoginUrl/success_-_with_default_auth_provider_lookup (0.00s)
+    --- PASS: TestGetLoginUrl/success_-_without_code_challenge (0.00s)
+=== RUN   TestRedirect
+=== RUN   TestRedirect/error_-_invalid_state
+=== RUN   TestRedirect/error_-_state_decryption_fails
+=== RUN   TestRedirect/error_-_invalid_state_format
+=== RUN   TestRedirect/error_-_invalid_code_challenge_method
+=== RUN   TestRedirect/error_-_auth_provider_getToken_fails
+=== RUN   TestRedirect/error_-_auth_provider_service_provider_creation_fails
+=== RUN   TestRedirect/error_-_token_verification_fails
+=== RUN   TestRedirect/error_-_auth_token_caching_fails
+=== RUN   TestRedirect/error_-_redirect_URL_validation_fails
+=== RUN   TestRedirect/error_-_redirect_URL_not_in_allowed_list
+=== RUN   TestRedirect/error_-_URL_decoding_fails_in_state
+=== RUN   TestRedirect/success_-_state_invalidation_called_on_successful_redirect
+=== RUN   TestRedirect/warning_-_state_invalidation_fails_but_redirect_succeeds
+2026/02/17 17:45:26.355680 service_impl.go:114: [Error] error invalidating state error deleting the value from cache cache deletion failed
+--- PASS: TestRedirect (0.01s)
+    --- PASS: TestRedirect/error_-_invalid_state (0.00s)
+    --- PASS: TestRedirect/error_-_state_decryption_fails (0.00s)
+    --- PASS: TestRedirect/error_-_invalid_state_format (0.00s)
+    --- PASS: TestRedirect/error_-_invalid_code_challenge_method (0.00s)
+    --- PASS: TestRedirect/error_-_auth_provider_getToken_fails (0.00s)
+    --- PASS: TestRedirect/error_-_auth_provider_service_provider_creation_fails (0.00s)
+    --- PASS: TestRedirect/error_-_token_verification_fails (0.00s)
+    --- PASS: TestRedirect/error_-_auth_token_caching_fails (0.00s)
+    --- PASS: TestRedirect/error_-_redirect_URL_validation_fails (0.00s)
+    --- PASS: TestRedirect/error_-_redirect_URL_not_in_allowed_list (0.00s)
+    --- PASS: TestRedirect/error_-_URL_decoding_fails_in_state (0.00s)
+    --- PASS: TestRedirect/success_-_state_invalidation_called_on_successful_redirect (0.00s)
+    --- PASS: TestRedirect/warning_-_state_invalidation_fails_but_redirect_succeeds (0.00s)
+=== RUN   TestClientCallback
+=== RUN   TestClientCallback/error_-_invalid_code
+=== RUN   TestClientCallback/error_-_auth_token_decryption_fails
+=== RUN   TestClientCallback/error_-_auth_token_JSON_unmarshal_fails
+=== RUN   TestClientCallback/error_-_private_client_-_client_not_found
+=== RUN   TestClientCallback/error_-_private_client_-_invalid_client_secret
+=== RUN   TestClientCallback/error_-_public_client_-_invalid_code_challenge_method
+=== RUN   TestClientCallback/error_-_public_client_-_invalid_code_verifier
+2026/02/17 17:45:26.369471 helpers.go:58: [Debug] invalid code verifier calculated_verifier=ea4Z4WsM8b8y_sZzjkihmAlpqdbthRC4oxGKgwUkTTQ code_challenge=wrong-verifier
+=== RUN   TestClientCallback/error_-_public_client_-_client_ID_mismatch
+=== RUN   TestClientCallback/error_-_access_token_caching_fails
+=== RUN   TestClientCallback/error_-_JWT_token_generation_fails
+=== RUN   TestClientCallback/error_-_auth_token_invalidation_fails
+=== RUN   TestClientCallback/success_-_private_client_flow
+=== RUN   TestClientCallback/success_-_public_client_flow
+=== RUN   TestClientCallback/success_-_neither_private_nor_public_client
+--- PASS: TestClientCallback (0.05s)
+    --- PASS: TestClientCallback/error_-_invalid_code (0.00s)
+    --- PASS: TestClientCallback/error_-_auth_token_decryption_fails (0.00s)
+    --- PASS: TestClientCallback/error_-_auth_token_JSON_unmarshal_fails (0.00s)
+    --- PASS: TestClientCallback/error_-_private_client_-_client_not_found (0.00s)
+    --- PASS: TestClientCallback/error_-_private_client_-_invalid_client_secret (0.00s)
+    --- PASS: TestClientCallback/error_-_public_client_-_invalid_code_challenge_method (0.00s)
+    --- PASS: TestClientCallback/error_-_public_client_-_invalid_code_verifier (0.00s)
+    --- PASS: TestClientCallback/error_-_public_client_-_client_ID_mismatch (0.00s)
+    --- PASS: TestClientCallback/error_-_access_token_caching_fails (0.00s)
+    --- PASS: TestClientCallback/error_-_JWT_token_generation_fails (0.03s)
+    --- PASS: TestClientCallback/error_-_auth_token_invalidation_fails (0.00s)
+    --- PASS: TestClientCallback/success_-_private_client_flow (0.00s)
+    --- PASS: TestClientCallback/success_-_public_client_flow (0.00s)
+    --- PASS: TestClientCallback/success_-_neither_private_nor_public_client (0.00s)
+=== RUN   TestGetIdentity
+=== RUN   TestGetIdentity/success_-_full_flow
+=== RUN   TestGetIdentity/success_-_user_cache_hit
+2026/02/17 17:45:26.428343 service_impl.go:202: [Debug] fetched user records from cache - cached-user-123
+=== RUN   TestGetIdentity/error_-_user_cache_hit_but_decryption_fails
+=== RUN   TestGetIdentity/error_-_user_cache_hit_but_JSON_decode_fails
+=== RUN   TestGetIdentity/error_-_invalid_token
+=== RUN   TestGetIdentity/error_-_missing_id_claim
+=== RUN   TestGetIdentity/error_-_access_token_not_found_in_cache
+=== RUN   TestGetIdentity/error_-_access_token_decryption_fails
+=== RUN   TestGetIdentity/error_-_access_token_JSON_unmarshal_fails
+=== RUN   TestGetIdentity/error_-_auth_provider_not_found
+=== RUN   TestGetIdentity/error_-_service_provider_creation_fails
+=== RUN   TestGetIdentity/error_-_service_provider_GetIdentity_fails
+=== RUN   TestGetIdentity/error_-_user_has_no_email_or_phone
+=== RUN   TestGetIdentity/error_-_user_creation_fails
+=== RUN   TestGetIdentity/error_-_user_is_disabled
+=== RUN   TestGetIdentity/error_-_user_is_expired
+=== RUN   TestGetIdentity/error_-_cache_user_details_fails
+--- PASS: TestGetIdentity (0.08s)
+    --- PASS: TestGetIdentity/success_-_full_flow (0.01s)
+    --- PASS: TestGetIdentity/success_-_user_cache_hit (0.00s)
+    --- PASS: TestGetIdentity/error_-_user_cache_hit_but_decryption_fails (0.00s)
+    --- PASS: TestGetIdentity/error_-_user_cache_hit_but_JSON_decode_fails (0.02s)
+    --- PASS: TestGetIdentity/error_-_invalid_token (0.00s)
+    --- PASS: TestGetIdentity/error_-_missing_id_claim (0.00s)
+    --- PASS: TestGetIdentity/error_-_access_token_not_found_in_cache (0.00s)
+    --- PASS: TestGetIdentity/error_-_access_token_decryption_fails (0.00s)
+    --- PASS: TestGetIdentity/error_-_access_token_JSON_unmarshal_fails (0.00s)
+    --- PASS: TestGetIdentity/error_-_auth_provider_not_found (0.00s)
+    --- PASS: TestGetIdentity/error_-_service_provider_creation_fails (0.00s)
+    --- PASS: TestGetIdentity/error_-_service_provider_GetIdentity_fails (0.00s)
+    --- PASS: TestGetIdentity/error_-_user_has_no_email_or_phone (0.00s)
+    --- PASS: TestGetIdentity/error_-_user_creation_fails (0.00s)
+    --- PASS: TestGetIdentity/error_-_user_is_disabled (0.00s)
+    --- PASS: TestGetIdentity/error_-_user_is_expired (0.00s)
+    --- PASS: TestGetIdentity/error_-_cache_user_details_fails (0.00s)
+=== RUN   TestHandleEvent
+=== RUN   TestHandleEvent/client_created_event
+=== RUN   TestHandleEvent/client_updated_event
+=== RUN   TestHandleEvent/unknown_event_-_should_be_ignored
+--- PASS: TestHandleEvent (0.00s)
+    --- PASS: TestHandleEvent/client_created_event (0.00s)
+    --- PASS: TestHandleEvent/client_updated_event (0.00s)
+    --- PASS: TestHandleEvent/unknown_event_-_should_be_ignored (0.00s)
+=== RUN   TestGetServiceAccountUser
+=== RUN   TestGetServiceAccountUser/successful_service_account_user_retrieval
+=== RUN   TestGetServiceAccountUser/error_when_user_service_fails
+=== RUN   TestGetServiceAccountUser/nil_token
+=== RUN   TestGetServiceAccountUser/empty_service_account_user_id
+--- PASS: TestGetServiceAccountUser (0.00s)
+    --- PASS: TestGetServiceAccountUser/successful_service_account_user_retrieval (0.00s)
+    --- PASS: TestGetServiceAccountUser/error_when_user_service_fails (0.00s)
+    --- PASS: TestGetServiceAccountUser/nil_token (0.00s)
+    --- PASS: TestGetServiceAccountUser/empty_service_account_user_id (0.00s)
+=== RUN   TestRefreshAuthToken
+=== RUN   TestRefreshAuthToken/successful_token_refresh
+=== RUN   TestRefreshAuthToken/error_when_service_provider_refresh_fails
+=== RUN   TestRefreshAuthToken/error_when_caching_fails
+=== RUN   TestRefreshAuthToken/empty_refresh_token
+--- PASS: TestRefreshAuthToken (0.00s)
+    --- PASS: TestRefreshAuthToken/successful_token_refresh (0.00s)
+    --- PASS: TestRefreshAuthToken/error_when_service_provider_refresh_fails (0.00s)
+    --- PASS: TestRefreshAuthToken/error_when_caching_fails (0.00s)
+    --- PASS: TestRefreshAuthToken/empty_refresh_token (0.00s)
+=== RUN   TestClientCredentials
+=== RUN   TestClientCredentials/successful_client_credentials_flow
+=== RUN   TestClientCredentials/invalid_client_id
+=== RUN   TestClientCredentials/disabled_client
+=== RUN   TestClientCredentials/authentication_failed
+=== RUN   TestClientCredentials/client_does_not_support_service_account_flow
+=== RUN   TestClientCredentials/client_does_not_have_linked_user
+=== RUN   TestClientCredentials/error_fetching_linked_user
+=== RUN   TestClientCredentials/empty_client_id
+=== RUN   TestClientCredentials/empty_client_secret
+--- PASS: TestClientCredentials (0.00s)
+    --- PASS: TestClientCredentials/successful_client_credentials_flow (0.00s)
+    --- PASS: TestClientCredentials/invalid_client_id (0.00s)
+    --- PASS: TestClientCredentials/disabled_client (0.00s)
+    --- PASS: TestClientCredentials/authentication_failed (0.00s)
+    --- PASS: TestClientCredentials/client_does_not_support_service_account_flow (0.00s)
+    --- PASS: TestClientCredentials/client_does_not_have_linked_user (0.00s)
+    --- PASS: TestClientCredentials/error_fetching_linked_user (0.00s)
+    --- PASS: TestClientCredentials/empty_client_id (0.00s)
+    --- PASS: TestClientCredentials/empty_client_secret (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/services/auth	2.407s
+?   	github.com/codearena-platform/codearena-platform/internal/iam/services/auth/syncuser	[no test files]
+=== RUN   TestFromModelToSdk
+--- PASS: TestFromModelToSdk (0.00s)
+=== RUN   TestFromModelListToSdk
+--- PASS: TestFromModelListToSdk (0.00s)
+=== RUN   TestFromProviderParamsModelToSdk
+=== RUN   TestFromProviderParamsModelToSdk/empty_params
+=== RUN   TestFromProviderParamsModelToSdk/single_param
+=== RUN   TestFromProviderParamsModelToSdk/multiple_params
+--- PASS: TestFromProviderParamsModelToSdk (0.00s)
+    --- PASS: TestFromProviderParamsModelToSdk/empty_params (0.00s)
+    --- PASS: TestFromProviderParamsModelToSdk/single_param (0.00s)
+    --- PASS: TestFromProviderParamsModelToSdk/multiple_params (0.00s)
+=== RUN   TestFromSdkToModel
+--- PASS: TestFromSdkToModel (0.00s)
+=== RUN   TestFromProviderParamsSdkToModel
+=== RUN   TestFromProviderParamsSdkToModel/empty_params
+=== RUN   TestFromProviderParamsSdkToModel/single_param
+=== RUN   TestFromProviderParamsSdkToModel/multiple_params_with_secrets
+--- PASS: TestFromProviderParamsSdkToModel (0.00s)
+    --- PASS: TestFromProviderParamsSdkToModel/empty_params (0.00s)
+    --- PASS: TestFromProviderParamsSdkToModel/single_param (0.00s)
+    --- PASS: TestFromProviderParamsSdkToModel/multiple_params_with_secrets (0.00s)
+=== RUN   TestNewService
+=== RUN   TestNewService/success_create_new_service
+=== RUN   TestNewService/success_with_nil_dependencies
+--- PASS: TestNewService (0.00s)
+    --- PASS: TestNewService/success_create_new_service (0.00s)
+    --- PASS: TestNewService/success_with_nil_dependencies (0.00s)
+=== RUN   TestService_GetAll
+=== RUN   TestService_GetAll/success_with_projects_in_context
+=== RUN   TestService_GetAll/success_with_empty_projects
+=== RUN   TestService_GetAll/success_with_no_context_projects
+=== RUN   TestService_GetAll/error_from_store
+=== RUN   TestService_GetAll/success_preserves_existing_params
+--- PASS: TestService_GetAll (0.00s)
+    --- PASS: TestService_GetAll/success_with_projects_in_context (0.00s)
+    --- PASS: TestService_GetAll/success_with_empty_projects (0.00s)
+    --- PASS: TestService_GetAll/success_with_no_context_projects (0.00s)
+    --- PASS: TestService_GetAll/error_from_store (0.00s)
+    --- PASS: TestService_GetAll/success_preserves_existing_params (0.00s)
+=== RUN   TestService_Get
+=== RUN   TestService_Get/success_dont_check_projects
+=== RUN   TestService_Get/success_check_projects_allowed
+=== RUN   TestService_Get/error_check_projects_not_allowed
+=== RUN   TestService_Get/error_from_store
+=== RUN   TestService_Get/error_with_empty_projects_context
+=== RUN   TestService_Get/error_with_nil_projects_context
+--- PASS: TestService_Get (0.01s)
+    --- PASS: TestService_Get/success_dont_check_projects (0.00s)
+    --- PASS: TestService_Get/success_check_projects_allowed (0.01s)
+    --- PASS: TestService_Get/error_check_projects_not_allowed (0.00s)
+    --- PASS: TestService_Get/error_from_store (0.00s)
+    --- PASS: TestService_Get/error_with_empty_projects_context (0.00s)
+    --- PASS: TestService_Get/error_with_nil_projects_context (0.00s)
+=== RUN   TestService_Create
+=== RUN   TestService_Create/success_valid_project
+=== RUN   TestService_Create/error_invalid_project
+=== RUN   TestService_Create/error_empty_projects_context
+=== RUN   TestService_Create/error_nil_projects_context
+=== RUN   TestService_Create/error_from_store
+--- PASS: TestService_Create (0.00s)
+    --- PASS: TestService_Create/success_valid_project (0.00s)
+    --- PASS: TestService_Create/error_invalid_project (0.00s)
+    --- PASS: TestService_Create/error_empty_projects_context (0.00s)
+    --- PASS: TestService_Create/error_nil_projects_context (0.00s)
+    --- PASS: TestService_Create/error_from_store (0.00s)
+=== RUN   TestService_Update
+=== RUN   TestService_Update/success_valid_project
+=== RUN   TestService_Update/error_invalid_project
+=== RUN   TestService_Update/error_empty_projects_context
+=== RUN   TestService_Update/error_nil_projects_context
+=== RUN   TestService_Update/error_from_store
+--- PASS: TestService_Update (0.00s)
+    --- PASS: TestService_Update/success_valid_project (0.00s)
+    --- PASS: TestService_Update/error_invalid_project (0.00s)
+    --- PASS: TestService_Update/error_empty_projects_context (0.00s)
+    --- PASS: TestService_Update/error_nil_projects_context (0.00s)
+    --- PASS: TestService_Update/error_from_store (0.00s)
+=== RUN   TestService_GetProvider
+=== RUN   TestService_GetProvider/success_google_provider
+=== RUN   TestService_GetProvider/success_microsoft_provider
+=== RUN   TestService_GetProvider/success_github_provider
+=== RUN   TestService_GetProvider/error_unknown_provider
+=== RUN   TestService_GetProvider/success_google_provider_empty_params
+--- PASS: TestService_GetProvider (0.00s)
+    --- PASS: TestService_GetProvider/success_google_provider (0.00s)
+    --- PASS: TestService_GetProvider/success_microsoft_provider (0.00s)
+    --- PASS: TestService_GetProvider/success_github_provider (0.00s)
+    --- PASS: TestService_GetProvider/error_unknown_provider (0.00s)
+    --- PASS: TestService_GetProvider/success_google_provider_empty_params (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/services/authprovider	8.249s
+=== RUN   TestNewAuthProvider
+--- PASS: TestNewAuthProvider (0.00s)
+=== RUN   TestGetAuthCodeUrl
+=== RUN   TestGetAuthCodeUrl/basic_state
+=== RUN   TestGetAuthCodeUrl/empty_state
+=== RUN   TestGetAuthCodeUrl/complex_state
+--- PASS: TestGetAuthCodeUrl (0.02s)
+    --- PASS: TestGetAuthCodeUrl/basic_state (0.00s)
+    --- PASS: TestGetAuthCodeUrl/empty_state (0.02s)
+    --- PASS: TestGetAuthCodeUrl/complex_state (0.00s)
+=== RUN   TestVerifyCode
+=== RUN   TestVerifyCode/invalid_code_-_network_error_expected
+=== RUN   TestVerifyCode/empty_code
+=== RUN   TestVerifyCode/context_cancellation
+--- PASS: TestVerifyCode (3.26s)
+    --- PASS: TestVerifyCode/invalid_code_-_network_error_expected (2.19s)
+    --- PASS: TestVerifyCode/empty_code (1.06s)
+    --- PASS: TestVerifyCode/context_cancellation (0.00s)
+=== RUN   TestGetIdentity
+=== RUN   TestGetIdentity/valid_access_token
+=== RUN   TestGetIdentity/no_email_token_-_should_fetch_from_emails_endpoint
+=== RUN   TestGetIdentity/empty_fields_token
+=== RUN   TestGetIdentity/invalid_access_token
+=== RUN   TestGetIdentity/empty_token
+--- PASS: TestGetIdentity (0.12s)
+    --- PASS: TestGetIdentity/valid_access_token (0.06s)
+    --- PASS: TestGetIdentity/no_email_token_-_should_fetch_from_emails_endpoint (0.05s)
+    --- PASS: TestGetIdentity/empty_fields_token (0.00s)
+    --- PASS: TestGetIdentity/invalid_access_token (0.00s)
+    --- PASS: TestGetIdentity/empty_token (0.00s)
+=== RUN   TestGetIdentity_NetworkError
+{
+  "message": "Bad credentials",
+  "documentation_url": "https://docs.github.com/rest",
+  "status": "401"
+}
+--- PASS: TestGetIdentity_NetworkError (0.27s)
+=== RUN   TestGetIdentity_APIError
+--- PASS: TestGetIdentity_APIError (0.01s)
+=== RUN   TestGetIdentity_InvalidJSON
+--- PASS: TestGetIdentity_InvalidJSON (0.00s)
+=== RUN   TestGitHubIdentityEmail_UpdateUserDetails
+--- PASS: TestGitHubIdentityEmail_UpdateUserDetails (0.00s)
+=== RUN   TestGitHubIdentityName_UpdateUserDetails
+--- PASS: TestGitHubIdentityName_UpdateUserDetails (0.00s)
+=== RUN   TestGitHubIdentityProfilePic_UpdateUserDetails
+--- PASS: TestGitHubIdentityProfilePic_UpdateUserDetails (0.00s)
+=== RUN   TestGitHubIdentityUsername_UpdateUserDetails
+=== RUN   TestGitHubIdentityUsername_UpdateUserDetails/update_name_when_empty
+=== RUN   TestGitHubIdentityUsername_UpdateUserDetails/don't_override_existing_name
+--- PASS: TestGitHubIdentityUsername_UpdateUserDetails (0.00s)
+    --- PASS: TestGitHubIdentityUsername_UpdateUserDetails/update_name_when_empty (0.00s)
+    --- PASS: TestGitHubIdentityUsername_UpdateUserDetails/don't_override_existing_name (0.00s)
+=== RUN   TestHasRefreshTokenFlow
+--- PASS: TestHasRefreshTokenFlow (0.00s)
+=== RUN   TestRefreshToken
+--- PASS: TestRefreshToken (0.00s)
+=== RUN   TestAuthProvider_EdgeCases
+=== RUN   TestAuthProvider_EdgeCases/provider_with_missing_parameters
+=== RUN   TestAuthProvider_EdgeCases/provider_with_partial_parameters
+--- PASS: TestAuthProvider_EdgeCases (0.00s)
+    --- PASS: TestAuthProvider_EdgeCases/provider_with_missing_parameters (0.00s)
+    --- PASS: TestAuthProvider_EdgeCases/provider_with_partial_parameters (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/services/authprovider/github	9.877s
+=== RUN   TestNewAuthProvider
+=== RUN   TestNewAuthProvider/success_create_auth_provider
+=== RUN   TestNewAuthProvider/success_oauth_config_setup
+=== RUN   TestNewAuthProvider/success_missing_params_handled
+--- PASS: TestNewAuthProvider (0.00s)
+    --- PASS: TestNewAuthProvider/success_create_auth_provider (0.00s)
+    --- PASS: TestNewAuthProvider/success_oauth_config_setup (0.00s)
+    --- PASS: TestNewAuthProvider/success_missing_params_handled (0.00s)
+=== RUN   TestAuthProvider_GetAuthCodeUrl
+=== RUN   TestAuthProvider_GetAuthCodeUrl/success_generate_auth_url
+=== RUN   TestAuthProvider_GetAuthCodeUrl/success_different_states
+=== RUN   TestAuthProvider_GetAuthCodeUrl/success_empty_state
+--- PASS: TestAuthProvider_GetAuthCodeUrl (0.00s)
+    --- PASS: TestAuthProvider_GetAuthCodeUrl/success_generate_auth_url (0.00s)
+    --- PASS: TestAuthProvider_GetAuthCodeUrl/success_different_states (0.00s)
+    --- PASS: TestAuthProvider_GetAuthCodeUrl/success_empty_state (0.00s)
+=== RUN   TestAuthProvider_VerifyCode
+=== RUN   TestAuthProvider_VerifyCode/success_verify_code
+=== RUN   TestAuthProvider_VerifyCode/error_invalid_code
+--- PASS: TestAuthProvider_VerifyCode (0.07s)
+    --- PASS: TestAuthProvider_VerifyCode/success_verify_code (0.07s)
+    --- PASS: TestAuthProvider_VerifyCode/error_invalid_code (0.01s)
+=== RUN   TestAuthProvider_RefreshToken
+=== RUN   TestAuthProvider_RefreshToken/test_refresh_token_call
+--- PASS: TestAuthProvider_RefreshToken (0.89s)
+    --- PASS: TestAuthProvider_RefreshToken/test_refresh_token_call (0.89s)
+=== RUN   TestAuthProvider_RefreshToken_EdgeCases
+=== RUN   TestAuthProvider_RefreshToken_EdgeCases/empty_refresh_token
+=== RUN   TestAuthProvider_RefreshToken_EdgeCases/nil_refresh_token
+=== RUN   TestAuthProvider_RefreshToken_EdgeCases/invalid_characters_refresh_token
+=== RUN   TestAuthProvider_RefreshToken_EdgeCases/whitespace_only_refresh_token
+=== RUN   TestAuthProvider_RefreshToken_EdgeCases/malformed_refresh_token
+=== RUN   TestAuthProvider_RefreshToken_EdgeCases/expired_refresh_token
+=== RUN   TestAuthProvider_RefreshToken_EdgeCases/revoked_refresh_token
+=== RUN   TestAuthProvider_RefreshToken_EdgeCases/missing_client_credentials
+=== RUN   TestAuthProvider_RefreshToken_EdgeCases/network_timeout_simulation
+=== RUN   TestAuthProvider_RefreshToken_EdgeCases/json_marshal_edge_case
+--- PASS: TestAuthProvider_RefreshToken_EdgeCases (1.27s)
+    --- PASS: TestAuthProvider_RefreshToken_EdgeCases/empty_refresh_token (0.08s)
+    --- PASS: TestAuthProvider_RefreshToken_EdgeCases/nil_refresh_token (0.08s)
+    --- PASS: TestAuthProvider_RefreshToken_EdgeCases/invalid_characters_refresh_token (0.09s)
+    --- PASS: TestAuthProvider_RefreshToken_EdgeCases/whitespace_only_refresh_token (0.09s)
+    --- PASS: TestAuthProvider_RefreshToken_EdgeCases/malformed_refresh_token (0.44s)
+    --- PASS: TestAuthProvider_RefreshToken_EdgeCases/expired_refresh_token (0.12s)
+    --- PASS: TestAuthProvider_RefreshToken_EdgeCases/revoked_refresh_token (0.10s)
+    --- PASS: TestAuthProvider_RefreshToken_EdgeCases/missing_client_credentials (0.06s)
+    --- PASS: TestAuthProvider_RefreshToken_EdgeCases/network_timeout_simulation (0.09s)
+    --- PASS: TestAuthProvider_RefreshToken_EdgeCases/json_marshal_edge_case (0.10s)
+=== RUN   TestAuthProvider_RefreshToken_HTTPMocking
+=== RUN   TestAuthProvider_RefreshToken_HTTPMocking/successful_token_refresh
+=== RUN   TestAuthProvider_RefreshToken_HTTPMocking/invalid_json_response
+=== RUN   TestAuthProvider_RefreshToken_HTTPMocking/http_error_response
+=== RUN   TestAuthProvider_RefreshToken_HTTPMocking/empty_response_body
+--- PASS: TestAuthProvider_RefreshToken_HTTPMocking (0.58s)
+    --- PASS: TestAuthProvider_RefreshToken_HTTPMocking/successful_token_refresh (0.10s)
+    --- PASS: TestAuthProvider_RefreshToken_HTTPMocking/invalid_json_response (0.28s)
+    --- PASS: TestAuthProvider_RefreshToken_HTTPMocking/http_error_response (0.09s)
+    --- PASS: TestAuthProvider_RefreshToken_HTTPMocking/empty_response_body (0.09s)
+=== RUN   TestAuthProvider_VerifyCode_WithMocks
+=== RUN   TestAuthProvider_VerifyCode_WithMocks/verify_code_basic_functionality
+2026/02/17 17:45:50 http: superfluous response.WriteHeader call from github.com/codearena-platform/codearena-platform/internal/iam/services/authprovider/google.NewMockGoogleEndpoints.func1 (google_test.go:84)
+2026/02/17 17:45:50 http: superfluous response.WriteHeader call from github.com/codearena-platform/codearena-platform/internal/iam/services/authprovider/google.NewMockGoogleEndpoints.func1 (google_test.go:84)
+=== RUN   TestAuthProvider_VerifyCode_WithMocks/verify_code_with_empty_code
+2026/02/17 17:45:50 http: superfluous response.WriteHeader call from github.com/codearena-platform/codearena-platform/internal/iam/services/authprovider/google.NewMockGoogleEndpoints.func1 (google_test.go:84)
+2026/02/17 17:45:50 http: superfluous response.WriteHeader call from github.com/codearena-platform/codearena-platform/internal/iam/services/authprovider/google.NewMockGoogleEndpoints.func1 (google_test.go:84)
+=== RUN   TestAuthProvider_VerifyCode_WithMocks/verify_code_with_context_timeout
+2026/02/17 17:45:50 http: superfluous response.WriteHeader call from github.com/codearena-platform/codearena-platform/internal/iam/services/authprovider/google.NewMockGoogleEndpoints.func1 (google_test.go:84)
+2026/02/17 17:45:50 http: superfluous response.WriteHeader call from github.com/codearena-platform/codearena-platform/internal/iam/services/authprovider/google.NewMockGoogleEndpoints.func1 (google_test.go:84)
+--- PASS: TestAuthProvider_VerifyCode_WithMocks (0.18s)
+    --- PASS: TestAuthProvider_VerifyCode_WithMocks/verify_code_basic_functionality (0.17s)
+    --- PASS: TestAuthProvider_VerifyCode_WithMocks/verify_code_with_empty_code (0.00s)
+    --- PASS: TestAuthProvider_VerifyCode_WithMocks/verify_code_with_context_timeout (0.00s)
+=== RUN   TestAuthProvider_GetAuthCodeUrl_WithMocks
+=== RUN   TestAuthProvider_GetAuthCodeUrl_WithMocks/auth_code_url_generation
+=== RUN   TestAuthProvider_GetAuthCodeUrl_WithMocks/auth_code_url_with_empty_state
+=== RUN   TestAuthProvider_GetAuthCodeUrl_WithMocks/auth_code_url_with_special_characters
+--- PASS: TestAuthProvider_GetAuthCodeUrl_WithMocks (0.00s)
+    --- PASS: TestAuthProvider_GetAuthCodeUrl_WithMocks/auth_code_url_generation (0.00s)
+    --- PASS: TestAuthProvider_GetAuthCodeUrl_WithMocks/auth_code_url_with_empty_state (0.00s)
+    --- PASS: TestAuthProvider_GetAuthCodeUrl_WithMocks/auth_code_url_with_special_characters (0.00s)
+=== RUN   TestAuthProvider_RefreshToken_WithMocks
+=== RUN   TestAuthProvider_RefreshToken_WithMocks/successful_refresh_with_mock
+=== RUN   TestAuthProvider_RefreshToken_WithMocks/expired_token_error
+=== RUN   TestAuthProvider_RefreshToken_WithMocks/invalid_token_error
+=== RUN   TestAuthProvider_RefreshToken_WithMocks/empty_refresh_token
+=== RUN   TestAuthProvider_RefreshToken_WithMocks/missing_client_credentials
+=== RUN   TestAuthProvider_RefreshToken_WithMocks/malformed_json_response
+=== RUN   TestAuthProvider_RefreshToken_WithMocks/html_error_response
+--- PASS: TestAuthProvider_RefreshToken_WithMocks (0.02s)
+    --- PASS: TestAuthProvider_RefreshToken_WithMocks/successful_refresh_with_mock (0.01s)
+    --- PASS: TestAuthProvider_RefreshToken_WithMocks/expired_token_error (0.00s)
+    --- PASS: TestAuthProvider_RefreshToken_WithMocks/invalid_token_error (0.00s)
+    --- PASS: TestAuthProvider_RefreshToken_WithMocks/empty_refresh_token (0.00s)
+    --- PASS: TestAuthProvider_RefreshToken_WithMocks/missing_client_credentials (0.00s)
+    --- PASS: TestAuthProvider_RefreshToken_WithMocks/malformed_json_response (0.00s)
+    --- PASS: TestAuthProvider_RefreshToken_WithMocks/html_error_response (0.00s)
+=== RUN   TestAuthProvider_GetIdentity
+=== RUN   TestAuthProvider_GetIdentity/test_get_identity_call
+--- PASS: TestAuthProvider_GetIdentity (0.21s)
+    --- PASS: TestAuthProvider_GetIdentity/test_get_identity_call (0.21s)
+=== RUN   TestAuthProvider_GetIdentity_EdgeCases
+=== RUN   TestAuthProvider_GetIdentity_EdgeCases/empty_token
+=== RUN   TestAuthProvider_GetIdentity_EdgeCases/whitespace_only_token
+=== RUN   TestAuthProvider_GetIdentity_EdgeCases/very_long_token
+=== RUN   TestAuthProvider_GetIdentity_EdgeCases/invalid_characters_token
+=== RUN   TestAuthProvider_GetIdentity_EdgeCases/special_characters_token
+=== RUN   TestAuthProvider_GetIdentity_EdgeCases/unicode_characters_token
+=== RUN   TestAuthProvider_GetIdentity_EdgeCases/malformed_token_formats
+=== RUN   TestAuthProvider_GetIdentity_EdgeCases/expired_access_token
+=== RUN   TestAuthProvider_GetIdentity_EdgeCases/revoked_access_token
+=== RUN   TestAuthProvider_GetIdentity_EdgeCases/network_timeout_simulation
+--- PASS: TestAuthProvider_GetIdentity_EdgeCases (1.31s)
+    --- PASS: TestAuthProvider_GetIdentity_EdgeCases/empty_token (0.07s)
+    --- PASS: TestAuthProvider_GetIdentity_EdgeCases/whitespace_only_token (0.08s)
+    --- PASS: TestAuthProvider_GetIdentity_EdgeCases/very_long_token (0.08s)
+    --- PASS: TestAuthProvider_GetIdentity_EdgeCases/invalid_characters_token (0.08s)
+    --- PASS: TestAuthProvider_GetIdentity_EdgeCases/special_characters_token (0.08s)
+    --- PASS: TestAuthProvider_GetIdentity_EdgeCases/unicode_characters_token (0.08s)
+    --- PASS: TestAuthProvider_GetIdentity_EdgeCases/malformed_token_formats (0.61s)
+    --- PASS: TestAuthProvider_GetIdentity_EdgeCases/expired_access_token (0.07s)
+    --- PASS: TestAuthProvider_GetIdentity_EdgeCases/revoked_access_token (0.08s)
+    --- PASS: TestAuthProvider_GetIdentity_EdgeCases/network_timeout_simulation (0.07s)
+=== RUN   TestAuthProvider_GetIdentity_HTTPResponseCases
+=== RUN   TestAuthProvider_GetIdentity_HTTPResponseCases/url_encoding_verification
+=== RUN   TestAuthProvider_GetIdentity_HTTPResponseCases/http_error_status_codes
+=== RUN   TestAuthProvider_GetIdentity_HTTPResponseCases/malformed_json_response
+=== RUN   TestAuthProvider_GetIdentity_HTTPResponseCases/empty_json_response
+=== RUN   TestAuthProvider_GetIdentity_HTTPResponseCases/partial_user_info_response
+=== RUN   TestAuthProvider_GetIdentity_HTTPResponseCases/non_json_response
+=== RUN   TestAuthProvider_GetIdentity_HTTPResponseCases/connection_refused
+--- PASS: TestAuthProvider_GetIdentity_HTTPResponseCases (0.86s)
+    --- PASS: TestAuthProvider_GetIdentity_HTTPResponseCases/url_encoding_verification (0.07s)
+    --- PASS: TestAuthProvider_GetIdentity_HTTPResponseCases/http_error_status_codes (0.39s)
+    --- PASS: TestAuthProvider_GetIdentity_HTTPResponseCases/malformed_json_response (0.08s)
+    --- PASS: TestAuthProvider_GetIdentity_HTTPResponseCases/empty_json_response (0.08s)
+    --- PASS: TestAuthProvider_GetIdentity_HTTPResponseCases/partial_user_info_response (0.07s)
+    --- PASS: TestAuthProvider_GetIdentity_HTTPResponseCases/non_json_response (0.09s)
+    --- PASS: TestAuthProvider_GetIdentity_HTTPResponseCases/connection_refused (0.07s)
+=== RUN   TestAuthProvider_GetIdentity_IdentityStructureValidation
+=== RUN   TestAuthProvider_GetIdentity_IdentityStructureValidation/identity_metadata_types
+=== RUN   TestAuthProvider_GetIdentity_IdentityStructureValidation/identity_types_consistency
+=== RUN   TestAuthProvider_GetIdentity_IdentityStructureValidation/empty_userinfo_fields_handling
+--- PASS: TestAuthProvider_GetIdentity_IdentityStructureValidation (0.37s)
+    --- PASS: TestAuthProvider_GetIdentity_IdentityStructureValidation/identity_metadata_types (0.07s)
+    --- PASS: TestAuthProvider_GetIdentity_IdentityStructureValidation/identity_types_consistency (0.22s)
+    --- PASS: TestAuthProvider_GetIdentity_IdentityStructureValidation/empty_userinfo_fields_handling (0.08s)
+=== RUN   TestAuthProvider_GetIdentity_WithMocks
+=== RUN   TestAuthProvider_GetIdentity_WithMocks/successful_identity_fetch
+=== RUN   TestAuthProvider_GetIdentity_WithMocks/empty_access_token
+=== RUN   TestAuthProvider_GetIdentity_WithMocks/expired_access_token
+=== RUN   TestAuthProvider_GetIdentity_WithMocks/unauthorized_token
+=== RUN   TestAuthProvider_GetIdentity_WithMocks/forbidden_token
+=== RUN   TestAuthProvider_GetIdentity_WithMocks/not_found_error
+=== RUN   TestAuthProvider_GetIdentity_WithMocks/rate_limit_error
+=== RUN   TestAuthProvider_GetIdentity_WithMocks/server_error
+=== RUN   TestAuthProvider_GetIdentity_WithMocks/malformed_json_response
+=== RUN   TestAuthProvider_GetIdentity_WithMocks/html_error_response
+=== RUN   TestAuthProvider_GetIdentity_WithMocks/empty_user_info
+=== RUN   TestAuthProvider_GetIdentity_WithMocks/partial_user_info
+=== RUN   TestAuthProvider_GetIdentity_WithMocks/url_encoding_special_characters
+--- PASS: TestAuthProvider_GetIdentity_WithMocks (0.04s)
+    --- PASS: TestAuthProvider_GetIdentity_WithMocks/successful_identity_fetch (0.02s)
+    --- PASS: TestAuthProvider_GetIdentity_WithMocks/empty_access_token (0.00s)
+    --- PASS: TestAuthProvider_GetIdentity_WithMocks/expired_access_token (0.00s)
+    --- PASS: TestAuthProvider_GetIdentity_WithMocks/unauthorized_token (0.00s)
+    --- PASS: TestAuthProvider_GetIdentity_WithMocks/forbidden_token (0.00s)
+    --- PASS: TestAuthProvider_GetIdentity_WithMocks/not_found_error (0.00s)
+    --- PASS: TestAuthProvider_GetIdentity_WithMocks/rate_limit_error (0.00s)
+    --- PASS: TestAuthProvider_GetIdentity_WithMocks/server_error (0.00s)
+    --- PASS: TestAuthProvider_GetIdentity_WithMocks/malformed_json_response (0.00s)
+    --- PASS: TestAuthProvider_GetIdentity_WithMocks/html_error_response (0.00s)
+    --- PASS: TestAuthProvider_GetIdentity_WithMocks/empty_user_info (0.00s)
+    --- PASS: TestAuthProvider_GetIdentity_WithMocks/partial_user_info (0.00s)
+    --- PASS: TestAuthProvider_GetIdentity_WithMocks/url_encoding_special_characters (0.00s)
+=== RUN   TestGoogleIdentityTypes
+=== RUN   TestGoogleIdentityTypes/test_google_identity_email_update_user
+=== RUN   TestGoogleIdentityTypes/test_google_identity_name_update_user
+=== RUN   TestGoogleIdentityTypes/test_google_identity_profile_pic_update_user
+=== RUN   TestGoogleIdentityTypes/test_combined_identity_updates
+--- PASS: TestGoogleIdentityTypes (0.00s)
+    --- PASS: TestGoogleIdentityTypes/test_google_identity_email_update_user (0.00s)
+    --- PASS: TestGoogleIdentityTypes/test_google_identity_name_update_user (0.00s)
+    --- PASS: TestGoogleIdentityTypes/test_google_identity_profile_pic_update_user (0.00s)
+    --- PASS: TestGoogleIdentityTypes/test_combined_identity_updates (0.00s)
+=== RUN   TestTokenResponse
+=== RUN   TestTokenResponse/test_token_response_structure
+=== RUN   TestTokenResponse/test_token_response_json_marshaling
+--- PASS: TestTokenResponse (0.00s)
+    --- PASS: TestTokenResponse/test_token_response_structure (0.00s)
+    --- PASS: TestTokenResponse/test_token_response_json_marshaling (0.00s)
+=== RUN   TestOAuth2ConfigSetup
+=== RUN   TestOAuth2ConfigSetup/test_oauth2_scopes_configuration
+=== RUN   TestOAuth2ConfigSetup/test_oauth2_endpoint_configuration
+--- PASS: TestOAuth2ConfigSetup (0.00s)
+    --- PASS: TestOAuth2ConfigSetup/test_oauth2_scopes_configuration (0.00s)
+    --- PASS: TestOAuth2ConfigSetup/test_oauth2_endpoint_configuration (0.00s)
+=== RUN   TestParameterRetrieval
+=== RUN   TestParameterRetrieval/test_get_param_existing
+=== RUN   TestParameterRetrieval/test_get_param_nonexistent
+--- PASS: TestParameterRetrieval (0.00s)
+    --- PASS: TestParameterRetrieval/test_get_param_existing (0.00s)
+    --- PASS: TestParameterRetrieval/test_get_param_nonexistent (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/services/authprovider/google	14.912s
+=== RUN   TestNewAuthProvider
+--- PASS: TestNewAuthProvider (0.00s)
+=== RUN   TestGetAuthCodeUrl
+=== RUN   TestGetAuthCodeUrl/basic_state
+=== RUN   TestGetAuthCodeUrl/empty_state
+=== RUN   TestGetAuthCodeUrl/complex_state
+--- PASS: TestGetAuthCodeUrl (0.00s)
+    --- PASS: TestGetAuthCodeUrl/basic_state (0.00s)
+    --- PASS: TestGetAuthCodeUrl/empty_state (0.00s)
+    --- PASS: TestGetAuthCodeUrl/complex_state (0.00s)
+=== RUN   TestVerifyCode
+=== RUN   TestVerifyCode/invalid_code_-_network_error_expected
+=== RUN   TestVerifyCode/empty_code
+=== RUN   TestVerifyCode/context_cancellation
+--- PASS: TestVerifyCode (1.69s)
+    --- PASS: TestVerifyCode/invalid_code_-_network_error_expected (1.33s)
+    --- PASS: TestVerifyCode/empty_code (0.35s)
+    --- PASS: TestVerifyCode/context_cancellation (0.00s)
+=== RUN   TestRefreshToken
+=== RUN   TestRefreshToken/valid_refresh_token
+=== RUN   TestRefreshToken/empty_refresh_token
+=== RUN   TestRefreshToken/expired_refresh_token
+=== RUN   TestRefreshToken/invalid_refresh_token
+--- PASS: TestRefreshToken (0.07s)
+    --- PASS: TestRefreshToken/valid_refresh_token (0.05s)
+    --- PASS: TestRefreshToken/empty_refresh_token (0.01s)
+    --- PASS: TestRefreshToken/expired_refresh_token (0.00s)
+    --- PASS: TestRefreshToken/invalid_refresh_token (0.00s)
+=== RUN   TestRefreshToken_NetworkError
+--- PASS: TestRefreshToken_NetworkError (0.03s)
+=== RUN   TestGetIdentity
+=== RUN   TestGetIdentity/valid_access_token
+=== RUN   TestGetIdentity/empty_fields_token
+=== RUN   TestGetIdentity/invalid_access_token
+=== RUN   TestGetIdentity/empty_token
+--- PASS: TestGetIdentity (0.03s)
+    --- PASS: TestGetIdentity/valid_access_token (0.01s)
+    --- PASS: TestGetIdentity/empty_fields_token (0.00s)
+    --- PASS: TestGetIdentity/invalid_access_token (0.01s)
+    --- PASS: TestGetIdentity/empty_token (0.00s)
+=== RUN   TestGetIdentity_NetworkError
+--- PASS: TestGetIdentity_NetworkError (0.29s)
+=== RUN   TestMicrosoftIdentityEmail_UpdateUserDetails
+--- PASS: TestMicrosoftIdentityEmail_UpdateUserDetails (0.00s)
+=== RUN   TestMicrosoftIdentityName_UpdateUserDetails
+--- PASS: TestMicrosoftIdentityName_UpdateUserDetails (0.00s)
+=== RUN   TestMicrosoftIdentityProfilePic_UpdateUserDetails
+--- PASS: TestMicrosoftIdentityProfilePic_UpdateUserDetails (0.00s)
+=== RUN   TestAuthProvider_EdgeCases
+=== RUN   TestAuthProvider_EdgeCases/provider_with_missing_parameters
+=== RUN   TestAuthProvider_EdgeCases/provider_with_partial_parameters
+--- PASS: TestAuthProvider_EdgeCases (0.00s)
+    --- PASS: TestAuthProvider_EdgeCases/provider_with_missing_parameters (0.00s)
+    --- PASS: TestAuthProvider_EdgeCases/provider_with_partial_parameters (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/services/authprovider/microsoft	8.318s
+=== RUN   TestNewAuthProvider
+=== RUN   TestNewAuthProvider/creates_provider_with_default_scopes
+--- PASS: TestNewAuthProvider (0.00s)
+    --- PASS: TestNewAuthProvider/creates_provider_with_default_scopes (0.00s)
+=== RUN   TestAuthProvider_HasRefreshTokenFlow
+--- PASS: TestAuthProvider_HasRefreshTokenFlow (0.00s)
+=== RUN   TestAuthProvider_GetAuthCodeUrl
+--- PASS: TestAuthProvider_GetAuthCodeUrl (0.00s)
+=== RUN   TestAuthProvider_VerifyCode
+--- PASS: TestAuthProvider_VerifyCode (0.04s)
+=== RUN   TestAuthProvider_RefreshToken
+--- PASS: TestAuthProvider_RefreshToken (0.00s)
+=== RUN   TestAuthProvider_GetIdentity
+--- PASS: TestAuthProvider_GetIdentity (0.01s)
+=== RUN   TestIdentityTypes_UpdateUserDetails
+--- PASS: TestIdentityTypes_UpdateUserDetails (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/services/authprovider/oidc	7.091s
+=== RUN   TestNewRedisService
+--- PASS: TestNewRedisService (0.00s)
+=== RUN   TestRedisService_Methods
+=== RUN   TestRedisService_Methods/Set_method
+=== RUN   TestRedisService_Methods/Get_method
+=== RUN   TestRedisService_Methods/Delete_method
+=== RUN   TestRedisService_Methods/Expire_method
+--- PASS: TestRedisService_Methods (0.00s)
+    --- PASS: TestRedisService_Methods/Set_method (0.00s)
+    --- PASS: TestRedisService_Methods/Get_method (0.00s)
+    --- PASS: TestRedisService_Methods/Delete_method (0.00s)
+    --- PASS: TestRedisService_Methods/Expire_method (0.00s)
+=== RUN   TestRedisService_WithMockService
+=== RUN   TestRedisService_WithMockService/set_and_get_operations
+=== RUN   TestRedisService_WithMockService/get_non_existent_key
+=== RUN   TestRedisService_WithMockService/delete_existing_key
+=== RUN   TestRedisService_WithMockService/delete_non_existent_key
+=== RUN   TestRedisService_WithMockService/expire_existing_key
+=== RUN   TestRedisService_WithMockService/expire_non_existent_key
+=== RUN   TestRedisService_WithMockService/set_with_ttl
+=== RUN   TestRedisService_WithMockService/set_with_zero_ttl
+--- PASS: TestRedisService_WithMockService (0.31s)
+    --- PASS: TestRedisService_WithMockService/set_and_get_operations (0.00s)
+    --- PASS: TestRedisService_WithMockService/get_non_existent_key (0.00s)
+    --- PASS: TestRedisService_WithMockService/delete_existing_key (0.00s)
+    --- PASS: TestRedisService_WithMockService/delete_non_existent_key (0.00s)
+    --- PASS: TestRedisService_WithMockService/expire_existing_key (0.15s)
+    --- PASS: TestRedisService_WithMockService/expire_non_existent_key (0.00s)
+    --- PASS: TestRedisService_WithMockService/set_with_ttl (0.15s)
+    --- PASS: TestRedisService_WithMockService/set_with_zero_ttl (0.00s)
+=== RUN   TestRedisService_ParameterValidation
+=== RUN   TestRedisService_ParameterValidation/empty_key_operations
+=== RUN   TestRedisService_ParameterValidation/empty_value_set
+=== RUN   TestRedisService_ParameterValidation/get_by_name_empty_name_handling
+--- PASS: TestRedisService_ParameterValidation (0.00s)
+    --- PASS: TestRedisService_ParameterValidation/empty_key_operations (0.00s)
+    --- PASS: TestRedisService_ParameterValidation/empty_value_set (0.00s)
+    --- PASS: TestRedisService_ParameterValidation/get_by_name_empty_name_handling (0.00s)
+=== RUN   TestRedisService_ErrorScenarios
+=== RUN   TestRedisService_ErrorScenarios/service_error_handling
+=== RUN   TestRedisService_ErrorScenarios/nil_service_error_handling
+--- PASS: TestRedisService_ErrorScenarios (0.00s)
+    --- PASS: TestRedisService_ErrorScenarios/service_error_handling (0.00s)
+    --- PASS: TestRedisService_ErrorScenarios/nil_service_error_handling (0.00s)
+=== RUN   TestRedisService_IntegrationScenarios
+=== RUN   TestRedisService_IntegrationScenarios/complete_lifecycle_test
+=== RUN   TestRedisService_IntegrationScenarios/multiple_keys_operations
+=== RUN   TestRedisService_IntegrationScenarios/expire_workflow
+--- PASS: TestRedisService_IntegrationScenarios (0.15s)
+    --- PASS: TestRedisService_IntegrationScenarios/complete_lifecycle_test (0.00s)
+    --- PASS: TestRedisService_IntegrationScenarios/multiple_keys_operations (0.00s)
+    --- PASS: TestRedisService_IntegrationScenarios/expire_workflow (0.15s)
+=== RUN   TestRedisService_ContextHandling
+=== RUN   TestRedisService_ContextHandling/operations_with_cancelled_context
+=== RUN   TestRedisService_ContextHandling/operations_with_timeout_context
+--- PASS: TestRedisService_ContextHandling (0.00s)
+    --- PASS: TestRedisService_ContextHandling/operations_with_cancelled_context (0.00s)
+    --- PASS: TestRedisService_ContextHandling/operations_with_timeout_context (0.00s)
+=== RUN   TestRedisService_ServiceInterface
+=== RUN   TestRedisService_ServiceInterface/verify_service_interface_implementation
+=== RUN   TestRedisService_ServiceInterface/service_creation_with_different_parameters
+=== RUN   TestRedisService_ServiceInterface/service_creation_with_different_parameters/localhost_with_password
+=== RUN   TestRedisService_ServiceInterface/service_creation_with_different_parameters/remote_host_with_password
+=== RUN   TestRedisService_ServiceInterface/service_creation_with_different_parameters/localhost_no_password
+=== RUN   TestRedisService_ServiceInterface/service_creation_with_different_parameters/custom_port
+--- PASS: TestRedisService_ServiceInterface (0.00s)
+    --- PASS: TestRedisService_ServiceInterface/verify_service_interface_implementation (0.00s)
+    --- PASS: TestRedisService_ServiceInterface/service_creation_with_different_parameters (0.00s)
+        --- PASS: TestRedisService_ServiceInterface/service_creation_with_different_parameters/localhost_with_password (0.00s)
+        --- PASS: TestRedisService_ServiceInterface/service_creation_with_different_parameters/remote_host_with_password (0.00s)
+        --- PASS: TestRedisService_ServiceInterface/service_creation_with_different_parameters/localhost_no_password (0.00s)
+        --- PASS: TestRedisService_ServiceInterface/service_creation_with_different_parameters/custom_port (0.00s)
+=== RUN   TestRedisService_EdgeCases
+=== RUN   TestRedisService_EdgeCases/very_long_key_and_value
+=== RUN   TestRedisService_EdgeCases/special_characters_in_key_and_value
+=== RUN   TestRedisService_EdgeCases/unicode_characters
+--- PASS: TestRedisService_EdgeCases (0.00s)
+    --- PASS: TestRedisService_EdgeCases/very_long_key_and_value (0.00s)
+    --- PASS: TestRedisService_EdgeCases/special_characters_in_key_and_value (0.00s)
+    --- PASS: TestRedisService_EdgeCases/unicode_characters (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/services/cache	6.850s
+=== RUN   TestFromModelListToSdk
+=== RUN   TestFromModelListToSdk/empty_list
+=== RUN   TestFromModelListToSdk/single_client
+=== RUN   TestFromModelListToSdk/multiple_clients
+=== RUN   TestFromModelListToSdk/clients_with_nil_timestamps
+=== RUN   TestFromModelListToSdk/clients_with_empty_arrays
+=== RUN   TestFromModelListToSdk/clients_with_nil_arrays
+=== RUN   TestFromModelListToSdk/clients_with_default_values
+--- PASS: TestFromModelListToSdk (0.00s)
+    --- PASS: TestFromModelListToSdk/empty_list (0.00s)
+    --- PASS: TestFromModelListToSdk/single_client (0.00s)
+    --- PASS: TestFromModelListToSdk/multiple_clients (0.00s)
+    --- PASS: TestFromModelListToSdk/clients_with_nil_timestamps (0.00s)
+    --- PASS: TestFromModelListToSdk/clients_with_empty_arrays (0.00s)
+    --- PASS: TestFromModelListToSdk/clients_with_nil_arrays (0.00s)
+    --- PASS: TestFromModelListToSdk/clients_with_default_values (0.00s)
+=== RUN   TestFromModelToSdk
+=== RUN   TestFromModelToSdk/complete_client
+=== RUN   TestFromModelToSdk/nil_client
+=== RUN   TestFromModelToSdk/empty_client
+--- PASS: TestFromModelToSdk (0.00s)
+    --- PASS: TestFromModelToSdk/complete_client (0.00s)
+    --- PASS: TestFromModelToSdk/nil_client (0.00s)
+    --- PASS: TestFromModelToSdk/empty_client (0.00s)
+=== RUN   TestFromSdkToModel
+=== RUN   TestFromSdkToModel/complete_client
+=== RUN   TestFromSdkToModel/empty_client
+--- PASS: TestFromSdkToModel (0.00s)
+    --- PASS: TestFromSdkToModel/complete_client (0.00s)
+    --- PASS: TestFromSdkToModel/empty_client (0.00s)
+=== RUN   TestHashSecret
+=== RUN   TestHashSecret/hash_simple_secret
+=== RUN   TestHashSecret/hash_empty_secret
+=== RUN   TestHashSecret/hash_same_secret_produces_same_hash
+=== RUN   TestHashSecret/hash_different_secrets_produce_different_hashes
+=== RUN   TestHashSecret/hash_special_characters
+--- PASS: TestHashSecret (0.00s)
+    --- PASS: TestHashSecret/hash_simple_secret (0.00s)
+    --- PASS: TestHashSecret/hash_empty_secret (0.00s)
+    --- PASS: TestHashSecret/hash_same_secret_produces_same_hash (0.00s)
+    --- PASS: TestHashSecret/hash_different_secrets_produce_different_hashes (0.00s)
+    --- PASS: TestHashSecret/hash_special_characters (0.00s)
+=== RUN   TestGenerateRandomSecret
+=== RUN   TestGenerateRandomSecret/generate_secret_with_specific_length
+=== RUN   TestGenerateRandomSecret/generate_secret_with_different_lengths
+=== RUN   TestGenerateRandomSecret/generate_multiple_secrets_are_different
+=== RUN   TestGenerateRandomSecret/generate_secret_with_zero_length
+=== RUN   TestGenerateRandomSecret/generate_secret_with_small_length
+--- PASS: TestGenerateRandomSecret (0.00s)
+    --- PASS: TestGenerateRandomSecret/generate_secret_with_specific_length (0.00s)
+    --- PASS: TestGenerateRandomSecret/generate_secret_with_different_lengths (0.00s)
+    --- PASS: TestGenerateRandomSecret/generate_multiple_secrets_are_different (0.00s)
+    --- PASS: TestGenerateRandomSecret/generate_secret_with_zero_length (0.00s)
+    --- PASS: TestGenerateRandomSecret/generate_secret_with_small_length (0.00s)
+=== RUN   TestNewService
+--- PASS: TestNewService (0.00s)
+=== RUN   TestService_Emit
+--- PASS: TestService_Emit (0.00s)
+=== RUN   TestService_Subscribe
+--- PASS: TestService_Subscribe (0.00s)
+=== RUN   TestService_GetAll_Success
+--- PASS: TestService_GetAll_Success (0.00s)
+=== RUN   TestService_Get_Success
+--- PASS: TestService_Get_Success (0.00s)
+=== RUN   TestService_Get_ClientNotInUserProjects
+--- PASS: TestService_Get_ClientNotInUserProjects (0.00s)
+=== RUN   TestService_Create_Success
+--- PASS: TestService_Create_Success (0.00s)
+=== RUN   TestService_Create_With_ServiceAccountEmail_Success
+--- PASS: TestService_Create_With_ServiceAccountEmail_Success (0.00s)
+=== RUN   TestService_Create_ProjectNotFound
+--- PASS: TestService_Create_ProjectNotFound (0.00s)
+=== RUN   TestService_Update_Success
+--- PASS: TestService_Update_Success (0.00s)
+=== RUN   TestService_Update_ProjectNotFound
+--- PASS: TestService_Update_ProjectNotFound (0.00s)
+=== RUN   TestService_GetIAMClients_Success
+--- PASS: TestService_GetIAMClients_Success (0.00s)
+=== RUN   TestService_GetIAMClients_StoreError
+--- PASS: TestService_GetIAMClients_StoreError (0.00s)
+=== RUN   TestService_Get_WithoutProjectCheck
+--- PASS: TestService_Get_WithoutProjectCheck (0.00s)
+=== RUN   TestService_Get_StoreError
+--- PASS: TestService_Get_StoreError (0.00s)
+=== RUN   TestService_Create_StoreError
+--- PASS: TestService_Create_StoreError (0.00s)
+=== RUN   TestService_Update_StoreError
+--- PASS: TestService_Update_StoreError (0.00s)
+=== RUN   TestEvent_Name
+=== RUN   TestEvent_Name/client_created_event
+=== RUN   TestEvent_Name/client_updated_event
+--- PASS: TestEvent_Name (0.00s)
+    --- PASS: TestEvent_Name/client_created_event (0.00s)
+    --- PASS: TestEvent_Name/client_updated_event (0.00s)
+=== RUN   TestEvent_Payload
+=== RUN   TestEvent_Payload/simple_client
+=== RUN   TestEvent_Payload/complex_client_with_all_fields
+=== RUN   TestEvent_Payload/empty_client
+--- PASS: TestEvent_Payload (0.00s)
+    --- PASS: TestEvent_Payload/simple_client (0.00s)
+    --- PASS: TestEvent_Payload/complex_client_with_all_fields (0.00s)
+    --- PASS: TestEvent_Payload/empty_client (0.00s)
+=== RUN   TestEvent_Metadata
+=== RUN   TestEvent_Metadata/metadata_with_user_and_projects
+=== RUN   TestEvent_Metadata/metadata_with_nil_user
+=== RUN   TestEvent_Metadata/metadata_with_empty_projects
+=== RUN   TestEvent_Metadata/empty_metadata
+--- PASS: TestEvent_Metadata (0.00s)
+    --- PASS: TestEvent_Metadata/metadata_with_user_and_projects (0.00s)
+    --- PASS: TestEvent_Metadata/metadata_with_nil_user (0.00s)
+    --- PASS: TestEvent_Metadata/metadata_with_empty_projects (0.00s)
+    --- PASS: TestEvent_Metadata/empty_metadata (0.00s)
+=== RUN   TestEvent_Context
+=== RUN   TestEvent_Context/background_context
+=== RUN   TestEvent_Context/context_with_values
+=== RUN   TestEvent_Context/context_with_metadata
+=== RUN   TestEvent_Context/context_with_cancellation
+--- PASS: TestEvent_Context (0.00s)
+    --- PASS: TestEvent_Context/background_context (0.00s)
+    --- PASS: TestEvent_Context/context_with_values (0.00s)
+    --- PASS: TestEvent_Context/context_with_metadata (0.00s)
+    --- PASS: TestEvent_Context/context_with_cancellation (0.00s)
+=== RUN   TestNewEvent
+=== RUN   TestNewEvent/create_event_with_all_parameters
+=== RUN   TestNewEvent/create_event_with_minimal_parameters
+--- PASS: TestNewEvent (0.00s)
+    --- PASS: TestNewEvent/create_event_with_all_parameters (0.00s)
+    --- PASS: TestNewEvent/create_event_with_minimal_parameters (0.00s)
+=== RUN   TestService_VerifySecret
+=== RUN   TestService_VerifySecret/successful_verification
+=== RUN   TestService_VerifySecret/empty_plain_secret
+--- PASS: TestService_VerifySecret (0.00s)
+    --- PASS: TestService_VerifySecret/successful_verification (0.00s)
+    --- PASS: TestService_VerifySecret/empty_plain_secret (0.00s)
+=== RUN   TestService_RegenerateSecret
+--- PASS: TestService_RegenerateSecret (0.00s)
+=== RUN   TestService_RegenerateSecret_GetError
+--- PASS: TestService_RegenerateSecret_GetError (0.00s)
+=== RUN   TestService_RegenerateSecret_UpdateError
+--- PASS: TestService_RegenerateSecret_UpdateError (0.00s)
+=== RUN   TestService_Create_NoUserInContext
+--- PASS: TestService_Create_NoUserInContext (0.00s)
+=== RUN   TestService_Create_ServiceAccountUpdateError
+2026/02/17 17:46:04.850886 service_impl.go:174: [Debug] failed to update client with linked user client_id= user_id= error=error while updating client: update failed
+--- PASS: TestService_Create_ServiceAccountUpdateError (0.12s)
+=== RUN   TestService_Create_WithAuthProvider
+--- PASS: TestService_Create_WithAuthProvider (0.00s)
+=== RUN   TestService_Create_AuthProviderNotFound
+--- PASS: TestService_Create_AuthProviderNotFound (0.00s)
+=== RUN   TestService_VerifySecret_Success
+--- PASS: TestService_VerifySecret_Success (0.00s)
+=== RUN   TestService_Create_UserCreateError
+--- PASS: TestService_Create_UserCreateError (0.00s)
+=== RUN   TestService_GetAll_StoreError
+--- PASS: TestService_GetAll_StoreError (0.00s)
+=== RUN   TestService_GetAll_NoProjectIdsOrGoIamClient
+--- PASS: TestService_GetAll_NoProjectIdsOrGoIamClient (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/services/client	8.554s
+=== RUN   TestNewService
+=== RUN   TestNewService/successful_service_creation
+=== RUN   TestNewService/service_creation_with_16_byte_key
+=== RUN   TestNewService/service_creation_with_24_byte_key
+=== RUN   TestNewService/invalid_key_length
+=== RUN   TestNewService/empty_key
+=== RUN   TestNewService/nil_key
+--- PASS: TestNewService (0.00s)
+    --- PASS: TestNewService/successful_service_creation (0.00s)
+    --- PASS: TestNewService/service_creation_with_16_byte_key (0.00s)
+    --- PASS: TestNewService/service_creation_with_24_byte_key (0.00s)
+    --- PASS: TestNewService/invalid_key_length (0.00s)
+    --- PASS: TestNewService/empty_key (0.00s)
+    --- PASS: TestNewService/nil_key (0.00s)
+=== RUN   TestService_Encrypt
+=== RUN   TestService_Encrypt/successful_encryption
+=== RUN   TestService_Encrypt/encrypt_empty_string
+=== RUN   TestService_Encrypt/encrypt_long_message
+=== RUN   TestService_Encrypt/encrypt_special_characters
+=== RUN   TestService_Encrypt/encrypt_unicode_characters
+=== RUN   TestService_Encrypt/multiple_encryptions_produce_different_results
+--- PASS: TestService_Encrypt (0.00s)
+    --- PASS: TestService_Encrypt/successful_encryption (0.00s)
+    --- PASS: TestService_Encrypt/encrypt_empty_string (0.00s)
+    --- PASS: TestService_Encrypt/encrypt_long_message (0.00s)
+    --- PASS: TestService_Encrypt/encrypt_special_characters (0.00s)
+    --- PASS: TestService_Encrypt/encrypt_unicode_characters (0.00s)
+    --- PASS: TestService_Encrypt/multiple_encryptions_produce_different_results (0.00s)
+=== RUN   TestService_Decrypt
+=== RUN   TestService_Decrypt/successful_decryption
+=== RUN   TestService_Decrypt/decrypt_empty_string_encryption
+=== RUN   TestService_Decrypt/decrypt_long_message
+=== RUN   TestService_Decrypt/decrypt_special_characters
+=== RUN   TestService_Decrypt/decrypt_unicode_characters
+=== RUN   TestService_Decrypt/decrypt_invalid_hex
+=== RUN   TestService_Decrypt/decrypt_empty_string
+=== RUN   TestService_Decrypt/decrypt_invalid_encrypted_data
+=== RUN   TestService_Decrypt/decrypt_properly_sized_invalid_data
+=== RUN   TestService_Decrypt/decrypt_truncated_message
+=== RUN   TestService_Decrypt/decrypt_with_wrong_key
+--- PASS: TestService_Decrypt (0.00s)
+    --- PASS: TestService_Decrypt/successful_decryption (0.00s)
+    --- PASS: TestService_Decrypt/decrypt_empty_string_encryption (0.00s)
+    --- PASS: TestService_Decrypt/decrypt_long_message (0.00s)
+    --- PASS: TestService_Decrypt/decrypt_special_characters (0.00s)
+    --- PASS: TestService_Decrypt/decrypt_unicode_characters (0.00s)
+    --- PASS: TestService_Decrypt/decrypt_invalid_hex (0.00s)
+    --- PASS: TestService_Decrypt/decrypt_empty_string (0.00s)
+    --- PASS: TestService_Decrypt/decrypt_invalid_encrypted_data (0.00s)
+    --- PASS: TestService_Decrypt/decrypt_properly_sized_invalid_data (0.00s)
+    --- PASS: TestService_Decrypt/decrypt_truncated_message (0.00s)
+    --- PASS: TestService_Decrypt/decrypt_with_wrong_key (0.00s)
+=== RUN   TestService_EncryptDecryptRoundtrip
+=== RUN   TestService_EncryptDecryptRoundtrip/simple_text
+=== RUN   TestService_EncryptDecryptRoundtrip/empty_string
+=== RUN   TestService_EncryptDecryptRoundtrip/single_character
+=== RUN   TestService_EncryptDecryptRoundtrip/numbers
+=== RUN   TestService_EncryptDecryptRoundtrip/json_like
+=== RUN   TestService_EncryptDecryptRoundtrip/xml_like
+=== RUN   TestService_EncryptDecryptRoundtrip/multiline
+=== RUN   TestService_EncryptDecryptRoundtrip/tabs_and_spaces
+=== RUN   TestService_EncryptDecryptRoundtrip/special_chars
+=== RUN   TestService_EncryptDecryptRoundtrip/unicode
+=== RUN   TestService_EncryptDecryptRoundtrip/long_text
+=== RUN   TestService_EncryptDecryptRoundtrip/binary_like
+--- PASS: TestService_EncryptDecryptRoundtrip (0.00s)
+    --- PASS: TestService_EncryptDecryptRoundtrip/simple_text (0.00s)
+    --- PASS: TestService_EncryptDecryptRoundtrip/empty_string (0.00s)
+    --- PASS: TestService_EncryptDecryptRoundtrip/single_character (0.00s)
+    --- PASS: TestService_EncryptDecryptRoundtrip/numbers (0.00s)
+    --- PASS: TestService_EncryptDecryptRoundtrip/json_like (0.00s)
+    --- PASS: TestService_EncryptDecryptRoundtrip/xml_like (0.00s)
+    --- PASS: TestService_EncryptDecryptRoundtrip/multiline (0.00s)
+    --- PASS: TestService_EncryptDecryptRoundtrip/tabs_and_spaces (0.00s)
+    --- PASS: TestService_EncryptDecryptRoundtrip/special_chars (0.00s)
+    --- PASS: TestService_EncryptDecryptRoundtrip/unicode (0.00s)
+    --- PASS: TestService_EncryptDecryptRoundtrip/long_text (0.00s)
+    --- PASS: TestService_EncryptDecryptRoundtrip/binary_like (0.00s)
+=== RUN   TestService_InterfaceCompliance
+=== RUN   TestService_InterfaceCompliance/verify_service_interface_implementation
+    service_impl_test.go:391: service &{0xc0000ea000}
+--- PASS: TestService_InterfaceCompliance (0.00s)
+    --- PASS: TestService_InterfaceCompliance/verify_service_interface_implementation (0.00s)
+=== RUN   TestService_Consistency
+=== RUN   TestService_Consistency/same_key_produces_same_decryption
+=== RUN   TestService_Consistency/different_keys_cannot_decrypt
+--- PASS: TestService_Consistency (0.00s)
+    --- PASS: TestService_Consistency/same_key_produces_same_decryption (0.00s)
+    --- PASS: TestService_Consistency/different_keys_cannot_decrypt (0.00s)
+=== RUN   TestService_EdgeCases
+=== RUN   TestService_EdgeCases/very_long_message
+=== RUN   TestService_EdgeCases/message_with_null_bytes
+=== RUN   TestService_EdgeCases/repeated_encrypt_decrypt_operations
+--- PASS: TestService_EdgeCases (0.18s)
+    --- PASS: TestService_EdgeCases/very_long_message (0.18s)
+    --- PASS: TestService_EdgeCases/message_with_null_bytes (0.00s)
+    --- PASS: TestService_EdgeCases/repeated_encrypt_decrypt_operations (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/services/encrypt	7.143s
+=== RUN   TestNewService
+=== RUN   TestNewService/successful_service_creation
+=== RUN   TestNewService/service_creation_with_empty_secret
+=== RUN   TestNewService/service_creation_with_long_secret
+=== RUN   TestNewService/service_creation_with_nil_secret
+--- PASS: TestNewService (0.00s)
+    --- PASS: TestNewService/successful_service_creation (0.00s)
+    --- PASS: TestNewService/service_creation_with_empty_secret (0.00s)
+    --- PASS: TestNewService/service_creation_with_long_secret (0.00s)
+    --- PASS: TestNewService/service_creation_with_nil_secret (0.00s)
+=== RUN   TestService_GenerateToken
+=== RUN   TestService_GenerateToken/successful_token_generation
+=== RUN   TestService_GenerateToken/generate_token_with_empty_claims
+=== RUN   TestService_GenerateToken/generate_token_with_nil_claims
+=== RUN   TestService_GenerateToken/generate_token_with_various_claim_types
+=== RUN   TestService_GenerateToken/generate_token_with_past_expiry
+=== RUN   TestService_GenerateToken/generate_token_with_zero_expiry
+=== RUN   TestService_GenerateToken/generate_token_with_future_expiry
+=== RUN   TestService_GenerateToken/generate_multiple_tokens_are_different
+--- PASS: TestService_GenerateToken (0.01s)
+    --- PASS: TestService_GenerateToken/successful_token_generation (0.00s)
+    --- PASS: TestService_GenerateToken/generate_token_with_empty_claims (0.00s)
+    --- PASS: TestService_GenerateToken/generate_token_with_nil_claims (0.00s)
+    --- PASS: TestService_GenerateToken/generate_token_with_various_claim_types (0.00s)
+    --- PASS: TestService_GenerateToken/generate_token_with_past_expiry (0.00s)
+    --- PASS: TestService_GenerateToken/generate_token_with_zero_expiry (0.00s)
+    --- PASS: TestService_GenerateToken/generate_token_with_future_expiry (0.00s)
+    --- PASS: TestService_GenerateToken/generate_multiple_tokens_are_different (0.00s)
+=== RUN   TestService_ValidateToken
+=== RUN   TestService_ValidateToken/successful_token_validation
+=== RUN   TestService_ValidateToken/validate_token_with_empty_claims
+=== RUN   TestService_ValidateToken/validate_expired_token
+=== RUN   TestService_ValidateToken/validate_invalid_token_format
+=== RUN   TestService_ValidateToken/validate_empty_token
+=== RUN   TestService_ValidateToken/validate_malformed_token
+=== RUN   TestService_ValidateToken/validate_token_with_wrong_secret
+=== RUN   TestService_ValidateToken/validate_token_with_tampered_payload
+=== RUN   TestService_ValidateToken/validate_token_missing_parts
+=== RUN   TestService_ValidateToken/validate_token_with_wrong_signing_method
+--- PASS: TestService_ValidateToken (0.00s)
+    --- PASS: TestService_ValidateToken/successful_token_validation (0.00s)
+    --- PASS: TestService_ValidateToken/validate_token_with_empty_claims (0.00s)
+    --- PASS: TestService_ValidateToken/validate_expired_token (0.00s)
+    --- PASS: TestService_ValidateToken/validate_invalid_token_format (0.00s)
+    --- PASS: TestService_ValidateToken/validate_empty_token (0.00s)
+    --- PASS: TestService_ValidateToken/validate_malformed_token (0.00s)
+    --- PASS: TestService_ValidateToken/validate_token_with_wrong_secret (0.00s)
+    --- PASS: TestService_ValidateToken/validate_token_with_tampered_payload (0.00s)
+    --- PASS: TestService_ValidateToken/validate_token_missing_parts (0.00s)
+    --- PASS: TestService_ValidateToken/validate_token_with_wrong_signing_method (0.00s)
+=== RUN   TestService_GenerateValidateRoundtrip
+=== RUN   TestService_GenerateValidateRoundtrip/simple_claims
+=== RUN   TestService_GenerateValidateRoundtrip/complex_claims
+=== RUN   TestService_GenerateValidateRoundtrip/empty_claims
+=== RUN   TestService_GenerateValidateRoundtrip/special_characters
+--- PASS: TestService_GenerateValidateRoundtrip (0.00s)
+    --- PASS: TestService_GenerateValidateRoundtrip/simple_claims (0.00s)
+    --- PASS: TestService_GenerateValidateRoundtrip/complex_claims (0.00s)
+    --- PASS: TestService_GenerateValidateRoundtrip/empty_claims (0.00s)
+    --- PASS: TestService_GenerateValidateRoundtrip/special_characters (0.00s)
+=== RUN   TestService_InterfaceCompliance
+=== RUN   TestService_InterfaceCompliance/verify_service_interface_implementation
+    service_impl_test.go:411: service &{[105 110 116 101 114 102 97 99 101 45 116 101 115 116 45 115 101 99 114 101 116]}
+--- PASS: TestService_InterfaceCompliance (0.00s)
+    --- PASS: TestService_InterfaceCompliance/verify_service_interface_implementation (0.00s)
+=== RUN   TestService_EdgeCases
+=== RUN   TestService_EdgeCases/very_large_claims
+=== RUN   TestService_EdgeCases/claims_with_nested_structures
+=== RUN   TestService_EdgeCases/extreme_expiry_times
+=== RUN   TestService_EdgeCases/service_consistency_across_instances
+--- PASS: TestService_EdgeCases (0.00s)
+    --- PASS: TestService_EdgeCases/very_large_claims (0.00s)
+    --- PASS: TestService_EdgeCases/claims_with_nested_structures (0.00s)
+    --- PASS: TestService_EdgeCases/extreme_expiry_times (0.00s)
+    --- PASS: TestService_EdgeCases/service_consistency_across_instances (0.00s)
+=== RUN   TestService_ErrorHandling
+=== RUN   TestService_ErrorHandling/service_with_empty_secret
+=== RUN   TestService_ErrorHandling/special_characters_in_secret
+--- PASS: TestService_ErrorHandling (0.00s)
+    --- PASS: TestService_ErrorHandling/service_with_empty_secret (0.00s)
+    --- PASS: TestService_ErrorHandling/special_characters_in_secret (0.00s)
+=== RUN   TestService_GenerateToken_EdgeCases
+=== RUN   TestService_GenerateToken_EdgeCases/generate_token_with_very_large_claims
+=== RUN   TestService_GenerateToken_EdgeCases/generate_token_with_special_characters_in_claims
+--- PASS: TestService_GenerateToken_EdgeCases (0.00s)
+    --- PASS: TestService_GenerateToken_EdgeCases/generate_token_with_very_large_claims (0.00s)
+    --- PASS: TestService_GenerateToken_EdgeCases/generate_token_with_special_characters_in_claims (0.00s)
+=== RUN   TestService_ValidateToken_AdditionalErrorCases
+=== RUN   TestService_ValidateToken_AdditionalErrorCases/validate_token_with_none_algorithm
+=== RUN   TestService_ValidateToken_AdditionalErrorCases/validate_token_with_invalid_signature
+=== RUN   TestService_ValidateToken_AdditionalErrorCases/validate_token_with_expired_and_invalid_signature
+=== RUN   TestService_ValidateToken_AdditionalErrorCases/validate_token_with_malformed_header
+--- PASS: TestService_ValidateToken_AdditionalErrorCases (0.00s)
+    --- PASS: TestService_ValidateToken_AdditionalErrorCases/validate_token_with_none_algorithm (0.00s)
+    --- PASS: TestService_ValidateToken_AdditionalErrorCases/validate_token_with_invalid_signature (0.00s)
+    --- PASS: TestService_ValidateToken_AdditionalErrorCases/validate_token_with_expired_and_invalid_signature (0.00s)
+    --- PASS: TestService_ValidateToken_AdditionalErrorCases/validate_token_with_malformed_header (0.00s)
+=== RUN   TestService_ValidateToken_TokenNotValid
+--- PASS: TestService_ValidateToken_TokenNotValid (0.00s)
+=== RUN   TestService_ValidateToken_ClaimsTypeAssertionFails
+--- PASS: TestService_ValidateToken_ClaimsTypeAssertionFails (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/services/jwt	7.058s
+=== RUN   TestNewService
+--- PASS: TestNewService (0.00s)
+=== RUN   TestService_GetAll_Success
+--- PASS: TestService_GetAll_Success (0.00s)
+=== RUN   TestService_GetAll_StoreError
+--- PASS: TestService_GetAll_StoreError (0.00s)
+=== RUN   TestService_GetAll_EmptyResult
+--- PASS: TestService_GetAll_EmptyResult (0.00s)
+=== RUN   TestService_GetAll_WithPagination
+--- PASS: TestService_GetAll_WithPagination (0.00s)
+=== RUN   TestService_GetAll_WithQuery
+--- PASS: TestService_GetAll_WithQuery (0.00s)
+=== RUN   TestService_GetAll_ContextCancellation
+--- PASS: TestService_GetAll_ContextCancellation (0.00s)
+=== RUN   TestService_GetAll_BusinessLogic
+=== RUN   TestService_GetAll_BusinessLogic/service_delegates_to_store
+=== RUN   TestService_GetAll_BusinessLogic/service_passes_exact_parameters
+=== RUN   TestService_GetAll_BusinessLogic/service_returns_exact_store_result
+=== RUN   TestService_GetAll_BusinessLogic/service_returns_exact_store_error
+--- PASS: TestService_GetAll_BusinessLogic (0.00s)
+    --- PASS: TestService_GetAll_BusinessLogic/service_delegates_to_store (0.00s)
+    --- PASS: TestService_GetAll_BusinessLogic/service_passes_exact_parameters (0.00s)
+    --- PASS: TestService_GetAll_BusinessLogic/service_returns_exact_store_result (0.00s)
+    --- PASS: TestService_GetAll_BusinessLogic/service_returns_exact_store_error (0.00s)
+=== RUN   TestService_GetAll_EdgeCases
+=== RUN   TestService_GetAll_EdgeCases/empty_query
+=== RUN   TestService_GetAll_EdgeCases/zero_limit
+=== RUN   TestService_GetAll_EdgeCases/large_skip_value
+--- PASS: TestService_GetAll_EdgeCases (0.00s)
+    --- PASS: TestService_GetAll_EdgeCases/empty_query (0.00s)
+    --- PASS: TestService_GetAll_EdgeCases/zero_limit (0.00s)
+    --- PASS: TestService_GetAll_EdgeCases/large_skip_value (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/services/policy	7.038s
+=== RUN   TestNewAccessToCreatedResource
+--- PASS: TestNewAccessToCreatedResource (0.00s)
+=== RUN   TestAccessToCreatedResource_HandleEvent_Success
+2026/02/17 17:46:21.307551 access_to_created_resource.go:30: [Debug] received resource event event=resource:created
+2026/02/17 17:46:21.411758 access_to_created_resource.go:49: [Info] successfully added created resource to user userId=user123 resource_id=resource123
+--- PASS: TestAccessToCreatedResource_HandleEvent_Success (0.11s)
+=== RUN   TestAccessToCreatedResource_HandleEvent_PolicyCheckError
+2026/02/17 17:46:21.412404 access_to_created_resource.go:30: [Debug] received resource event event=resource:created
+2026/02/17 17:46:21.412404 access_to_created_resource.go:34: [Error] error checking user while handling resource create event userId=user123 resource_id=resource123 error=policy check error
+--- PASS: TestAccessToCreatedResource_HandleEvent_PolicyCheckError (0.00s)
+=== RUN   TestAccessToCreatedResource_HandleEvent_PolicyNotExists
+2026/02/17 17:46:21.412404 access_to_created_resource.go:30: [Debug] received resource event event=resource:created
+--- PASS: TestAccessToCreatedResource_HandleEvent_PolicyNotExists (0.00s)
+=== RUN   TestAccessToCreatedResource_HandleEvent_AddResourceError
+2026/02/17 17:46:21.413094 access_to_created_resource.go:30: [Debug] received resource event event=resource:created
+2026/02/17 17:46:21.413094 access_to_created_resource.go:46: [Error] error adding resource to user while handling resource create event userId=user123 resource_id=resource123 error=add resource error
+--- PASS: TestAccessToCreatedResource_HandleEvent_AddResourceError (0.00s)
+=== RUN   TestNewAddResourcesToRole
+--- PASS: TestNewAddResourcesToRole (0.00s)
+=== RUN   TestAddResourcesToRole_HandleEvent_Success
+2026/02/17 17:46:21.413644 add_resources_to_role.go:32: [Debug] received resource event event=resource:created
+2026/02/17 17:46:21.417604 add_resources_to_role.go:55: [Info] successfully added created resource to role role_id=role456 resource_id=resource123
+--- PASS: TestAddResourcesToRole_HandleEvent_Success (0.00s)
+=== RUN   TestAddResourcesToRole_HandleEvent_PolicyCheckError
+2026/02/17 17:46:21.417604 add_resources_to_role.go:32: [Debug] received resource event event=resource:created
+2026/02/17 17:46:21.418157 add_resources_to_role.go:36: [Error] error checking user while handling resource create event userId=user123 resource_id=resource123 error=policy check error
+--- PASS: TestAddResourcesToRole_HandleEvent_PolicyCheckError (0.00s)
+=== RUN   TestAddResourcesToRole_HandleEvent_PolicyNotExists
+2026/02/17 17:46:21.418157 add_resources_to_role.go:32: [Debug] received resource event event=resource:created
+--- PASS: TestAddResourcesToRole_HandleEvent_PolicyNotExists (0.00s)
+=== RUN   TestAddResourcesToRole_HandleEvent_NoRoleIdInPolicy
+2026/02/17 17:46:21.418157 add_resources_to_role.go:32: [Debug] received resource event event=resource:created
+--- PASS: TestAddResourcesToRole_HandleEvent_NoRoleIdInPolicy (0.00s)
+=== RUN   TestAddResourcesToRole_HandleEvent_EmptyRoleId
+2026/02/17 17:46:21.418782 add_resources_to_role.go:32: [Debug] received resource event event=resource:created
+--- PASS: TestAddResourcesToRole_HandleEvent_EmptyRoleId (0.00s)
+=== RUN   TestAddResourcesToRole_HandleEvent_AddResourceError
+2026/02/17 17:46:21.418782 add_resources_to_role.go:32: [Debug] received resource event event=resource:created
+2026/02/17 17:46:21.419338 add_resources_to_role.go:52: [Error] error adding resource to role while handling resource create event role_id=role456 resource_id=resource123 error=add resource error
+--- PASS: TestAddResourcesToRole_HandleEvent_AddResourceError (0.00s)
+=== RUN   TestAddResourcesToRole_getTargetRoleId
+=== RUN   TestAddResourcesToRole_getTargetRoleId/valid_role_id
+=== RUN   TestAddResourcesToRole_getTargetRoleId/policy_not_found
+=== RUN   TestAddResourcesToRole_getTargetRoleId/role_id_argument_not_found
+=== RUN   TestAddResourcesToRole_getTargetRoleId/empty_role_id
+--- PASS: TestAddResourcesToRole_getTargetRoleId (0.00s)
+    --- PASS: TestAddResourcesToRole_getTargetRoleId/valid_role_id (0.00s)
+    --- PASS: TestAddResourcesToRole_getTargetRoleId/policy_not_found (0.00s)
+    --- PASS: TestAddResourcesToRole_getTargetRoleId/role_id_argument_not_found (0.00s)
+    --- PASS: TestAddResourcesToRole_getTargetRoleId/empty_role_id (0.00s)
+=== RUN   TestAddResourcesToRole_PolicyDef
+--- PASS: TestAddResourcesToRole_PolicyDef (0.00s)
+=== RUN   TestNewAddResourcesToUser
+--- PASS: TestNewAddResourcesToUser (0.00s)
+=== RUN   TestAddResourcesToUser_HandleEvent_Success
+2026/02/17 17:46:21.419955 add_resources_to_user.go:30: [Debug] received resource event event=resource:created
+2026/02/17 17:46:21.419955 add_resources_to_user.go:53: [Info] successfully added created resource to user user_id=target456 resource_id=resource123
+--- PASS: TestAddResourcesToUser_HandleEvent_Success (0.00s)
+=== RUN   TestAddResourcesToUser_HandleEvent_PolicyCheckError
+2026/02/17 17:46:21.419955 add_resources_to_user.go:30: [Debug] received resource event event=resource:created
+2026/02/17 17:46:21.420720 add_resources_to_user.go:34: [Error] error checking user while handling resource create event userId=user123 resource_id=resource123 error=policy check error
+--- PASS: TestAddResourcesToUser_HandleEvent_PolicyCheckError (0.00s)
+=== RUN   TestAddResourcesToUser_HandleEvent_PolicyNotExists
+2026/02/17 17:46:21.420720 add_resources_to_user.go:30: [Debug] received resource event event=resource:created
+--- PASS: TestAddResourcesToUser_HandleEvent_PolicyNotExists (0.00s)
+=== RUN   TestAddResourcesToUser_HandleEvent_NoUserIdInPolicy
+2026/02/17 17:46:21.420720 add_resources_to_user.go:30: [Debug] received resource event event=resource:created
+--- PASS: TestAddResourcesToUser_HandleEvent_NoUserIdInPolicy (0.00s)
+=== RUN   TestAddResourcesToUser_HandleEvent_EmptyUserId
+2026/02/17 17:46:21.421258 add_resources_to_user.go:30: [Debug] received resource event event=resource:created
+--- PASS: TestAddResourcesToUser_HandleEvent_EmptyUserId (0.00s)
+=== RUN   TestAddResourcesToUser_HandleEvent_AddResourceError
+2026/02/17 17:46:21.421258 add_resources_to_user.go:30: [Debug] received resource event event=resource:created
+2026/02/17 17:46:21.421821 add_resources_to_user.go:50: [Error] error adding resource to user while handling resource create event user_id=target456 resource_id=resource123 error=add resource error
+--- PASS: TestAddResourcesToUser_HandleEvent_AddResourceError (0.00s)
+=== RUN   TestAddResourcesToUser_getTargetUserId
+=== RUN   TestAddResourcesToUser_getTargetUserId/valid_user_id
+=== RUN   TestAddResourcesToUser_getTargetUserId/policy_not_found
+=== RUN   TestAddResourcesToUser_getTargetUserId/user_id_argument_not_found
+=== RUN   TestAddResourcesToUser_getTargetUserId/empty_user_id
+--- PASS: TestAddResourcesToUser_getTargetUserId (0.00s)
+    --- PASS: TestAddResourcesToUser_getTargetUserId/valid_user_id (0.00s)
+    --- PASS: TestAddResourcesToUser_getTargetUserId/policy_not_found (0.00s)
+    --- PASS: TestAddResourcesToUser_getTargetUserId/user_id_argument_not_found (0.00s)
+    --- PASS: TestAddResourcesToUser_getTargetUserId/empty_user_id (0.00s)
+=== RUN   TestAddResourcesToUser_PolicyDef
+--- PASS: TestAddResourcesToUser_PolicyDef (0.00s)
+=== RUN   TestNewDefaultPoliciesOnUser
+--- PASS: TestNewDefaultPoliciesOnUser (0.00s)
+=== RUN   TestDefaultPoliciesOnUser_HandleEvent_Success
+2026/02/17 17:46:21.421821 default_policies_on_user.go:24: [Debug] received user event event=user:created
+2026/02/17 17:46:21.421821 default_policies_on_user.go:32: [Info] successfully added default policies to user userId=user123
+--- PASS: TestDefaultPoliciesOnUser_HandleEvent_Success (0.00s)
+=== RUN   TestDefaultPoliciesOnUser_HandleEvent_AddPolicyError
+2026/02/17 17:46:21.421821 default_policies_on_user.go:24: [Debug] received user event event=user:created
+2026/02/17 17:46:21.421821 default_policies_on_user.go:29: [Error] error updating user with default policies while handling user create event userId=user123 error=add policy error
+--- PASS: TestDefaultPoliciesOnUser_HandleEvent_AddPolicyError (0.00s)
+=== RUN   TestDefaultPoliciesOnUser_HandleEvent_DifferentUser
+2026/02/17 17:46:21.423021 default_policies_on_user.go:24: [Debug] received user event event=user:created
+2026/02/17 17:46:21.423021 default_policies_on_user.go:32: [Info] successfully added default policies to user userId=target456
+--- PASS: TestDefaultPoliciesOnUser_HandleEvent_DifferentUser (0.00s)
+=== RUN   TestNewPolicyCheck
+--- PASS: TestNewPolicyCheck (0.00s)
+=== RUN   TestPolicyCheck_RunCheck_Success_PolicyExists
+--- PASS: TestPolicyCheck_RunCheck_Success_PolicyExists (0.00s)
+=== RUN   TestPolicyCheck_RunCheck_Success_PolicyNotExists
+--- PASS: TestPolicyCheck_RunCheck_Success_PolicyNotExists (0.00s)
+=== RUN   TestPolicyCheck_RunCheck_UserServiceError
+--- PASS: TestPolicyCheck_RunCheck_UserServiceError (0.00s)
+=== RUN   TestPolicyCheck_RunCheck_PolicyExists_WithOtherPolicies
+--- PASS: TestPolicyCheck_RunCheck_PolicyExists_WithOtherPolicies (0.00s)
+=== RUN   TestPolicyCheck_RunCheck_DifferentPolicyId
+--- PASS: TestPolicyCheck_RunCheck_DifferentPolicyId (0.00s)
+=== RUN   TestNewRemoveDeletedResourceFromRole
+--- PASS: TestNewRemoveDeletedResourceFromRole (0.00s)
+=== RUN   TestRemoveDeletedResourceFromRole_ID
+--- PASS: TestRemoveDeletedResourceFromRole_ID (0.00s)
+=== RUN   TestRemoveDeletedResourceFromRole_Name
+--- PASS: TestRemoveDeletedResourceFromRole_Name (0.00s)
+=== RUN   TestRemoveDeletedResourceFromRole_HandleEvent
+2026/02/17 17:46:21.424714 remove_deleted_resources_from_role.go:28: [Debug] received resource event event=resource:deleted
+2026/02/17 17:46:21.424714 remove_deleted_resources_from_role.go:34: [Info] successfully removed deleted resource from all roles resource_id=resource123
+--- PASS: TestRemoveDeletedResourceFromRole_HandleEvent (0.00s)
+=== RUN   TestRemoveDeletedResourceFromRole_HandleEvent_Error
+2026/02/17 17:46:21.424714 remove_deleted_resources_from_role.go:28: [Debug] received resource event event=resource:deleted
+2026/02/17 17:46:21.424714 remove_deleted_resources_from_role.go:31: [Error] error removing resource from all roles while handling resource delete event resource_id=resource123 error=remove error
+--- PASS: TestRemoveDeletedResourceFromRole_HandleEvent_Error (0.00s)
+=== RUN   TestRemoveDeletedResourceFromRole_PolicyDef
+--- PASS: TestRemoveDeletedResourceFromRole_PolicyDef (0.00s)
+=== RUN   TestNewRemoveDeletedResourceFromUser
+--- PASS: TestNewRemoveDeletedResourceFromUser (0.00s)
+=== RUN   TestRemoveDeletedResourceFromUser_ID
+--- PASS: TestRemoveDeletedResourceFromUser_ID (0.00s)
+=== RUN   TestRemoveDeletedResourceFromUser_Name
+--- PASS: TestRemoveDeletedResourceFromUser_Name (0.00s)
+=== RUN   TestRemoveDeletedResourceFromUser_HandleEvent
+2026/02/17 17:46:21.425462 remove_deleted_resources_from_user.go:28: [Debug] received resource event event=resource:deleted
+2026/02/17 17:46:21.425462 remove_deleted_resources_from_user.go:34: [Info] successfully removed deleted resource from all users resource_id=resource123
+--- PASS: TestRemoveDeletedResourceFromUser_HandleEvent (0.00s)
+=== RUN   TestRemoveDeletedResourceFromUser_HandleEvent_Error
+2026/02/17 17:46:21.425462 remove_deleted_resources_from_user.go:28: [Debug] received resource event event=resource:deleted
+2026/02/17 17:46:21.425462 remove_deleted_resources_from_user.go:31: [Error] error removing resource from all users while handling resource delete event resource_id=resource123 error=remove error
+--- PASS: TestRemoveDeletedResourceFromUser_HandleEvent_Error (0.00s)
+=== RUN   TestRemoveDeletedResourceFromUser_PolicyDef
+--- PASS: TestRemoveDeletedResourceFromUser_PolicyDef (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/services/policy/system	9.394s
+FAIL	github.com/codearena-platform/codearena-platform/internal/iam/services/project [build failed]
+FAIL	github.com/codearena-platform/codearena-platform/internal/iam/services/resource [build failed]
+=== RUN   TestNewService
+--- PASS: TestNewService (0.00s)
+=== RUN   TestService_Create
+=== RUN   TestService_Create/successful_create
+=== RUN   TestService_Create/store_error
+--- PASS: TestService_Create (0.00s)
+    --- PASS: TestService_Create/successful_create (0.00s)
+    --- PASS: TestService_Create/store_error (0.00s)
+=== RUN   TestService_Update
+=== RUN   TestService_Update/successful_update
+=== RUN   TestService_Update/store_error
+--- PASS: TestService_Update (0.00s)
+    --- PASS: TestService_Update/successful_update (0.00s)
+    --- PASS: TestService_Update/store_error (0.00s)
+=== RUN   TestService_GetById
+=== RUN   TestService_GetById/successful_get
+=== RUN   TestService_GetById/role_not_found
+=== RUN   TestService_GetById/store_error
+--- PASS: TestService_GetById (0.00s)
+    --- PASS: TestService_GetById/successful_get (0.00s)
+    --- PASS: TestService_GetById/role_not_found (0.00s)
+    --- PASS: TestService_GetById/store_error (0.00s)
+=== RUN   TestService_GetAll
+=== RUN   TestService_GetAll/successful_get_all
+=== RUN   TestService_GetAll/empty_result
+=== RUN   TestService_GetAll/store_error
+--- PASS: TestService_GetAll (0.00s)
+    --- PASS: TestService_GetAll/successful_get_all (0.00s)
+    --- PASS: TestService_GetAll/empty_result (0.00s)
+    --- PASS: TestService_GetAll/store_error (0.00s)
+=== RUN   TestService_AddResource
+=== RUN   TestService_AddResource/successful_add_resource_to_new_role
+=== RUN   TestService_AddResource/successful_add_resource_to_existing_resources
+=== RUN   TestService_AddResource/role_not_found
+=== RUN   TestService_AddResource/get_role_error
+=== RUN   TestService_AddResource/update_role_error
+--- PASS: TestService_AddResource (0.01s)
+    --- PASS: TestService_AddResource/successful_add_resource_to_new_role (0.00s)
+    --- PASS: TestService_AddResource/successful_add_resource_to_existing_resources (0.00s)
+    --- PASS: TestService_AddResource/role_not_found (0.00s)
+    --- PASS: TestService_AddResource/get_role_error (0.00s)
+    --- PASS: TestService_AddResource/update_role_error (0.00s)
+=== RUN   TestService_Emit
+=== RUN   TestService_Emit/emit_valid_event
+=== RUN   TestService_Emit/emit_nil_event
+--- PASS: TestService_Emit (0.00s)
+    --- PASS: TestService_Emit/emit_valid_event (0.00s)
+    --- PASS: TestService_Emit/emit_nil_event (0.00s)
+=== RUN   TestService_Subscribe
+=== RUN   TestService_Subscribe/subscribe_to_event
+--- PASS: TestService_Subscribe (0.00s)
+    --- PASS: TestService_Subscribe/subscribe_to_event (0.00s)
+=== RUN   TestService_RemoveResourceFromAll
+=== RUN   TestService_RemoveResourceFromAll/successful_remove_resource_from_all_roles
+=== RUN   TestService_RemoveResourceFromAll/failed_remove_resource_from_all_roles
+--- PASS: TestService_RemoveResourceFromAll (0.00s)
+    --- PASS: TestService_RemoveResourceFromAll/successful_remove_resource_from_all_roles (0.00s)
+    --- PASS: TestService_RemoveResourceFromAll/failed_remove_resource_from_all_roles (0.00s)
+=== RUN   TestEvent_Name
+=== RUN   TestEvent_Name/role_updated_event
+--- PASS: TestEvent_Name (0.00s)
+    --- PASS: TestEvent_Name/role_updated_event (0.00s)
+=== RUN   TestEvent_Payload
+=== RUN   TestEvent_Payload/simple_role
+=== RUN   TestEvent_Payload/role_with_resources
+--- PASS: TestEvent_Payload (0.00s)
+    --- PASS: TestEvent_Payload/simple_role (0.00s)
+    --- PASS: TestEvent_Payload/role_with_resources (0.00s)
+=== RUN   TestEvent_Metadata
+=== RUN   TestEvent_Metadata/metadata_with_user_and_projects
+--- PASS: TestEvent_Metadata (0.01s)
+    --- PASS: TestEvent_Metadata/metadata_with_user_and_projects (0.00s)
+=== RUN   TestEvent_Context
+=== RUN   TestEvent_Context/background_context
+=== RUN   TestEvent_Context/context_with_metadata
+--- PASS: TestEvent_Context (0.00s)
+    --- PASS: TestEvent_Context/background_context (0.00s)
+    --- PASS: TestEvent_Context/context_with_metadata (0.00s)
+=== RUN   TestNewEvent
+=== RUN   TestNewEvent/create_event_with_all_parameters
+--- PASS: TestNewEvent (0.00s)
+    --- PASS: TestNewEvent/create_event_with_all_parameters (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/services/role	5.605s
+=== RUN   TestUserErrors
+--- PASS: TestUserErrors (0.00s)
+=== RUN   TestErrorTypes
+--- PASS: TestErrorTypes (0.00s)
+=== RUN   TestHandleEvent
+=== RUN   TestHandleEvent/success_-_handle_role_updated_event
+2026/02/17 17:28:54.616382 events.go:24: [Info] handling role update event for users
+2026/02/17 17:28:54.880745 events.go:45: [Info] fetched users with role role_id=role-123 role_name=Test Role no_of_users=0 page=1 limit=10
+=== RUN   TestHandleEvent/success_-_handle_unknown_event
+=== RUN   TestHandleEvent/success_-_handle_client_created_event
+--- PASS: TestHandleEvent (0.27s)
+    --- PASS: TestHandleEvent/success_-_handle_role_updated_event (0.27s)
+    --- PASS: TestHandleEvent/success_-_handle_unknown_event (0.00s)
+    --- PASS: TestHandleEvent/success_-_handle_client_created_event (0.00s)
+=== RUN   TestHandleRoleUpdate
+=== RUN   TestHandleRoleUpdate/success_-_handle_role_update_with_users
+2026/02/17 17:28:54.882127 events.go:24: [Info] handling role update event for users
+2026/02/17 17:28:54.882879 events.go:47: [Info] fetched users with role role_id=role-123 role_name=Test Role no_of_users=2 page=1 limit=10
+2026/02/17 17:28:54.882879 events.go:65: [Debug] updating users with role role_id=role-123 role_name=Test Role no_of_users=2
+2026/02/17 17:28:54.883391 events.go:72: [Debug] successfully updated the role for user user_id=user-123 role_id=role-123 index=0
+2026/02/17 17:28:54.883391 events.go:72: [Debug] successfully updated the role for user user_id=user-2 role_id=role-123 index=1
+2026/02/17 17:28:54.883391 events.go:58: [Info] successfully updated users with role role_id=role-123 role_name=Test Role no_of_users=2 page=1 limit=10
+2026/02/17 17:28:54.883391 events.go:45: [Info] fetched users with role role_id=role-123 role_name=Test Role no_of_users=0 page=2 limit=10
+=== RUN   TestHandleRoleUpdate/error_-_fetch_users_fails
+2026/02/17 17:28:54.883391 events.go:24: [Info] handling role update event for users
+2026/02/17 17:28:54.884408 events.go:45: [Info] fetched users with role role_id=role-123 role_name=Test Role no_of_users=0 page=1 limit=10
+2026/02/17 17:28:54.884408 events.go:27: [Error] error fetching and updating users with role error=database error
+--- PASS: TestHandleRoleUpdate (0.00s)
+    --- PASS: TestHandleRoleUpdate/success_-_handle_role_update_with_users (0.00s)
+    --- PASS: TestHandleRoleUpdate/error_-_fetch_users_fails (0.00s)
+=== RUN   TestFetchAndUpdateUsersWithRole
+=== RUN   TestFetchAndUpdateUsersWithRole/success_-_fetch_and_update_users_with_pagination
+2026/02/17 17:28:54.885524 events.go:47: [Info] fetched users with role role_id=role-123 role_name=Test Role no_of_users=10 page=1 limit=10
+2026/02/17 17:28:54.885524 events.go:65: [Debug] updating users with role role_id=role-123 role_name=Test Role no_of_users=10
+2026/02/17 17:28:54.885524 events.go:72: [Debug] successfully updated the role for user user_id=user- role_id=role-123 index=0
+2026/02/17 17:28:54.885524 events.go:72: [Debug] successfully updated the role for user user_id=user- role_id=role-123 index=1
+2026/02/17 17:28:54.885524 events.go:72: [Debug] successfully updated the role for user user_id=user- role_id=role-123 index=2
+2026/02/17 17:28:54.885524 events.go:72: [Debug] successfully updated the role for user user_id=user- role_id=role-123 index=3
+2026/02/17 17:28:54.885524 events.go:72: [Debug] successfully updated the role for user user_id=user- role_id=role-123 index=4
+2026/02/17 17:28:54.887541 events.go:72: [Debug] successfully updated the role for user user_id=user- role_id=role-123 index=5
+2026/02/17 17:28:54.887541 events.go:72: [Debug] successfully updated the role for user user_id=user- role_id=role-123 index=6
+2026/02/17 17:28:54.887541 events.go:72: [Debug] successfully updated the role for user user_id=user- role_id=role-123 index=7
+2026/02/17 17:28:54.887541 events.go:72: [Debug] successfully updated the role for user user_id=user-	 role_id=role-123 index=8
+2026/02/17 17:28:54.887541 events.go:72: [Debug] successfully updated the role for user user_id=user-
+ role_id=role-123 index=9
+2026/02/17 17:28:54.887541 events.go:58: [Info] successfully updated users with role role_id=role-123 role_name=Test Role no_of_users=10 page=1 limit=10
+2026/02/17 17:28:54.887541 events.go:47: [Info] fetched users with role role_id=role-123 role_name=Test Role no_of_users=1 page=2 limit=10
+2026/02/17 17:28:54.887541 events.go:65: [Debug] updating users with role role_id=role-123 role_name=Test Role no_of_users=1
+2026/02/17 17:28:54.887541 events.go:72: [Debug] successfully updated the role for user user_id=user-11 role_id=role-123 index=0
+2026/02/17 17:28:54.887541 events.go:58: [Info] successfully updated users with role role_id=role-123 role_name=Test Role no_of_users=1 page=2 limit=10
+2026/02/17 17:28:54.887541 events.go:45: [Info] fetched users with role role_id=role-123 role_name=Test Role no_of_users=0 page=3 limit=10
+=== RUN   TestFetchAndUpdateUsersWithRole/success_-_no_users_with_role
+2026/02/17 17:28:54.889226 events.go:45: [Info] fetched users with role role_id=role-123 role_name=Test Role no_of_users=0 page=1 limit=10
+=== RUN   TestFetchAndUpdateUsersWithRole/error_-_GetAll_fails
+2026/02/17 17:28:54.889226 events.go:45: [Info] fetched users with role role_id=role-123 role_name=Test Role no_of_users=0 page=1 limit=10
+=== RUN   TestFetchAndUpdateUsersWithRole/error_-_updateUsersWithRole_fails
+2026/02/17 17:28:54.892178 events.go:47: [Info] fetched users with role role_id=role-123 role_name=Test Role no_of_users=1 page=1 limit=10
+2026/02/17 17:28:54.892178 events.go:65: [Debug] updating users with role role_id=role-123 role_name=Test Role no_of_users=1
+2026/02/17 17:28:54.892178 events.go:69: [Error] error updating user with role changes. pausing the role update user_id=user-123 user_name=Test User role_id=role-123 error=update error
+--- PASS: TestFetchAndUpdateUsersWithRole (0.01s)
+    --- PASS: TestFetchAndUpdateUsersWithRole/success_-_fetch_and_update_users_with_pagination (0.00s)
+    --- PASS: TestFetchAndUpdateUsersWithRole/success_-_no_users_with_role (0.00s)
+    --- PASS: TestFetchAndUpdateUsersWithRole/error_-_GetAll_fails (0.00s)
+    --- PASS: TestFetchAndUpdateUsersWithRole/error_-_updateUsersWithRole_fails (0.00s)
+=== RUN   TestUpdateUsersWithRole
+=== RUN   TestUpdateUsersWithRole/success_-_update_multiple_users
+2026/02/17 17:28:54.893199 events.go:65: [Debug] updating users with role role_id=role-123 role_name=Test Role no_of_users=2
+2026/02/17 17:28:54.893694 events.go:72: [Debug] successfully updated the role for user user_id=user-123 role_id=role-123 index=0
+2026/02/17 17:28:54.894214 events.go:72: [Debug] successfully updated the role for user user_id=user-2 role_id=role-123 index=1
+=== RUN   TestUpdateUsersWithRole/success_-_update_empty_users_list
+2026/02/17 17:28:54.894214 events.go:65: [Debug] updating users with role role_id=role-123 role_name=Test Role no_of_users=0
+=== RUN   TestUpdateUsersWithRole/error_-_user_update_fails
+2026/02/17 17:28:54.894214 events.go:65: [Debug] updating users with role role_id=role-123 role_name=Test Role no_of_users=1
+2026/02/17 17:28:54.894865 events.go:69: [Error] error updating user with role changes. pausing the role update user_id=user-123 user_name=Test User role_id=role-123 error=update failed
+--- PASS: TestUpdateUsersWithRole (0.00s)
+    --- PASS: TestUpdateUsersWithRole/success_-_update_multiple_users (0.00s)
+    --- PASS: TestUpdateUsersWithRole/success_-_update_empty_users_list (0.00s)
+    --- PASS: TestUpdateUsersWithRole/error_-_user_update_fails (0.00s)
+=== RUN   TestUpdateUser
+=== RUN   TestUpdateUser/success_-_update_user_with_role
+=== RUN   TestUpdateUser/error_-_store_update_fails
+=== RUN   TestUpdateUser/success_-_update_user_without_existing_role
+--- PASS: TestUpdateUser (0.00s)
+    --- PASS: TestUpdateUser/success_-_update_user_with_role (0.00s)
+    --- PASS: TestUpdateUser/error_-_store_update_fails (0.00s)
+    --- PASS: TestUpdateUser/success_-_update_user_without_existing_role (0.00s)
+=== RUN   TestRemoveRoleFromUserObj
+=== RUN   TestRemoveRoleFromUserObj/success_-_remove_role_and_its_resources
+=== RUN   TestRemoveRoleFromUserObj/success_-_remove_role_and_keep_resource_with_policies
+=== RUN   TestRemoveRoleFromUserObj/success_-_remove_role_with_no_matching_resources
+=== RUN   TestRemoveRoleFromUserObj/success_-_handle_nil_user_fields
+=== RUN   TestRemoveRoleFromUserObj/success_-_remove_role_with_empty_resources
+--- PASS: TestRemoveRoleFromUserObj (0.00s)
+    --- PASS: TestRemoveRoleFromUserObj/success_-_remove_role_and_its_resources (0.00s)
+    --- PASS: TestRemoveRoleFromUserObj/success_-_remove_role_and_keep_resource_with_policies (0.00s)
+    --- PASS: TestRemoveRoleFromUserObj/success_-_remove_role_with_no_matching_resources (0.00s)
+    --- PASS: TestRemoveRoleFromUserObj/success_-_handle_nil_user_fields (0.00s)
+    --- PASS: TestRemoveRoleFromUserObj/success_-_remove_role_with_empty_resources (0.00s)
+=== RUN   TestAddRoleToUserObj
+=== RUN   TestAddRoleToUserObj/success_-_add_role_to_user_with_nil_fields
+=== RUN   TestAddRoleToUserObj/success_-_add_role_to_user_with_existing_roles_and_resources
+=== RUN   TestAddRoleToUserObj/success_-_add_role_with_existing_resource_(merge)
+=== RUN   TestAddRoleToUserObj/success_-_add_role_with_resource_having_empty_RoleIds
+=== RUN   TestAddRoleToUserObj/success_-_add_role_with_no_resources
+=== RUN   TestAddRoleToUserObj/success_-_add_role_with_nil_resource_RoleIds
+--- PASS: TestAddRoleToUserObj (0.00s)
+    --- PASS: TestAddRoleToUserObj/success_-_add_role_to_user_with_nil_fields (0.00s)
+    --- PASS: TestAddRoleToUserObj/success_-_add_role_to_user_with_existing_roles_and_resources (0.00s)
+    --- PASS: TestAddRoleToUserObj/success_-_add_role_with_existing_resource_(merge) (0.00s)
+    --- PASS: TestAddRoleToUserObj/success_-_add_role_with_resource_having_empty_RoleIds (0.00s)
+    --- PASS: TestAddRoleToUserObj/success_-_add_role_with_no_resources (0.00s)
+    --- PASS: TestAddRoleToUserObj/success_-_add_role_with_nil_resource_RoleIds (0.00s)
+=== RUN   TestAddResourceToUserObj
+=== RUN   TestAddResourceToUserObj/success_-_add_resource_to_user_with_nil_resources
+=== RUN   TestAddResourceToUserObj/success_-_add_resource_to_existing_resources
+=== RUN   TestAddResourceToUserObj/success_-_add_policy_to_existing_resource
+=== RUN   TestAddResourceToUserObj/success_-_add_policy_to_resource_with_empty_PolicyIds
+--- PASS: TestAddResourceToUserObj (0.00s)
+    --- PASS: TestAddResourceToUserObj/success_-_add_resource_to_user_with_nil_resources (0.00s)
+    --- PASS: TestAddResourceToUserObj/success_-_add_resource_to_existing_resources (0.00s)
+    --- PASS: TestAddResourceToUserObj/success_-_add_policy_to_existing_resource (0.00s)
+    --- PASS: TestAddResourceToUserObj/success_-_add_policy_to_resource_with_empty_PolicyIds (0.00s)
+=== RUN   TestAddPoliciesToUserObj
+=== RUN   TestAddPoliciesToUserObj/success_-_add_policies_to_user_with_nil_policies
+=== RUN   TestAddPoliciesToUserObj/success_-_add_policies_to_existing_policies
+=== RUN   TestAddPoliciesToUserObj/success_-_overwrite_existing_policy
+=== RUN   TestAddPoliciesToUserObj/success_-_add_empty_policies_map
+--- PASS: TestAddPoliciesToUserObj (0.00s)
+    --- PASS: TestAddPoliciesToUserObj/success_-_add_policies_to_user_with_nil_policies (0.00s)
+    --- PASS: TestAddPoliciesToUserObj/success_-_add_policies_to_existing_policies (0.00s)
+    --- PASS: TestAddPoliciesToUserObj/success_-_overwrite_existing_policy (0.00s)
+    --- PASS: TestAddPoliciesToUserObj/success_-_add_empty_policies_map (0.00s)
+=== RUN   TestRemovePoliciesFromUserObj
+=== RUN   TestRemovePoliciesFromUserObj/success_-_remove_policies_from_user_with_nil_policies
+=== RUN   TestRemovePoliciesFromUserObj/success_-_remove_existing_policies
+=== RUN   TestRemovePoliciesFromUserObj/success_-_remove_non-existent_policies
+=== RUN   TestRemovePoliciesFromUserObj/success_-_remove_some_existing_and_some_non-existent_policies
+=== RUN   TestRemovePoliciesFromUserObj/success_-_remove_policies_with_empty_list
+--- PASS: TestRemovePoliciesFromUserObj (0.00s)
+    --- PASS: TestRemovePoliciesFromUserObj/success_-_remove_policies_from_user_with_nil_policies (0.00s)
+    --- PASS: TestRemovePoliciesFromUserObj/success_-_remove_existing_policies (0.00s)
+    --- PASS: TestRemovePoliciesFromUserObj/success_-_remove_non-existent_policies (0.00s)
+    --- PASS: TestRemovePoliciesFromUserObj/success_-_remove_some_existing_and_some_non-existent_policies (0.00s)
+    --- PASS: TestRemovePoliciesFromUserObj/success_-_remove_policies_with_empty_list (0.00s)
+=== RUN   TestNewService
+--- PASS: TestNewService (0.00s)
+=== RUN   TestCreate
+=== RUN   TestCreate/success_-_create_user
+=== RUN   TestCreate/error_-_store_create_fails
+--- PASS: TestCreate (0.00s)
+    --- PASS: TestCreate/success_-_create_user (0.00s)
+    --- PASS: TestCreate/error_-_store_create_fails (0.00s)
+=== RUN   TestUpdate
+=== RUN   TestUpdate/success_-_update_user
+=== RUN   TestUpdate/error_-_store_update_fails
+--- PASS: TestUpdate (0.00s)
+    --- PASS: TestUpdate/success_-_update_user (0.00s)
+    --- PASS: TestUpdate/error_-_store_update_fails (0.00s)
+=== RUN   TestGetByEmail
+=== RUN   TestGetByEmail/success_-_user_found
+=== RUN   TestGetByEmail/error_-_user_not_found
+--- PASS: TestGetByEmail (0.00s)
+    --- PASS: TestGetByEmail/success_-_user_found (0.00s)
+    --- PASS: TestGetByEmail/error_-_user_not_found (0.00s)
+=== RUN   TestGetById
+=== RUN   TestGetById/success_-_user_found
+=== RUN   TestGetById/error_-_user_not_found
+--- PASS: TestGetById (0.00s)
+    --- PASS: TestGetById/success_-_user_found (0.00s)
+    --- PASS: TestGetById/error_-_user_not_found (0.00s)
+=== RUN   TestGetByPhone
+=== RUN   TestGetByPhone/success_-_user_found
+=== RUN   TestGetByPhone/error_-_user_not_found
+--- PASS: TestGetByPhone (0.00s)
+    --- PASS: TestGetByPhone/success_-_user_found (0.00s)
+    --- PASS: TestGetByPhone/error_-_user_not_found (0.00s)
+=== RUN   TestGetAll
+=== RUN   TestGetAll/success_-_users_found
+=== RUN   TestGetAll/error_-_store_query_fails
+--- PASS: TestGetAll (0.00s)
+    --- PASS: TestGetAll/success_-_users_found (0.00s)
+    --- PASS: TestGetAll/error_-_store_query_fails (0.00s)
+=== RUN   TestAddRoleToUser
+=== RUN   TestAddRoleToUser/success_-_add_role_to_user
+=== RUN   TestAddRoleToUser/error_-_user_not_found
+=== RUN   TestAddRoleToUser/error_-_role_not_found
+=== RUN   TestAddRoleToUser/error_-_store_update_fails
+=== RUN   TestAddRoleToUser/error_-_empty_user_ID
+=== RUN   TestAddRoleToUser/error_-_empty_role_ID
+=== RUN   TestAddRoleToUser/success_-_role_already_exists_(no-op)
+--- PASS: TestAddRoleToUser (0.00s)
+    --- PASS: TestAddRoleToUser/success_-_add_role_to_user (0.00s)
+    --- PASS: TestAddRoleToUser/error_-_user_not_found (0.00s)
+    --- PASS: TestAddRoleToUser/error_-_role_not_found (0.00s)
+    --- PASS: TestAddRoleToUser/error_-_store_update_fails (0.00s)
+    --- PASS: TestAddRoleToUser/error_-_empty_user_ID (0.00s)
+    --- PASS: TestAddRoleToUser/error_-_empty_role_ID (0.00s)
+    --- PASS: TestAddRoleToUser/success_-_role_already_exists_(no-op) (0.00s)
+=== RUN   TestRemoveRoleFromUser
+=== RUN   TestRemoveRoleFromUser/success_-_remove_role_from_user
+=== RUN   TestRemoveRoleFromUser/error_-_user_not_found
+=== RUN   TestRemoveRoleFromUser/success_-_role_not_in_user_(no-op)
+=== RUN   TestRemoveRoleFromUser/error_-_empty_user_ID
+=== RUN   TestRemoveRoleFromUser/error_-_empty_role_ID
+=== RUN   TestRemoveRoleFromUser/error_-_role_service_fails
+=== RUN   TestRemoveRoleFromUser/error_-_store_update_fails
+--- PASS: TestRemoveRoleFromUser (0.01s)
+    --- PASS: TestRemoveRoleFromUser/success_-_remove_role_from_user (0.00s)
+    --- PASS: TestRemoveRoleFromUser/error_-_user_not_found (0.00s)
+    --- PASS: TestRemoveRoleFromUser/success_-_role_not_in_user_(no-op) (0.01s)
+    --- PASS: TestRemoveRoleFromUser/error_-_empty_user_ID (0.00s)
+    --- PASS: TestRemoveRoleFromUser/error_-_empty_role_ID (0.00s)
+    --- PASS: TestRemoveRoleFromUser/error_-_role_service_fails (0.00s)
+    --- PASS: TestRemoveRoleFromUser/error_-_store_update_fails (0.00s)
+=== RUN   TestAddResourceToUser
+=== RUN   TestAddResourceToUser/success_-_add_resource_to_user
+=== RUN   TestAddResourceToUser/error_-_user_not_found
+=== RUN   TestAddResourceToUser/error_-_store_update_fails
+--- PASS: TestAddResourceToUser (0.00s)
+    --- PASS: TestAddResourceToUser/success_-_add_resource_to_user (0.00s)
+    --- PASS: TestAddResourceToUser/error_-_user_not_found (0.00s)
+    --- PASS: TestAddResourceToUser/error_-_store_update_fails (0.00s)
+=== RUN   TestAddPolicyToUser
+=== RUN   TestAddPolicyToUser/success_-_add_policies_to_user
+=== RUN   TestAddPolicyToUser/error_-_user_not_found
+=== RUN   TestAddPolicyToUser/error_-_store_update_fails
+--- PASS: TestAddPolicyToUser (0.00s)
+    --- PASS: TestAddPolicyToUser/success_-_add_policies_to_user (0.00s)
+    --- PASS: TestAddPolicyToUser/error_-_user_not_found (0.00s)
+    --- PASS: TestAddPolicyToUser/error_-_store_update_fails (0.00s)
+=== RUN   TestRemovePolicyFromUser
+=== RUN   TestRemovePolicyFromUser/success_-_remove_policies_from_user
+=== RUN   TestRemovePolicyFromUser/error_-_user_not_found
+=== RUN   TestRemovePolicyFromUser/error_-_store_update_fails
+--- PASS: TestRemovePolicyFromUser (0.00s)
+    --- PASS: TestRemovePolicyFromUser/success_-_remove_policies_from_user (0.00s)
+    --- PASS: TestRemovePolicyFromUser/error_-_user_not_found (0.00s)
+    --- PASS: TestRemovePolicyFromUser/error_-_store_update_fails (0.00s)
+=== RUN   TestRemoveResourceFromAllUsers
+=== RUN   TestRemoveResourceFromAllUsers/success_-_remove_resource_from_all_users
+=== RUN   TestRemoveResourceFromAllUsers/error_-_store_removal_fails
+--- PASS: TestRemoveResourceFromAllUsers (0.00s)
+    --- PASS: TestRemoveResourceFromAllUsers/success_-_remove_resource_from_all_users (0.00s)
+    --- PASS: TestRemoveResourceFromAllUsers/error_-_store_removal_fails (0.00s)
+=== RUN   TestTransferOwnership
+=== RUN   TestTransferOwnership/success_-_transfer_ownership
+=== RUN   TestTransferOwnership/success_-_transfer_ownership_with_policies
+=== RUN   TestTransferOwnership/success_-_transfer_ownership_with_roles
+=== RUN   TestTransferOwnership/success_-_transfer_ownership_with_resources
+=== RUN   TestTransferOwnership/success_-_transfer_ownership_with_roles_not_found
+2026/02/17 17:28:54.925463 service_impl.go:207: [Warn] failed to fetch role role-2: role not found
+=== RUN   TestTransferOwnership/success_-_transfer_ownership_when_new_owner_already_has_same_role
+=== RUN   TestTransferOwnership/success_-_transfer_ownership_when_users_have_overlapping_resources
+=== RUN   TestTransferOwnership/success_-_transfer_ownership_with_empty_resources_and_roles
+=== RUN   TestTransferOwnership/error_-_old_owner_not_found
+=== RUN   TestTransferOwnership/error_-_new_owner_not_found
+=== RUN   TestTransferOwnership/error_-_store_update_fails
+=== RUN   TestTransferOwnership/error_-_old_user_store_update_fails
+=== RUN   TestTransferOwnership/error_-_empty_old_owner_ID
+=== RUN   TestTransferOwnership/error_-_empty_new_owner_ID
+--- PASS: TestTransferOwnership (0.03s)
+    --- PASS: TestTransferOwnership/success_-_transfer_ownership (0.00s)
+    --- PASS: TestTransferOwnership/success_-_transfer_ownership_with_policies (0.00s)
+    --- PASS: TestTransferOwnership/success_-_transfer_ownership_with_roles (0.00s)
+    --- PASS: TestTransferOwnership/success_-_transfer_ownership_with_resources (0.00s)
+    --- PASS: TestTransferOwnership/success_-_transfer_ownership_with_roles_not_found (0.00s)
+    --- PASS: TestTransferOwnership/success_-_transfer_ownership_when_new_owner_already_has_same_role (0.00s)
+    --- PASS: TestTransferOwnership/success_-_transfer_ownership_when_users_have_overlapping_resources (0.00s)
+    --- PASS: TestTransferOwnership/success_-_transfer_ownership_with_empty_resources_and_roles (0.01s)
+    --- PASS: TestTransferOwnership/error_-_old_owner_not_found (0.00s)
+    --- PASS: TestTransferOwnership/error_-_new_owner_not_found (0.00s)
+    --- PASS: TestTransferOwnership/error_-_store_update_fails (0.00s)
+    --- PASS: TestTransferOwnership/error_-_old_user_store_update_fails (0.01s)
+    --- PASS: TestTransferOwnership/error_-_empty_old_owner_ID (0.00s)
+    --- PASS: TestTransferOwnership/error_-_empty_new_owner_ID (0.00s)
+=== RUN   TestCopyUserResources
+=== RUN   TestCopyUserResources/success_-_copy_resources_from_source_to_target
+=== RUN   TestCopyUserResources/success_-_copy_resources_when_target_has_no_existing_resources
+=== RUN   TestCopyUserResources/success_-_copy_resources_overwrites_existing_resources_with_same_key
+=== RUN   TestCopyUserResources/success_-_copy_from_user_with_no_resources
+=== RUN   TestCopyUserResources/error_-_source_user_not_found
+=== RUN   TestCopyUserResources/error_-_target_user_not_found
+=== RUN   TestCopyUserResources/error_-_database_update_fails
+--- PASS: TestCopyUserResources (0.01s)
+    --- PASS: TestCopyUserResources/success_-_copy_resources_from_source_to_target (0.00s)
+    --- PASS: TestCopyUserResources/success_-_copy_resources_when_target_has_no_existing_resources (0.00s)
+    --- PASS: TestCopyUserResources/success_-_copy_resources_overwrites_existing_resources_with_same_key (0.01s)
+    --- PASS: TestCopyUserResources/success_-_copy_from_user_with_no_resources (0.00s)
+    --- PASS: TestCopyUserResources/error_-_source_user_not_found (0.00s)
+    --- PASS: TestCopyUserResources/error_-_target_user_not_found (0.00s)
+    --- PASS: TestCopyUserResources/error_-_database_update_fails (0.00s)
+=== RUN   TestEventHandling
+--- PASS: TestEventHandling (0.00s)
+=== RUN   TestEventMethods
+=== RUN   TestEventMethods/Name_method
+=== RUN   TestEventMethods/Payload_method
+=== RUN   TestEventMethods/Metadata_method
+=== RUN   TestEventMethods/Context_method
+=== RUN   TestEventMethods/Event_with_empty_metadata
+=== RUN   TestEventMethods/Event_with_different_event_types
+--- PASS: TestEventMethods (0.00s)
+    --- PASS: TestEventMethods/Name_method (0.00s)
+    --- PASS: TestEventMethods/Payload_method (0.00s)
+    --- PASS: TestEventMethods/Metadata_method (0.00s)
+    --- PASS: TestEventMethods/Context_method (0.00s)
+    --- PASS: TestEventMethods/Event_with_empty_metadata (0.00s)
+    --- PASS: TestEventMethods/Event_with_different_event_types (0.00s)
+=== RUN   TestEmit
+=== RUN   TestEmit/success_-_emit_valid_event
+=== RUN   TestEmit/success_-_emit_nil_event
+=== RUN   TestEmit/success_-_emit_event_with_different_types
+=== RUN   TestEmit/success_-_emit_event_with_different_types/user:created
+=== RUN   TestEmit/success_-_emit_event_with_different_types/role:updated
+=== RUN   TestEmit/success_-_emit_event_with_different_types/resource:created
+=== RUN   TestEmit/success_-_emit_event_with_different_types/client:created
+--- PASS: TestEmit (0.00s)
+    --- PASS: TestEmit/success_-_emit_valid_event (0.00s)
+    --- PASS: TestEmit/success_-_emit_nil_event (0.00s)
+    --- PASS: TestEmit/success_-_emit_event_with_different_types (0.00s)
+        --- PASS: TestEmit/success_-_emit_event_with_different_types/user:created (0.00s)
+        --- PASS: TestEmit/success_-_emit_event_with_different_types/role:updated (0.00s)
+        --- PASS: TestEmit/success_-_emit_event_with_different_types/resource:created (0.00s)
+        --- PASS: TestEmit/success_-_emit_event_with_different_types/client:created (0.00s)
+=== RUN   TestSubscribe
+=== RUN   TestSubscribe/success_-_subscribe_to_user_created_event
+=== RUN   TestSubscribe/success_-_subscribe_to_different_events
+=== RUN   TestSubscribe/success_-_subscribe_to_different_events/user:created
+=== RUN   TestSubscribe/success_-_subscribe_to_different_events/role:updated
+=== RUN   TestSubscribe/success_-_subscribe_to_different_events/resource:created
+=== RUN   TestSubscribe/success_-_subscribe_to_different_events/client:created
+--- PASS: TestSubscribe (0.00s)
+    --- PASS: TestSubscribe/success_-_subscribe_to_user_created_event (0.00s)
+    --- PASS: TestSubscribe/success_-_subscribe_to_different_events (0.00s)
+        --- PASS: TestSubscribe/success_-_subscribe_to_different_events/user:created (0.00s)
+        --- PASS: TestSubscribe/success_-_subscribe_to_different_events/role:updated (0.00s)
+        --- PASS: TestSubscribe/success_-_subscribe_to_different_events/resource:created (0.00s)
+        --- PASS: TestSubscribe/success_-_subscribe_to_different_events/client:created (0.00s)
+=== RUN   TestEmitAndSubscribeIntegration
+=== RUN   TestEmitAndSubscribeIntegration/integration_-_subscribe_and_emit
+--- PASS: TestEmitAndSubscribeIntegration (0.00s)
+    --- PASS: TestEmitAndSubscribeIntegration/integration_-_subscribe_and_emit (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/services/user	(cached)
+?   	github.com/codearena-platform/codearena-platform/internal/iam/usecase	[no test files]
+=== RUN   TestNewEmitter
+--- PASS: TestNewEmitter (0.00s)
+=== RUN   TestEmitter_Subscribe
+--- PASS: TestEmitter_Subscribe (0.00s)
+=== RUN   TestEmitter_Subscribe_MultipleSubscribers
+--- PASS: TestEmitter_Subscribe_MultipleSubscribers (0.00s)
+=== RUN   TestEmitter_Subscribe_DifferentEvents
+--- PASS: TestEmitter_Subscribe_DifferentEvents (0.00s)
+=== RUN   TestEmitter_Emit_WithSubscribers
+--- PASS: TestEmitter_Emit_WithSubscribers (0.00s)
+=== RUN   TestEmitter_Emit_NoSubscribers
+--- PASS: TestEmitter_Emit_NoSubscribers (0.00s)
+=== RUN   TestEmitter_Emit_MultipleSubscribers
+--- PASS: TestEmitter_Emit_MultipleSubscribers (0.00s)
+=== RUN   TestEmitter_Emit_WrongEventName
+--- PASS: TestEmitter_Emit_WrongEventName (0.00s)
+=== RUN   TestEvent_Interface_Methods
+--- PASS: TestEvent_Interface_Methods (0.00s)
+=== RUN   TestEmitter_ComplexScenario
+--- PASS: TestEmitter_ComplexScenario (0.00s)
+=== RUN   TestEmitter_EmptyEventName
+--- PASS: TestEmitter_EmptyEventName (0.00s)
+=== RUN   TestEmitter_NilContext
+--- PASS: TestEmitter_NilContext (0.00s)
+=== RUN   TestEmitter_EmptyMetadata
+--- PASS: TestEmitter_EmptyMetadata (0.00s)
+=== RUN   TestEmitter_NilMetadata
+--- PASS: TestEmitter_NilMetadata (0.00s)
+=== RUN   TestEmitter_ComplexPayload
+--- PASS: TestEmitter_ComplexPayload (0.00s)
+=== RUN   TestEmitter_ConcurrentAccess
+--- PASS: TestEmitter_ConcurrentAccess (0.02s)
+=== RUN   TestMap_IntToString
+--- PASS: TestMap_IntToString (0.00s)
+=== RUN   TestMap_StringToInt
+--- PASS: TestMap_StringToInt (0.00s)
+=== RUN   TestMap_StringToUpper
+--- PASS: TestMap_StringToUpper (0.00s)
+=== RUN   TestMap_EmptySlice
+--- PASS: TestMap_EmptySlice (0.00s)
+=== RUN   TestMap_SingleElement
+--- PASS: TestMap_SingleElement (0.00s)
+=== RUN   TestMap_ComplexTransformation
+--- PASS: TestMap_ComplexTransformation (0.00s)
+=== RUN   TestMap_BooleanTransformation
+--- PASS: TestMap_BooleanTransformation (0.00s)
+=== RUN   TestMap_SliceLength
+--- PASS: TestMap_SliceLength (0.00s)
+=== RUN   TestMap_NilFunction
+--- PASS: TestMap_NilFunction (0.00s)
+=== RUN   TestMap_FloatToInt
+--- PASS: TestMap_FloatToInt (0.00s)
+=== RUN   TestReduce_Sum
+--- PASS: TestReduce_Sum (0.00s)
+=== RUN   TestReduce_Product
+--- PASS: TestReduce_Product (0.00s)
+=== RUN   TestReduce_StringConcatenation
+--- PASS: TestReduce_StringConcatenation (0.00s)
+=== RUN   TestReduce_EmptySlice
+--- PASS: TestReduce_EmptySlice (0.00s)
+=== RUN   TestReduce_SingleElement
+--- PASS: TestReduce_SingleElement (0.00s)
+=== RUN   TestReduce_Max
+--- PASS: TestReduce_Max (0.00s)
+=== RUN   TestReduce_Min
+--- PASS: TestReduce_Min (0.00s)
+=== RUN   TestReduce_CountingCondition
+--- PASS: TestReduce_CountingCondition (0.00s)
+=== RUN   TestReduce_ComplexAccumulation
+--- PASS: TestReduce_ComplexAccumulation (0.00s)
+=== RUN   TestReduce_DifferentTypes
+--- PASS: TestReduce_DifferentTypes (0.00s)
+=== RUN   TestReduce_NilFunction
+--- PASS: TestReduce_NilFunction (0.00s)
+=== RUN   TestReduce_BooleanLogic
+--- PASS: TestReduce_BooleanLogic (0.00s)
+=== RUN   TestMap_LargeSlice
+--- PASS: TestMap_LargeSlice (0.00s)
+=== RUN   TestReduce_LargeSlice
+--- PASS: TestReduce_LargeSlice (0.00s)
+=== RUN   TestMap_Chaining
+--- PASS: TestMap_Chaining (0.00s)
+=== RUN   TestMapAndReduce_Integration
+--- PASS: TestMapAndReduce_Integration (0.00s)
+=== RUN   TestMap_ZeroValues
+--- PASS: TestMap_ZeroValues (0.00s)
+=== RUN   TestReduce_ZeroValues
+--- PASS: TestReduce_ZeroValues (0.00s)
+=== RUN   TestMap_PointerTypes
+--- PASS: TestMap_PointerTypes (0.00s)
+=== RUN   TestReduce_PointerTypes
+--- PASS: TestReduce_PointerTypes (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/utils	2.875s
+=== RUN   TestIntoDescription
+--- PASS: TestIntoDescription (0.00s)
+=== RUN   TestIntoDescriptionStructure
+--- PASS: TestIntoDescriptionStructure (0.00s)
+=== RUN   TestIntoDescriptionContent
+--- PASS: TestIntoDescriptionContent (0.00s)
+=== RUN   TestApiWrapper_Struct
+--- PASS: TestApiWrapper_Struct (0.00s)
+=== RUN   TestApiParameter_Struct
+--- PASS: TestApiParameter_Struct (0.00s)
+=== RUN   TestApiRequestBody_Struct
+--- PASS: TestApiRequestBody_Struct (0.00s)
+=== RUN   TestApiResponse_Struct
+--- PASS: TestApiResponse_Struct (0.00s)
+=== RUN   TestRegisterApi
+--- PASS: TestRegisterApi (0.00s)
+=== RUN   TestGenerateOpenAPI_NoAPIs
+--- PASS: TestGenerateOpenAPI_NoAPIs (0.00s)
+=== RUN   TestGenerateOpenAPI_Success
+--- PASS: TestGenerateOpenAPI_Success (0.01s)
+=== RUN   TestGenerateOpenAPI_WithInvalidAPI
+--- PASS: TestGenerateOpenAPI_WithInvalidAPI (0.00s)
+=== RUN   TestExtractPathParams
+=== RUN   TestExtractPathParams/No_parameters
+=== RUN   TestExtractPathParams/Single_parameter
+=== RUN   TestExtractPathParams/Multiple_parameters
+=== RUN   TestExtractPathParams/Mixed_path
+=== RUN   TestExtractPathParams/Root_path
+=== RUN   TestExtractPathParams/Empty_path
+--- PASS: TestExtractPathParams (0.00s)
+    --- PASS: TestExtractPathParams/No_parameters (0.00s)
+    --- PASS: TestExtractPathParams/Single_parameter (0.00s)
+    --- PASS: TestExtractPathParams/Multiple_parameters (0.00s)
+    --- PASS: TestExtractPathParams/Mixed_path (0.00s)
+    --- PASS: TestExtractPathParams/Root_path (0.00s)
+    --- PASS: TestExtractPathParams/Empty_path (0.00s)
+=== RUN   TestGenerateDocsForApi_EmptyAPIs
+--- PASS: TestGenerateDocsForApi_EmptyAPIs (0.00s)
+=== RUN   TestGenerateDocsForApi_Success
+--- PASS: TestGenerateDocsForApi_Success (0.00s)
+=== RUN   TestGenerateDocsForApi_AllHTTPMethods
+=== RUN   TestGenerateDocsForApi_AllHTTPMethods/GET
+=== RUN   TestGenerateDocsForApi_AllHTTPMethods/POST
+=== RUN   TestGenerateDocsForApi_AllHTTPMethods/PUT
+=== RUN   TestGenerateDocsForApi_AllHTTPMethods/DELETE
+--- PASS: TestGenerateDocsForApi_AllHTTPMethods (0.00s)
+    --- PASS: TestGenerateDocsForApi_AllHTTPMethods/GET (0.00s)
+    --- PASS: TestGenerateDocsForApi_AllHTTPMethods/POST (0.00s)
+    --- PASS: TestGenerateDocsForApi_AllHTTPMethods/PUT (0.00s)
+    --- PASS: TestGenerateDocsForApi_AllHTTPMethods/DELETE (0.00s)
+=== RUN   TestGenerateDocsForApi_UnsupportedMethod
+--- PASS: TestGenerateDocsForApi_UnsupportedMethod (0.00s)
+=== RUN   TestGenerateDocsForRequestBody_NilContent
+--- PASS: TestGenerateDocsForRequestBody_NilContent (0.00s)
+=== RUN   TestGenerateDocsForRequestBody_Success
+--- PASS: TestGenerateDocsForRequestBody_Success (0.00s)
+=== RUN   TestGenerateDocsForResponse_NilContent
+--- PASS: TestGenerateDocsForResponse_NilContent (0.00s)
+=== RUN   TestGenerateDocsForResponse_Success
+--- PASS: TestGenerateDocsForResponse_Success (0.00s)
+=== RUN   TestGenerateDocsForParameters_EmptyParameters
+--- PASS: TestGenerateDocsForParameters_EmptyParameters (0.00s)
+=== RUN   TestGenerateDocsForParameters_Success
+--- PASS: TestGenerateDocsForParameters_Success (0.00s)
+=== RUN   TestCreateOpenApiDoc_Success
+--- PASS: TestCreateOpenApiDoc_Success (0.25s)
+=== RUN   TestCreateOpenApiDoc_GenerateError
+--- PASS: TestCreateOpenApiDoc_GenerateError (0.02s)
+=== RUN   TestCreateOpenApiDoc_WriteError
+--- PASS: TestCreateOpenApiDoc_WriteError (0.00s)
+=== RUN   TestGenerateOpenAPI_ComplexScenario
+--- PASS: TestGenerateOpenAPI_ComplexScenario (0.02s)
+=== RUN   TestGenerateDocsForApi_RequestBodyError
+--- PASS: TestGenerateDocsForApi_RequestBodyError (0.00s)
+=== RUN   TestGenerateDocsForApi_ResponseError
+--- PASS: TestGenerateDocsForApi_ResponseError (0.00s)
+=== RUN   TestConstants
+--- PASS: TestConstants (0.00s)
+=== RUN   TestGlobalApisState
+--- PASS: TestGlobalApisState (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/utils/docs	2.131s
+=== RUN   TestGetIAMClient_Success
+--- PASS: TestGetIAMClient_Success (0.00s)
+=== RUN   TestGetIAMClient_MultipleClients
+--- PASS: TestGetIAMClient_MultipleClients (0.00s)
+=== RUN   TestGetIAMClient_ServiceError
+--- PASS: TestGetIAMClient_ServiceError (0.00s)
+=== RUN   TestGetIAMClient_NoClientsFound
+2026/02/17 17:46:38.107257 fetch.go:19: [Warn] IAM running in insecure mode. Create a client for Go IAM to make the application secure
+--- PASS: TestGetIAMClient_NoClientsFound (0.13s)
+=== RUN   TestGetIAMClient_EmptyClient
+--- PASS: TestGetIAMClient_EmptyClient (0.00s)
+=== RUN   TestGetIAMClient_NilFields
+--- PASS: TestGetIAMClient_NilFields (0.00s)
+=== RUN   TestGetIAMClient_CorrectQueryParams
+--- PASS: TestGetIAMClient_CorrectQueryParams (0.00s)
+=== RUN   TestGetIAMClient_ContextPassing
+--- PASS: TestGetIAMClient_ContextPassing (0.00s)
+=== RUN   TestGetIAMClient_ClientWithAllFields
+--- PASS: TestGetIAMClient_ClientWithAllFields (0.00s)
+=== RUN   TestGetIAMClient_ErrorTypes
+=== RUN   TestGetIAMClient_ErrorTypes/Database_error
+=== RUN   TestGetIAMClient_ErrorTypes/Network_error
+=== RUN   TestGetIAMClient_ErrorTypes/Authentication_error
+=== RUN   TestGetIAMClient_ErrorTypes/Generic_error
+--- PASS: TestGetIAMClient_ErrorTypes (0.00s)
+    --- PASS: TestGetIAMClient_ErrorTypes/Database_error (0.00s)
+    --- PASS: TestGetIAMClient_ErrorTypes/Network_error (0.00s)
+    --- PASS: TestGetIAMClient_ErrorTypes/Authentication_error (0.00s)
+    --- PASS: TestGetIAMClient_ErrorTypes/Generic_error (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/utils/httpclient	2.321s
+?   	github.com/codearena-platform/codearena-platform/internal/iam/utils/test	[no test files]
+?   	github.com/codearena-platform/codearena-platform/internal/iam/utils/test/server	[no test files]
+?   	github.com/codearena-platform/codearena-platform/internal/iam/utils/test/services	[no test files]
+FAIL

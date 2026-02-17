@@ -1,6 +1,6 @@
-// Package auth provides authentication middleware for the Go IAM system.
+// Package auth provides authentication middleware for the IAM system.
 // It handles user authentication via Bearer tokens and integrates with
-// the Go IAM authentication service to validate and extract user information.
+// the IAM authentication service to validate and extract user information.
 package auth
 
 import (
@@ -8,26 +8,26 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/log"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/auth"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/client"
-	goiamclient "github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamclient"
+	"github.com/codearena-platform/codearena-platform/internal/iam/utils/httpclient"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 // Middlewares provides authentication middleware functionality.
-// It encapsulates the authentication service, client service, and Go IAM client
+// It encapsulates the authentication service, client service, and IAM client
 // needed for user authentication and authorization.
 type Middlewares struct {
 	authSvc    auth.Service   // Authentication service for token validation
 	clientSvc  client.Service // Client service for client operations
-	AuthClient *sdk.Client    // Go IAM client configuration
+	AuthClient *sdk.Client    // IAM client configuration
 }
 
 // NewMiddlewares creates a new authentication middleware instance.
 // It initializes the middleware with the required services and retrieves
-// the Go IAM client configuration for authentication operations.
+// the IAM client configuration for authentication operations.
 //
 // Parameters:
 //   - authSvc: Authentication service for token validation
@@ -35,9 +35,9 @@ type Middlewares struct {
 //
 // Returns:
 //   - *Middlewares: Configured middleware instance
-//   - error: Error if Go IAM client retrieval fails
+//   - error: Error if IAM client retrieval fails
 func NewMiddlewares(authSvc auth.Service, clientSvc client.Service) (*Middlewares, error) {
-	authClient, err := goiamclient.GetGoIamClient(clientSvc)
+	authClient, err := httpclient.GetIAMClient(clientSvc)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (m *Middlewares) User(c *fiber.Ctx) error {
 // DashboardUser is a specialized Fiber middleware for dashboard authentication.
 // It performs user authentication similar to User middleware but returns
 // dashboard-specific response format including setup information about
-// the Go IAM client configuration.
+// the IAM client configuration.
 //
 // Usage:
 //

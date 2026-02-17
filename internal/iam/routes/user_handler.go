@@ -39,7 +39,7 @@ func (h *IAMHandler) CreateUser(c *fiber.Ctx) error {
 			Message: fmt.Sprintf("invalid request. %v", err),
 		})
 	}
-	err := h.prv.S.User.Create(c.Context(), payload)
+	err := h.prv.S.IdentityUC.CreateUser(c.Context(), payload)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(sdk.UserResponse{
 			Success: false,
@@ -55,7 +55,7 @@ func (h *IAMHandler) CreateUser(c *fiber.Ctx) error {
 
 func (h *IAMHandler) GetUserById(c *fiber.Ctx) error {
 	id := c.Params("id")
-	user, err := h.prv.S.User.GetById(c.Context(), id)
+	user, err := h.prv.S.IdentityUC.GetUserById(c.Context(), id)
 	if err != nil {
 		if strings.Contains(err.Error(), sdk.ErrUserNotFound.Error()) {
 			return c.Status(http.StatusNotFound).JSON(sdk.UserResponse{
@@ -91,7 +91,7 @@ func (h *IAMHandler) GetAllUsers(c *fiber.Ctx) error {
 			query.Limit = val
 		}
 	}
-	users, err := h.prv.S.User.GetAll(c.Context(), query)
+	users, err := h.prv.S.IdentityUC.GetAllUsers(c.Context(), query)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(sdk.UserResponse{
 			Success: false,
@@ -115,7 +115,7 @@ func (h *IAMHandler) UpdateUser(c *fiber.Ctx) error {
 		})
 	}
 	payload.Id = id
-	err := h.prv.S.User.Update(c.Context(), payload)
+	err := h.prv.S.IdentityUC.UpdateUser(c.Context(), payload)
 	if err != nil {
 		if errors.Is(err, sdk.ErrUserNotFound) {
 			return c.Status(http.StatusNotFound).JSON(sdk.UserResponse{
@@ -146,7 +146,7 @@ func (h *IAMHandler) UpdateUserRoles(c *fiber.Ctx) error {
 	}
 
 	for _, roleId := range payload.ToBeRemoved {
-		if err := h.prv.S.User.RemoveRoleFromUser(c.Context(), id, roleId); err != nil {
+		if err := h.prv.S.IdentityUC.RemoveRoleFromUser(c.Context(), id, roleId); err != nil {
 			return c.Status(http.StatusInternalServerError).JSON(sdk.UserResponse{
 				Success: false,
 				Message: fmt.Sprintf("failed to remove role %s. %v", roleId, err),
@@ -155,7 +155,7 @@ func (h *IAMHandler) UpdateUserRoles(c *fiber.Ctx) error {
 	}
 
 	for _, roleId := range payload.ToBeAdded {
-		if err := h.prv.S.User.AddRoleToUser(c.Context(), id, roleId); err != nil {
+		if err := h.prv.S.IdentityUC.AddRoleToUser(c.Context(), id, roleId); err != nil {
 			return c.Status(http.StatusInternalServerError).JSON(sdk.UserResponse{
 				Success: false,
 				Message: fmt.Sprintf("failed to add role %s. %v", roleId, err),
@@ -176,10 +176,10 @@ func (h *IAMHandler) UpdateUserPolicies(c *fiber.Ctx) error {
 		})
 	}
 
-	if err := h.prv.S.User.RemovePolicyFromUser(c.Context(), id, payload.ToBeRemoved); err != nil {
+	if err := h.prv.S.IdentityUC.RemovePolicyFromUser(c.Context(), id, payload.ToBeRemoved); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(sdk.UserResponse{Success: false, Message: err.Error()})
 	}
-	if err := h.prv.S.User.AddPolicyToUser(c.Context(), id, payload.ToBeAdded); err != nil {
+	if err := h.prv.S.IdentityUC.AddPolicyToUser(c.Context(), id, payload.ToBeAdded); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(sdk.UserResponse{Success: false, Message: err.Error()})
 	}
 
@@ -189,7 +189,7 @@ func (h *IAMHandler) UpdateUserPolicies(c *fiber.Ctx) error {
 func (h *IAMHandler) TransferOwnership(c *fiber.Ctx) error {
 	id := c.Params("id")
 	oldId := c.Params("oldId")
-	if err := h.prv.S.User.TransferOwnership(c.Context(), id, oldId); err != nil {
+	if err := h.prv.S.IdentityUC.TransferOwnership(c.Context(), id, oldId); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(sdk.UserResponse{Success: false, Message: err.Error()})
 	}
 	return c.JSON(sdk.UserResponse{Success: true, Message: "User ownership transferred successfully"})
@@ -198,7 +198,7 @@ func (h *IAMHandler) TransferOwnership(c *fiber.Ctx) error {
 func (h *IAMHandler) CopyUserResources(c *fiber.Ctx) error {
 	sourceId := c.Params("sourceId")
 	targetId := c.Params("targetId")
-	if err := h.prv.S.User.CopyUserResources(c.Context(), sourceId, targetId); err != nil {
+	if err := h.prv.S.IdentityUC.CopyUserResources(c.Context(), sourceId, targetId); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(sdk.UserResponse{Success: false, Message: err.Error()})
 	}
 	return c.JSON(sdk.UserResponse{Success: true, Message: "User resources copied successfully"})

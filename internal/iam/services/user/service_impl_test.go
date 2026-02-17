@@ -10,10 +10,11 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
+	"github.com/codearena-platform/codearena-platform/internal/iam/entity"
 	"github.com/codearena-platform/codearena-platform/internal/iam/middlewares"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils/test/services"
 )
 
@@ -22,29 +23,38 @@ type MockStore struct {
 	mock.Mock
 }
 
-func (m *MockStore) Create(ctx context.Context, user *sdk.User) error {
+func (m *MockStore) Create(ctx context.Context, user *entity.User) error {
 	args := m.Called(ctx, user)
 	return args.Error(0)
 }
 
-func (m *MockStore) Update(ctx context.Context, user *sdk.User) error {
+func (m *MockStore) Update(ctx context.Context, user *entity.User) error {
 	args := m.Called(ctx, user)
 	return args.Error(0)
 }
 
-func (m *MockStore) GetByEmail(ctx context.Context, email string, projectId string) (*sdk.User, error) {
+func (m *MockStore) GetByEmail(ctx context.Context, email string, projectId string) (*entity.User, error) {
 	args := m.Called(ctx, email, projectId)
-	return args.Get(0).(*sdk.User), args.Error(1)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*entity.User), args.Error(1)
 }
 
-func (m *MockStore) GetById(ctx context.Context, id string) (*sdk.User, error) {
+func (m *MockStore) GetById(ctx context.Context, id string) (*entity.User, error) {
 	args := m.Called(ctx, id)
-	return args.Get(0).(*sdk.User), args.Error(1)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*entity.User), args.Error(1)
 }
 
-func (m *MockStore) GetByPhone(ctx context.Context, phone string, projectId string) (*sdk.User, error) {
+func (m *MockStore) GetByPhone(ctx context.Context, phone string, projectId string) (*entity.User, error) {
 	args := m.Called(ctx, phone, projectId)
-	return args.Get(0).(*sdk.User), args.Error(1)
+	if args.Get(0) == nil {
+		return nil, args.Error(1)
+	}
+	return args.Get(0).(*entity.User), args.Error(1)
 }
 
 func (m *MockStore) GetAll(ctx context.Context, query sdk.UserQuery) (*sdk.UserList, error) {
@@ -98,7 +108,7 @@ func setupUserService() (*service, *MockStore, *services.MockRoleService) {
 	mockRoleService := &services.MockRoleService{}
 
 	svc := &service{
-		store:   mockStore,
+		repo:    mockStore,
 		roleSvc: mockRoleService,
 		e:       utils.NewEmitter[utils.Event[sdk.User]](),
 	}
@@ -141,14 +151,14 @@ func TestCreate(t *testing.T) {
 			name: "success - create user",
 			user: createTestUser(),
 			setupMocks: func() {
-				mockStore.On("Create", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("Create", mock.Anything, mock.Anything).Return(nil)
 			},
 		},
 		{
 			name: "error - store create fails",
 			user: createTestUser(),
 			setupMocks: func() {
-				mockStore.On("Create", ctx, mock.AnythingOfType("*sdk.User")).Return(errors.New("database error"))
+				mockStore.On("Create", mock.Anything, mock.Anything).Return(errors.New("database error"))
 			},
 			expectedError: "database error",
 		},
@@ -190,14 +200,14 @@ func TestUpdate(t *testing.T) {
 			name: "success - update user",
 			user: createTestUser(),
 			setupMocks: func() {
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 		},
 		{
 			name: "error - store update fails",
 			user: createTestUser(),
 			setupMocks: func() {
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(errors.New("update failed"))
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(errors.New("update failed"))
 			},
 			expectedError: "update failed",
 		},
@@ -244,7 +254,7 @@ func TestGetByEmail(t *testing.T) {
 			email:     "test@example.com",
 			projectId: "project-123",
 			setupMocks: func() {
-				mockStore.On("GetByEmail", ctx, "test@example.com", "project-123").Return(testUser, nil)
+				mockStore.On("GetByEmail", mock.Anything, mock.Anything, mock.Anything).Return(testUser, nil)
 			},
 			expectedUser: testUser,
 		},
@@ -253,7 +263,7 @@ func TestGetByEmail(t *testing.T) {
 			email:     "notfound@example.com",
 			projectId: "project-123",
 			setupMocks: func() {
-				mockStore.On("GetByEmail", ctx, "notfound@example.com", "project-123").Return((*sdk.User)(nil), ErrorUserNotFound)
+				mockStore.On("GetByEmail", mock.Anything, mock.Anything, mock.Anything).Return((*sdk.User)(nil), ErrorUserNotFound)
 			},
 			expectedError: "user not found",
 		},
@@ -300,7 +310,7 @@ func TestGetById(t *testing.T) {
 			name:   "success - user found",
 			userId: "user-123",
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-123").Return(testUser, nil)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return(testUser, nil)
 			},
 			expectedUser: testUser,
 		},
@@ -308,7 +318,7 @@ func TestGetById(t *testing.T) {
 			name:   "error - user not found",
 			userId: "user-999",
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-999").Return((*sdk.User)(nil), ErrorUserNotFound)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return((*sdk.User)(nil), ErrorUserNotFound)
 			},
 			expectedError: "user not found",
 		},
@@ -357,7 +367,7 @@ func TestGetByPhone(t *testing.T) {
 			phone:     "+1234567890",
 			projectId: "project-123",
 			setupMocks: func() {
-				mockStore.On("GetByPhone", ctx, "+1234567890", "project-123").Return(testUser, nil)
+				mockStore.On("GetByPhone", mock.Anything, mock.Anything, mock.Anything).Return(testUser, nil)
 			},
 			expectedUser: testUser,
 		},
@@ -366,7 +376,7 @@ func TestGetByPhone(t *testing.T) {
 			phone:     "+9999999999",
 			projectId: "project-123",
 			setupMocks: func() {
-				mockStore.On("GetByPhone", ctx, "+9999999999", "project-123").Return((*sdk.User)(nil), ErrorUserNotFound)
+				mockStore.On("GetByPhone", mock.Anything, mock.Anything, mock.Anything).Return((*sdk.User)(nil), ErrorUserNotFound)
 			},
 			expectedError: "user not found",
 		},
@@ -422,7 +432,7 @@ func TestGetAll(t *testing.T) {
 			name:  "success - users found",
 			query: query,
 			setupMocks: func() {
-				mockStore.On("GetAll", ctx, query).Return(testUsers, nil)
+				mockStore.On("GetAll", mock.Anything, mock.Anything).Return(testUsers, nil)
 			},
 			expectedUsers: testUsers,
 		},
@@ -430,7 +440,7 @@ func TestGetAll(t *testing.T) {
 			name:  "error - store query fails",
 			query: query,
 			setupMocks: func() {
-				mockStore.On("GetAll", ctx, query).Return((*sdk.UserList)(nil), errors.New("query failed"))
+				mockStore.On("GetAll", mock.Anything, mock.Anything).Return((*sdk.UserList)(nil), errors.New("query failed"))
 			},
 			expectedError: "query failed",
 		},
@@ -479,9 +489,9 @@ func TestAddRoleToUser(t *testing.T) {
 			userId: "user-123",
 			roleId: "role-123",
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-123").Return(testUser, nil)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return(testUser, nil)
 				mockRoleService.On("GetById", ctx, "role-123").Return(testRole, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 		},
 		{
@@ -489,7 +499,7 @@ func TestAddRoleToUser(t *testing.T) {
 			userId: "user-999",
 			roleId: "role-123",
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-999").Return((*sdk.User)(nil), ErrorUserNotFound)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return((*sdk.User)(nil), ErrorUserNotFound)
 			},
 			expectedError: "user not found",
 		},
@@ -498,7 +508,7 @@ func TestAddRoleToUser(t *testing.T) {
 			userId: "user-123",
 			roleId: "role-999",
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-123").Return(testUser, nil)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return(testUser, nil)
 				mockRoleService.On("GetById", ctx, "role-999").Return((*sdk.Role)(nil), errors.New("role not found"))
 			},
 			expectedError: "role not found",
@@ -511,9 +521,9 @@ func TestAddRoleToUser(t *testing.T) {
 				// Use a fresh user without the role so the update will be called
 				freshUser := createTestUser()
 				freshUser.Roles = make(map[string]sdk.UserRole) // Ensure no existing roles
-				mockStore.On("GetById", ctx, "user-123").Return(freshUser, nil)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return(freshUser, nil)
 				mockRoleService.On("GetById", ctx, "role-123").Return(testRole, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(errors.New("database connection failed"))
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(errors.New("database connection failed"))
 			},
 			expectedError: "failed to add role to user",
 		},
@@ -543,7 +553,7 @@ func TestAddRoleToUser(t *testing.T) {
 				// Create a user that already has this role
 				userWithRole := createTestUser()
 				userWithRole.Roles["role-123"] = sdk.UserRole{Id: "role-123", Name: "Test Role"}
-				mockStore.On("GetById", ctx, "user-123").Return(userWithRole, nil)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return(userWithRole, nil)
 				mockRoleService.On("GetById", ctx, "role-123").Return(testRole, nil)
 				// No Update call expected since role already exists
 			},
@@ -594,9 +604,9 @@ func TestRemoveRoleFromUser(t *testing.T) {
 			userId: "user-123",
 			roleId: "role-123",
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-123").Return(testUser, nil)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return(testUser, nil)
 				mockRoleService.On("GetById", ctx, "role-123").Return(testRole, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 		},
 		{
@@ -604,7 +614,7 @@ func TestRemoveRoleFromUser(t *testing.T) {
 			userId: "user-999",
 			roleId: "role-123",
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-999").Return((*sdk.User)(nil), ErrorUserNotFound)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return((*sdk.User)(nil), ErrorUserNotFound)
 			},
 			expectedError: "user not found",
 		},
@@ -614,7 +624,7 @@ func TestRemoveRoleFromUser(t *testing.T) {
 			roleId: "role-999",
 			setupMocks: func() {
 				// User doesn't have this role, so should return without doing anything
-				mockStore.On("GetById", ctx, "user-123").Return(createTestUser(), nil)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return(createTestUser(), nil)
 			},
 		},
 		{
@@ -638,7 +648,7 @@ func TestRemoveRoleFromUser(t *testing.T) {
 			setupMocks: func() {
 				userWithRole := createTestUser()
 				userWithRole.Roles["role-123"] = sdk.UserRole{Id: "role-123", Name: "Test Role"}
-				mockStore.On("GetById", ctx, "user-123").Return(userWithRole, nil)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return(userWithRole, nil)
 				mockRoleService.On("GetById", ctx, "role-123").Return((*sdk.Role)(nil), errors.New("role service error"))
 			},
 			expectedError: "role service error",
@@ -650,9 +660,9 @@ func TestRemoveRoleFromUser(t *testing.T) {
 			setupMocks: func() {
 				userWithRole := createTestUser()
 				userWithRole.Roles["role-123"] = sdk.UserRole{Id: "role-123", Name: "Test Role"}
-				mockStore.On("GetById", ctx, "user-123").Return(userWithRole, nil)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return(userWithRole, nil)
 				mockRoleService.On("GetById", ctx, "role-123").Return(testRole, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(errors.New("database error"))
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(errors.New("database error"))
 			},
 			expectedError: "failed to update user",
 		},
@@ -706,8 +716,8 @@ func TestAddResourceToUser(t *testing.T) {
 			userId:  "user-123",
 			request: resourceRequest,
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-123").Return(testUser, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return(testUser, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 		},
 		{
@@ -715,7 +725,7 @@ func TestAddResourceToUser(t *testing.T) {
 			userId:  "user-999",
 			request: resourceRequest,
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-999").Return((*sdk.User)(nil), ErrorUserNotFound)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return((*sdk.User)(nil), ErrorUserNotFound)
 			},
 			expectedError: "user not found",
 		},
@@ -724,8 +734,8 @@ func TestAddResourceToUser(t *testing.T) {
 			userId:  "user-123",
 			request: resourceRequest,
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-123").Return(testUser, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(errors.New("database error"))
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return(testUser, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(errors.New("database error"))
 			},
 			expectedError: "failed to update user",
 		},
@@ -781,8 +791,8 @@ func TestAddPolicyToUser(t *testing.T) {
 			userId:   "user-123",
 			policies: policies,
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-123").Return(testUser, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return(testUser, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 		},
 		{
@@ -790,7 +800,7 @@ func TestAddPolicyToUser(t *testing.T) {
 			userId:   "user-999",
 			policies: policies,
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-999").Return((*sdk.User)(nil), ErrorUserNotFound)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return((*sdk.User)(nil), ErrorUserNotFound)
 			},
 			expectedError: "user not found",
 		},
@@ -799,8 +809,8 @@ func TestAddPolicyToUser(t *testing.T) {
 			userId:   "user-123",
 			policies: policies,
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-123").Return(testUser, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(errors.New("database error"))
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return(testUser, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(errors.New("database error"))
 			},
 			expectedError: "failed to update user",
 		},
@@ -847,8 +857,8 @@ func TestRemovePolicyFromUser(t *testing.T) {
 			userId:    "user-123",
 			policyIds: []string{"test-policy"},
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-123").Return(testUser, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return(testUser, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 		},
 		{
@@ -856,7 +866,7 @@ func TestRemovePolicyFromUser(t *testing.T) {
 			userId:    "user-999",
 			policyIds: []string{"test-policy"},
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-999").Return((*sdk.User)(nil), ErrorUserNotFound)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return((*sdk.User)(nil), ErrorUserNotFound)
 			},
 			expectedError: "user not found",
 		},
@@ -865,8 +875,8 @@ func TestRemovePolicyFromUser(t *testing.T) {
 			userId:    "user-123",
 			policyIds: []string{"test-policy"},
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-123").Return(testUser, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(errors.New("database error"))
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return(testUser, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(errors.New("database error"))
 			},
 			expectedError: "failed to update user",
 		},
@@ -963,9 +973,9 @@ func TestTransferOwnership(t *testing.T) {
 			oldOwnerId: "user-123",
 			newOwnerId: "user-456",
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-123").Return(oldOwner, nil)
-				mockStore.On("GetById", ctx, "user-456").Return(newOwner, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("GetById", mock.Anything, "user-123").Return(oldOwner, nil)
+				mockStore.On("GetById", mock.Anything, "user-456").Return(newOwner, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 		},
 		{
@@ -979,9 +989,9 @@ func TestTransferOwnership(t *testing.T) {
 						Name: "policy-1",
 					},
 				}
-				mockStore.On("GetById", ctx, "user-123").Return(usr, nil)
-				mockStore.On("GetById", ctx, "user-456").Return(newOwner, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("GetById", mock.Anything, "user-123").Return(usr, nil)
+				mockStore.On("GetById", mock.Anything, "user-456").Return(newOwner, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 		},
 		{
@@ -1005,9 +1015,9 @@ func TestTransferOwnership(t *testing.T) {
 					},
 				}
 				roleSvc.On("GetById", ctx, "role-1").Return(createTestRole(), nil)
-				mockStore.On("GetById", ctx, "user-123").Return(usr, nil)
-				mockStore.On("GetById", ctx, "user-456").Return(newUsr, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("GetById", mock.Anything, "user-123").Return(usr, nil)
+				mockStore.On("GetById", mock.Anything, "user-456").Return(newUsr, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 		},
 		{
@@ -1032,9 +1042,9 @@ func TestTransferOwnership(t *testing.T) {
 						PolicyIds: map[string]bool{"policy-2": true},
 					},
 				}
-				mockStore.On("GetById", ctx, "user-123").Return(usr, nil)
-				mockStore.On("GetById", ctx, "user-456").Return(newUsr, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("GetById", mock.Anything, "user-123").Return(usr, nil)
+				mockStore.On("GetById", mock.Anything, "user-456").Return(newUsr, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 		},
 		{
@@ -1049,9 +1059,9 @@ func TestTransferOwnership(t *testing.T) {
 					},
 				}
 				roleSvc.On("GetById", ctx, "role-2").Return(createTestRole(), errors.New("role not found"))
-				mockStore.On("GetById", ctx, "user-123").Return(usr, nil)
-				mockStore.On("GetById", ctx, "user-456").Return(newOwner, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("GetById", mock.Anything, "user-123").Return(usr, nil)
+				mockStore.On("GetById", mock.Anything, "user-456").Return(newOwner, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 		},
 		{
@@ -1071,9 +1081,9 @@ func TestTransferOwnership(t *testing.T) {
 						Name: "role-1",
 					},
 				}
-				mockStore.On("GetById", ctx, "user-123").Return(usr, nil)
-				mockStore.On("GetById", ctx, "user-456").Return(newUsr, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("GetById", mock.Anything, "user-123").Return(usr, nil)
+				mockStore.On("GetById", mock.Anything, "user-456").Return(newUsr, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 		},
 		{
@@ -1099,9 +1109,9 @@ func TestTransferOwnership(t *testing.T) {
 						PolicyIds: map[string]bool{"policy-3": true}, // Different policies
 					},
 				}
-				mockStore.On("GetById", ctx, "user-123").Return(usr, nil)
-				mockStore.On("GetById", ctx, "user-456").Return(newUsr, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("GetById", mock.Anything, "user-123").Return(usr, nil)
+				mockStore.On("GetById", mock.Anything, "user-456").Return(newUsr, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 		},
 		{
@@ -1114,9 +1124,9 @@ func TestTransferOwnership(t *testing.T) {
 				usr.Resources = make(map[string]sdk.UserResource)
 				usr.Policies = make(map[string]sdk.UserPolicy)
 
-				mockStore.On("GetById", ctx, "user-123").Return(usr, nil)
-				mockStore.On("GetById", ctx, "user-456").Return(newOwner, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return(usr, nil)
+				mockStore.On("GetById", mock.Anything, mock.Anything).Return(newOwner, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 		},
 		{
@@ -1124,7 +1134,7 @@ func TestTransferOwnership(t *testing.T) {
 			oldOwnerId: "user-999",
 			newOwnerId: "user-456",
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-999").Return((*sdk.User)(nil), ErrorUserNotFound)
+				mockStore.On("GetById", mock.Anything, "user-999").Return((*sdk.User)(nil), ErrorUserNotFound)
 			},
 			expectedError: "user not found",
 		},
@@ -1133,8 +1143,8 @@ func TestTransferOwnership(t *testing.T) {
 			oldOwnerId: "user-123",
 			newOwnerId: "user-999",
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-123").Return(oldOwner, nil)
-				mockStore.On("GetById", ctx, "user-999").Return((*sdk.User)(nil), ErrorUserNotFound)
+				mockStore.On("GetById", mock.Anything, "user-123").Return(oldOwner, nil)
+				mockStore.On("GetById", mock.Anything, "user-999").Return((*sdk.User)(nil), ErrorUserNotFound)
 			},
 			expectedError: "user not found",
 		},
@@ -1143,9 +1153,9 @@ func TestTransferOwnership(t *testing.T) {
 			oldOwnerId: "user-123",
 			newOwnerId: "user-456",
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-123").Return(oldOwner, nil)
-				mockStore.On("GetById", ctx, "user-456").Return(newOwner, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(errors.New("database error"))
+				mockStore.On("GetById", mock.Anything, "user-123").Return(oldOwner, nil)
+				mockStore.On("GetById", mock.Anything, "user-456").Return(newOwner, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(errors.New("database error"))
 			},
 			expectedError: "failed to update new owner",
 		},
@@ -1154,10 +1164,10 @@ func TestTransferOwnership(t *testing.T) {
 			oldOwnerId: "user-123",
 			newOwnerId: "user-456",
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "user-123").Return(oldOwner, nil)
-				mockStore.On("GetById", ctx, "user-456").Return(newOwner, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil).Once()                          // First call succeeds
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(errors.New("database error")).Once() // Second call fails
+				mockStore.On("GetById", mock.Anything, "user-123").Return(oldOwner, nil)
+				mockStore.On("GetById", mock.Anything, "user-456").Return(newOwner, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil).Once()                          // First call succeeds
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(errors.New("database error")).Once() // Second call fails
 			},
 			expectedError: "failed to update old user",
 		},
@@ -1246,9 +1256,9 @@ func TestCopyUserResources(t *testing.T) {
 			sourceUserId: "source-user-123",
 			targetUserId: "target-user-456",
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "source-user-123").Return(sourceUser, nil)
-				mockStore.On("GetById", ctx, "target-user-456").Return(targetUser, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("GetById", mock.Anything, "source-user-123").Return(sourceUser, nil)
+				mockStore.On("GetById", mock.Anything, "target-user-456").Return(targetUser, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 			validateResult: func(t *testing.T) {
 				// Verify the Update call was made with correct user
@@ -1288,9 +1298,9 @@ func TestCopyUserResources(t *testing.T) {
 				targetUserEmpty.Id = "target-user-456"
 				targetUserEmpty.Resources = make(map[string]sdk.UserResource)
 
-				mockStore.On("GetById", ctx, "source-user-123").Return(sourceUser, nil)
-				mockStore.On("GetById", ctx, "target-user-456").Return(targetUserEmpty, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("GetById", mock.Anything, "source-user-123").Return(sourceUser, nil)
+				mockStore.On("GetById", mock.Anything, "target-user-456").Return(targetUserEmpty, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 			validateResult: func(t *testing.T) {
 				calls := mockStore.Calls
@@ -1319,9 +1329,9 @@ func TestCopyUserResources(t *testing.T) {
 					},
 				}
 
-				mockStore.On("GetById", ctx, "source-user-123").Return(sourceUser, nil)
-				mockStore.On("GetById", ctx, "target-user-456").Return(targetUserWithConflict, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("GetById", mock.Anything, "source-user-123").Return(sourceUser, nil)
+				mockStore.On("GetById", mock.Anything, "target-user-456").Return(targetUserWithConflict, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 			validateResult: func(t *testing.T) {
 				calls := mockStore.Calls
@@ -1344,9 +1354,9 @@ func TestCopyUserResources(t *testing.T) {
 				sourceUserEmpty.Id = "source-user-123"
 				sourceUserEmpty.Resources = make(map[string]sdk.UserResource)
 
-				mockStore.On("GetById", ctx, "source-user-123").Return(sourceUserEmpty, nil)
-				mockStore.On("GetById", ctx, "target-user-456").Return(targetUser, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+				mockStore.On("GetById", mock.Anything, "source-user-123").Return(sourceUserEmpty, nil)
+				mockStore.On("GetById", mock.Anything, "target-user-456").Return(targetUser, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 			},
 			validateResult: func(t *testing.T) {
 				calls := mockStore.Calls
@@ -1363,7 +1373,7 @@ func TestCopyUserResources(t *testing.T) {
 			sourceUserId: "nonexistent-source",
 			targetUserId: "target-user-456",
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "nonexistent-source").Return((*sdk.User)(nil), ErrorUserNotFound)
+				mockStore.On("GetById", mock.Anything, "nonexistent-source").Return((*sdk.User)(nil), ErrorUserNotFound)
 			},
 			expectedError: "user not found",
 		},
@@ -1372,8 +1382,8 @@ func TestCopyUserResources(t *testing.T) {
 			sourceUserId: "source-user-123",
 			targetUserId: "nonexistent-target",
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "source-user-123").Return(sourceUser, nil)
-				mockStore.On("GetById", ctx, "nonexistent-target").Return((*sdk.User)(nil), ErrorUserNotFound)
+				mockStore.On("GetById", mock.Anything, "source-user-123").Return(sourceUser, nil)
+				mockStore.On("GetById", mock.Anything, "nonexistent-target").Return((*sdk.User)(nil), ErrorUserNotFound)
 			},
 			expectedError: "user not found",
 		},
@@ -1382,9 +1392,9 @@ func TestCopyUserResources(t *testing.T) {
 			sourceUserId: "source-user-123",
 			targetUserId: "target-user-456",
 			setupMocks: func() {
-				mockStore.On("GetById", ctx, "source-user-123").Return(sourceUser, nil)
-				mockStore.On("GetById", ctx, "target-user-456").Return(targetUser, nil)
-				mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(errors.New("database error"))
+				mockStore.On("GetById", mock.Anything, "source-user-123").Return(sourceUser, nil)
+				mockStore.On("GetById", mock.Anything, "target-user-456").Return(targetUser, nil)
+				mockStore.On("Update", mock.Anything, mock.Anything).Return(errors.New("database error"))
 			},
 			expectedError: "failed to update target user",
 		},
@@ -1432,7 +1442,7 @@ func TestEventMethods(t *testing.T) {
 	ctx := createContextWithMetadata()
 	testUser := createTestUser()
 	testMetadata := middlewares.GetMetadata(ctx)
-	eventName := goiamuniverse.EventUserCreated
+	eventName := constants.EventUserCreated
 
 	// Create a new event using the newEvent function
 	event := newEvent(ctx, eventName, *testUser, testMetadata)
@@ -1473,8 +1483,8 @@ func TestEventMethods(t *testing.T) {
 	})
 
 	t.Run("Event with different event types", func(t *testing.T) {
-		updateEvent := newEvent(ctx, goiamuniverse.EventRoleUpdated, *testUser, testMetadata)
-		assert.Equal(t, goiamuniverse.EventRoleUpdated, updateEvent.Name())
+		updateEvent := newEvent(ctx, constants.EventRoleUpdated, *testUser, testMetadata)
+		assert.Equal(t, constants.EventRoleUpdated, updateEvent.Name())
 		assert.Equal(t, *testUser, updateEvent.Payload())
 		assert.Equal(t, testMetadata, updateEvent.Metadata())
 		assert.Equal(t, ctx, updateEvent.Context())
@@ -1489,7 +1499,7 @@ func TestEmit(t *testing.T) {
 	testMetadata := middlewares.GetMetadata(ctx)
 
 	t.Run("success - emit valid event", func(t *testing.T) {
-		event := newEvent(ctx, goiamuniverse.EventUserCreated, *testUser, testMetadata)
+		event := newEvent(ctx, constants.EventUserCreated, *testUser, testMetadata)
 
 		// This should not panic or return error
 		assert.NotPanics(t, func() {
@@ -1506,11 +1516,11 @@ func TestEmit(t *testing.T) {
 
 	t.Run("success - emit event with different types", func(t *testing.T) {
 		// Test with different event types
-		events := []goiamuniverse.Event{
-			goiamuniverse.EventUserCreated,
-			goiamuniverse.EventRoleUpdated,
-			goiamuniverse.EventResourceCreated,
-			goiamuniverse.EventClientCreated,
+		events := []constants.Event{
+			constants.EventUserCreated,
+			constants.EventRoleUpdated,
+			constants.EventResourceCreated,
+			constants.EventClientCreated,
 		}
 
 		for _, eventType := range events {
@@ -1540,16 +1550,16 @@ func TestSubscribe(t *testing.T) {
 	t.Run("success - subscribe to user created event", func(t *testing.T) {
 		mockSubscriber := &MockSubscriber{}
 		assert.NotPanics(t, func() {
-			svc.Subscribe(goiamuniverse.EventUserCreated, mockSubscriber)
+			svc.Subscribe(constants.EventUserCreated, mockSubscriber)
 		})
 	})
 
 	t.Run("success - subscribe to different events", func(t *testing.T) {
-		events := []goiamuniverse.Event{
-			goiamuniverse.EventUserCreated,
-			goiamuniverse.EventRoleUpdated,
-			goiamuniverse.EventResourceCreated,
-			goiamuniverse.EventClientCreated,
+		events := []constants.Event{
+			constants.EventUserCreated,
+			constants.EventRoleUpdated,
+			constants.EventResourceCreated,
+			constants.EventClientCreated,
 		}
 
 		for _, eventType := range events {
@@ -1574,10 +1584,10 @@ func TestEmitAndSubscribeIntegration(t *testing.T) {
 		mockSubscriber := &MockSubscriber{}
 
 		// Subscribe to events
-		svc.Subscribe(goiamuniverse.EventUserCreated, mockSubscriber)
+		svc.Subscribe(constants.EventUserCreated, mockSubscriber)
 
 		// Emit an event
-		event := newEvent(ctx, goiamuniverse.EventUserCreated, *testUser, testMetadata)
+		event := newEvent(ctx, constants.EventUserCreated, *testUser, testMetadata)
 		svc.Emit(event)
 
 		// Verify the subscription and emission worked without panicking

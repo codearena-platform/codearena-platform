@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/codearena-platform/codearena-platform/internal/iam/middlewares"
+	"github.com/codearena-platform/codearena-platform/internal/iam/repository"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/authprovider/github"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/authprovider/google"
@@ -15,24 +16,27 @@ import (
 )
 
 type service struct {
-	s Store
-	p project.Service
+	repo repository.AuthProviderRepository
+	p    project.Service
 }
 
-func NewService(s Store, p project.Service) Service {
+func NewService(repo repository.AuthProviderRepository, p project.Service) Service {
 	return &service{
-		s: s,
-		p: p,
+		repo: repo,
+		p:    p,
 	}
 }
 
 func (s service) GetAll(ctx context.Context, params sdk.AuthProviderQueryParams) ([]sdk.AuthProvider, error) {
-	params.ProjectIds = middlewares.GetProjects(ctx)
-	return s.s.GetAll(ctx, params)
+	projectIds := params.ProjectIds
+	if len(projectIds) == 0 {
+		projectIds = middlewares.GetProjects(ctx)
+	}
+	return s.repo.GetAll(ctx, projectIds)
 }
 
 func (s service) Get(ctx context.Context, id string, dontCheckProjects bool) (*sdk.AuthProvider, error) {
-	ap, err := s.s.Get(ctx, id)
+	ap, err := s.repo.GetById(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -53,7 +57,7 @@ func (s service) Create(ctx context.Context, provider *sdk.AuthProvider) error {
 	if _, ok := projectIdsMap[provider.ProjectId]; !ok {
 		return sdk.ErrProjectNotFound
 	}
-	return s.s.Create(ctx, provider)
+	return s.repo.Create(ctx, provider)
 }
 func (s service) Update(ctx context.Context, provider *sdk.AuthProvider) error {
 	// check if the project exists
@@ -61,7 +65,7 @@ func (s service) Update(ctx context.Context, provider *sdk.AuthProvider) error {
 	if _, ok := projectIdsMap[provider.ProjectId]; !ok {
 		return sdk.ErrProjectNotFound
 	}
-	return s.s.Update(ctx, provider)
+	return s.repo.Update(ctx, provider)
 }
 
 func (s service) GetProvider(ctx context.Context, v sdk.AuthProvider) (sdk.ServiceProvider, error) {

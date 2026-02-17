@@ -22,14 +22,14 @@ func (h *IAMHandler) CreateClient(c *fiber.Ctx) error {
 	if err := c.BodyParser(payload); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(sdk.ClientResponse{Success: false, Message: err.Error()})
 	}
-	if err := h.prv.S.Clients.Create(c.Context(), payload); err != nil {
+	if err := h.prv.S.AdminUC.CreateClient(c.Context(), payload); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(sdk.ClientResponse{Success: false, Message: err.Error()})
 	}
 	return c.Status(http.StatusCreated).JSON(sdk.ClientResponse{Success: true, Data: payload})
 }
 
 func (h *IAMHandler) GetAllClients(c *fiber.Ctx) error {
-	clients, err := h.prv.S.Clients.GetAll(c.Context(), sdk.ClientQueryParams{})
+	clients, err := h.prv.S.AdminUC.GetAllClients(c.Context(), sdk.ClientQueryParams{})
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(sdk.ClientsResponse{Success: false, Message: err.Error()})
 	}
@@ -38,7 +38,7 @@ func (h *IAMHandler) GetAllClients(c *fiber.Ctx) error {
 
 func (h *IAMHandler) GetClientById(c *fiber.Ctx) error {
 	id := c.Params("id")
-	client, err := h.prv.S.Clients.Get(c.Context(), id, false)
+	client, err := h.prv.S.AdminUC.GetClient(c.Context(), id, false)
 	if err != nil {
 		status := http.StatusInternalServerError
 		if errors.Is(err, sdk.ErrClientNotFound) {
@@ -56,7 +56,7 @@ func (h *IAMHandler) UpdateClient(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(sdk.ClientResponse{Success: false, Message: err.Error()})
 	}
 	payload.Id = id
-	if err := h.prv.S.Clients.Update(c.Context(), payload); err != nil {
+	if err := h.prv.S.AdminUC.UpdateClient(c.Context(), payload); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(sdk.ClientResponse{Success: false, Message: err.Error()})
 	}
 	return c.JSON(sdk.ClientResponse{Success: true, Data: payload})
@@ -64,7 +64,7 @@ func (h *IAMHandler) UpdateClient(c *fiber.Ctx) error {
 
 func (h *IAMHandler) RegenerateClientSecret(c *fiber.Ctx) error {
 	id := c.Params("id")
-	client, err := h.prv.S.Clients.RegenerateSecret(c.Context(), id)
+	client, err := h.prv.S.AdminUC.RegenerateClientSecret(c.Context(), id)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(sdk.ClientResponse{Success: false, Message: err.Error()})
 	}

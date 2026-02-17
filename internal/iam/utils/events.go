@@ -4,11 +4,11 @@ import (
 	"context"
 
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 )
 
 type Event[T any] interface {
-	Name() goiamuniverse.Event
+	Name() constants.Event
 	Payload() T
 	Metadata() sdk.Metadata
 	Context() context.Context
@@ -20,11 +20,11 @@ type Subscriber[T Event[V], V any] interface {
 
 type Emitter[T Event[V], V any] interface {
 	Emit(event T)
-	Subscribe(eventName goiamuniverse.Event, subscriber Subscriber[T, V])
+	Subscribe(eventName constants.Event, subscriber Subscriber[T, V])
 }
 
 type emitter[T Event[V], V any] struct {
-	subscribers map[goiamuniverse.Event][]Subscriber[T, V]
+	subscribers map[constants.Event][]Subscriber[T, V]
 }
 
 func (e *emitter[T, V]) Emit(event T) {
@@ -35,13 +35,13 @@ func (e *emitter[T, V]) Emit(event T) {
 	}
 }
 
-func (e *emitter[T, V]) Subscribe(eventName goiamuniverse.Event, subscriber Subscriber[T, V]) {
+func (e *emitter[T, V]) Subscribe(eventName constants.Event, subscriber Subscriber[T, V]) {
 	e.subscribers[eventName] = append(e.subscribers[eventName], subscriber)
 }
 
 // NewEmitter creates a new Emitter instance for the specified event type.
 func NewEmitter[T Event[V], V any]() Emitter[T, V] {
 	return &emitter[T, V]{
-		subscribers: make(map[goiamuniverse.Event][]Subscriber[T, V]),
+		subscribers: make(map[constants.Event][]Subscriber[T, V]),
 	}
 }

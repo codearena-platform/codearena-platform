@@ -33,8 +33,10 @@ type Resource struct {
 	Key         string     `json:"key"`
 	Name        string     `json:"name"`
 	Description string     `json:"description"`
+	Enabled     bool       `json:"enabled"`
 	CreatedAt   *time.Time `json:"created_at"`
 	CreatedBy   string     `json:"created_by"`
 	UpdatedAt   *time.Time `json:"updated_at"`
 	UpdatedBy   string     `json:"updated_by"`
+	DeletedAt   *time.Time `json:"deleted_at,omitempty"`
 }

@@ -7,7 +7,7 @@ import (
 
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils/test/services"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -28,13 +28,13 @@ func (m *MockPolicyCheck) RunCheck(ctx context.Context, id, userId string) (*sdk
 
 // mockEvent implements utils.Event[sdk.Resource] for testing
 type mockEvent struct {
-	name     goiamuniverse.Event
+	name     constants.Event
 	payload  sdk.Resource
 	metadata sdk.Metadata
 	ctx      context.Context
 }
 
-func (e mockEvent) Name() goiamuniverse.Event {
+func (e mockEvent) Name() constants.Event {
 	return e.name
 }
 
@@ -50,7 +50,7 @@ func (e mockEvent) Context() context.Context {
 	return e.ctx
 }
 
-func newMockEvent(ctx context.Context, name goiamuniverse.Event, payload sdk.Resource, metadata sdk.Metadata) utils.Event[sdk.Resource] {
+func newMockEvent(ctx context.Context, name constants.Event, payload sdk.Resource, metadata sdk.Metadata) utils.Event[sdk.Resource] {
 	return mockEvent{ctx: ctx, name: name, payload: payload, metadata: metadata}
 }
 
@@ -77,7 +77,7 @@ func TestAccessToCreatedResource_HandleEvent_Success(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceCreated,
+		constants.EventResourceCreated,
 		resource,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)
@@ -117,7 +117,7 @@ func TestAccessToCreatedResource_HandleEvent_PolicyCheckError(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceCreated,
+		constants.EventResourceCreated,
 		resource,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)
@@ -147,7 +147,7 @@ func TestAccessToCreatedResource_HandleEvent_PolicyNotExists(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceCreated,
+		constants.EventResourceCreated,
 		resource,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)
@@ -181,7 +181,7 @@ func TestAccessToCreatedResource_HandleEvent_AddResourceError(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceCreated,
+		constants.EventResourceCreated,
 		resource,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)

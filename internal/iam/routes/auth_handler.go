@@ -25,7 +25,7 @@ func (h *IAMHandler) Login(c *fiber.Ctx) error {
 	if len(codeChallengeMethod) != 0 && strings.Compare(codeChallengeMethod, "S256") != 0 {
 		return sdk.AuthProviderBadRequest("invalid code challenge. Only S256 is supported", c)
 	}
-	url, err := h.prv.S.Auth.GetLoginUrl(c.Context(), c.Query("client_id", ""), c.Query("auth_provider", ""), c.Query("state", ""), c.Query("redirect_url", ""), c.Query("code_challenge_method", ""), c.Query("code_challenge", ""))
+	url, err := h.prv.S.AuthUC.GetLoginUrl(c.Context(), c.Query("client_id", ""), c.Query("auth_provider", ""), c.Query("state", ""), c.Query("redirect_url", ""), c.Query("code_challenge_method", ""), c.Query("code_challenge", ""))
 	if err != nil {
 		return sdk.AuthProviderInternalServerError(err.Error(), c)
 	}
@@ -40,7 +40,7 @@ func (h *IAMHandler) Login(c *fiber.Ctx) error {
 }
 
 func (h *IAMHandler) AuthCallback(c *fiber.Ctx) error {
-	resp, err := h.prv.S.Auth.Redirect(c.Context(), c.Query("code"), c.Query("state"))
+	resp, err := h.prv.S.AuthUC.Redirect(c.Context(), c.Query("code"), c.Query("state"))
 	if err != nil {
 		return sdk.AuthProviderInternalServerError(err.Error(), c)
 	}
@@ -64,7 +64,7 @@ func (h *IAMHandler) VerifyToken(c *fiber.Ctx) error {
 		clientId = clId
 		clientSecret = clSec
 	}
-	resp, err := h.prv.S.Auth.ClientCallback(c.Context(), code, codeChallenge, clientId, clientSecret)
+	resp, err := h.prv.S.AuthUC.ClientCallback(c.Context(), code, codeChallenge, clientId, clientSecret)
 	if err != nil {
 		return sdk.AuthProviderInternalServerError(err.Error(), c)
 	}
@@ -80,7 +80,7 @@ func (h *IAMHandler) ClientCredentials(c *fiber.Ctx) error {
 	if err := c.BodyParser(payload); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(sdk.ClientCredentialsResponse{Success: false, Message: err.Error()})
 	}
-	resp, err := h.prv.S.Auth.ClientCredentials(c.Context(), payload.ClientId, payload.ClientSecret)
+	resp, err := h.prv.S.AuthUC.ClientCredentials(c.Context(), payload.ClientId, payload.ClientSecret)
 	if err != nil {
 		return c.Status(http.StatusUnauthorized).JSON(sdk.ClientCredentialsResponse{Success: false, Message: err.Error()})
 	}

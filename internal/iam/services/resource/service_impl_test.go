@@ -5,10 +5,10 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/codearena-platform/codearena-platform/internal/iam/middlewares"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -30,7 +30,7 @@ type MockStore struct {
 	mock.Mock
 }
 
-func (m *MockStore) Search(ctx context.Context, query sdk.ResourceQuery) (*sdk.ResourceList, error) {
+func (m *MockStore) GetAll(ctx context.Context, query sdk.ResourceQuery) (*sdk.ResourceList, error) {
 	args := m.Called(ctx, query)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -38,7 +38,7 @@ func (m *MockStore) Search(ctx context.Context, query sdk.ResourceQuery) (*sdk.R
 	return args.Get(0).(*sdk.ResourceList), args.Error(1)
 }
 
-func (m *MockStore) Get(ctx context.Context, id string) (*sdk.Resource, error) {
+func (m *MockStore) GetById(ctx context.Context, id string) (*sdk.Resource, error) {
 	args := m.Called(ctx, id)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -113,7 +113,7 @@ func TestService_Search(t *testing.T) {
 			Limit: 10,
 		}
 
-		mockStore.On("Search", ctx, expectedQuery).Return(expectedResult, nil)
+		mockStore.On("GetAll", ctx, expectedQuery).Return(expectedResult, nil)
 
 		result, err := service.Search(ctx, query)
 
@@ -133,7 +133,7 @@ func TestService_Search(t *testing.T) {
 			Name: "test",
 		}
 
-		mockStore.On("Search", ctx, mock.AnythingOfType("sdk.ResourceQuery")).Return(nil, errors.New("store error"))
+		mockStore.On("GetAll", ctx, mock.AnythingOfType("sdk.ResourceQuery")).Return(nil, errors.New("store error"))
 
 		result, err := service.Search(ctx, query)
 
@@ -159,9 +159,9 @@ func TestService_Get(t *testing.T) {
 			Description: "Resource for user management",
 		}
 
-		mockStore.On("Get", ctx, resourceId).Return(expectedResource, nil)
+		mockStore.On("GetById", ctx, resourceId).Return(expectedResource, nil)
 
-		result, err := service.Get(ctx, resourceId)
+		result, err := service.GetById(ctx, resourceId)
 
 		assert.NoError(t, err)
 		assert.Equal(t, expectedResource, result)
@@ -175,9 +175,9 @@ func TestService_Get(t *testing.T) {
 		ctx := createTestContext()
 		resourceId := "nonexistent"
 
-		mockStore.On("Get", ctx, resourceId).Return(nil, errors.New("resource not found"))
+		mockStore.On("GetById", ctx, resourceId).Return(nil, errors.New("resource not found"))
 
-		result, err := service.Get(ctx, resourceId)
+		result, err := service.GetById(ctx, resourceId)
 
 		assert.Error(t, err)
 		assert.Nil(t, result)
@@ -192,9 +192,9 @@ func TestService_Get(t *testing.T) {
 		ctx := createTestContext()
 		resourceId := "resource1"
 
-		mockStore.On("Get", ctx, resourceId).Return(nil, errors.New("database error"))
+		mockStore.On("GetById", ctx, resourceId).Return(nil, errors.New("database error"))
 
-		result, err := service.Get(ctx, resourceId)
+		result, err := service.GetById(ctx, resourceId)
 
 		assert.Error(t, err)
 		assert.Nil(t, result)
@@ -299,7 +299,7 @@ func TestService_Delete(t *testing.T) {
 		ctx := createTestContext()
 		resourceId := "resource1"
 
-		mockStore.On("Get", ctx, resourceId).Return(&sdk.Resource{ID: resourceId}, nil)
+		mockStore.On("GetById", ctx, resourceId).Return(&sdk.Resource{ID: resourceId}, nil)
 		mockStore.On("Delete", ctx, resourceId).Return(nil)
 
 		err := service.Delete(ctx, resourceId)
@@ -315,7 +315,7 @@ func TestService_Delete(t *testing.T) {
 		ctx := createTestContext()
 		resourceId := "resource1"
 
-		mockStore.On("Get", ctx, resourceId).Return(&sdk.Resource{ID: resourceId}, nil)
+		mockStore.On("GetById", ctx, resourceId).Return(&sdk.Resource{ID: resourceId}, nil)
 		mockStore.On("Delete", ctx, resourceId).Return(errors.New("delete failed"))
 
 		err := service.Delete(ctx, resourceId)
@@ -342,7 +342,7 @@ func TestService_Emit(t *testing.T) {
 			ProjectIds: []string{"project1"},
 		}
 
-		event := newEvent(ctx, goiamuniverse.EventResourceCreated, resource, metadata)
+		event := newEvent(ctx, constants.EventResourceCreated, resource, metadata)
 
 		// This should not panic or cause issues
 		service.Emit(event)
@@ -368,7 +368,7 @@ func TestService_Subscribe(t *testing.T) {
 		service := NewService(mockStore)
 
 		mockSubscriber := &MockSubscriber{}
-		eventName := goiamuniverse.EventResourceCreated
+		eventName := constants.EventResourceCreated
 
 		// This should not panic
 		service.Subscribe(eventName, mockSubscriber)
@@ -391,9 +391,9 @@ func TestEvent_Name(t *testing.T) {
 			ProjectIds: []string{"project1"},
 		}
 
-		event := newEvent(ctx, goiamuniverse.EventResourceCreated, resource, metadata)
+		event := newEvent(ctx, constants.EventResourceCreated, resource, metadata)
 
-		assert.Equal(t, goiamuniverse.EventResourceCreated, event.Name())
+		assert.Equal(t, constants.EventResourceCreated, event.Name())
 	})
 }
 
@@ -410,7 +410,7 @@ func TestEvent_Payload(t *testing.T) {
 			ProjectIds: []string{"project1"},
 		}
 
-		event := newEvent(ctx, goiamuniverse.EventResourceCreated, resource, metadata)
+		event := newEvent(ctx, constants.EventResourceCreated, resource, metadata)
 
 		payload := event.Payload()
 		assert.Equal(t, "resource1", payload.ID)
@@ -431,7 +431,7 @@ func TestEvent_Payload(t *testing.T) {
 			ProjectIds: []string{"project1"},
 		}
 
-		event := newEvent(ctx, goiamuniverse.EventResourceCreated, resource, metadata)
+		event := newEvent(ctx, constants.EventResourceCreated, resource, metadata)
 
 		payload := event.Payload()
 		assert.Equal(t, "resource1", payload.ID)
@@ -454,7 +454,7 @@ func TestEvent_Metadata(t *testing.T) {
 			ProjectIds: []string{"project1", "project2"},
 		}
 
-		event := newEvent(ctx, goiamuniverse.EventResourceCreated, resource, metadata)
+		event := newEvent(ctx, constants.EventResourceCreated, resource, metadata)
 
 		eventMetadata := event.Metadata()
 		assert.Equal(t, "user1", eventMetadata.User.Id)
@@ -475,7 +475,7 @@ func TestEvent_Context(t *testing.T) {
 			ProjectIds: []string{"project1"},
 		}
 
-		event := newEvent(ctx, goiamuniverse.EventResourceCreated, resource, metadata)
+		event := newEvent(ctx, constants.EventResourceCreated, resource, metadata)
 
 		assert.Equal(t, ctx, event.Context())
 	})
@@ -497,7 +497,7 @@ func TestEvent_Context(t *testing.T) {
 			ProjectIds: []string{"project1"},
 		}
 
-		event := newEvent(ctx, goiamuniverse.EventResourceCreated, resource, metadata)
+		event := newEvent(ctx, constants.EventResourceCreated, resource, metadata)
 
 		assert.Equal(t, ctx, event.Context())
 
@@ -511,7 +511,7 @@ func TestEvent_Context(t *testing.T) {
 func TestNewEvent(t *testing.T) {
 	t.Run("create_event_with_all_parameters", func(t *testing.T) {
 		ctx := createTestContext()
-		eventName := goiamuniverse.EventResourceCreated
+		eventName := constants.EventResourceCreated
 		resource := sdk.Resource{
 			ID:          "resource1",
 			Key:         "users",

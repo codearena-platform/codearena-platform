@@ -9,7 +9,7 @@ import (
 	"github.com/codearena-platform/codearena-platform/internal/iam/middlewares"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -523,7 +523,7 @@ func TestService_Emit(t *testing.T) {
 		metadata := sdk.Metadata{User: user, ProjectIds: []string{"project1"}}
 		ctx := context.Background()
 
-		event := newEvent(ctx, goiamuniverse.EventRoleUpdated, role, metadata)
+		event := newEvent(ctx, constants.EventRoleUpdated, role, metadata)
 
 		// This should not panic
 		assert.NotPanics(t, func() {
@@ -552,7 +552,7 @@ func TestService_Subscribe(t *testing.T) {
 
 		// This should not panic
 		assert.NotPanics(t, func() {
-			service.Subscribe(goiamuniverse.EventRoleUpdated, mockSubscriber)
+			service.Subscribe(constants.EventRoleUpdated, mockSubscriber)
 		})
 	})
 }
@@ -605,11 +605,11 @@ func TestEvent_Name(t *testing.T) {
 	metadata := sdk.Metadata{User: &sdk.User{Id: "user1"}, ProjectIds: []string{"project1"}}
 
 	t.Run("role_updated_event", func(t *testing.T) {
-		event := newEvent(ctx, goiamuniverse.EventRoleUpdated, role, metadata)
+		event := newEvent(ctx, constants.EventRoleUpdated, role, metadata)
 
 		result := event.Name()
 
-		assert.Equal(t, goiamuniverse.EventRoleUpdated, result)
+		assert.Equal(t, constants.EventRoleUpdated, result)
 	})
 }
 
@@ -626,7 +626,7 @@ func TestEvent_Payload(t *testing.T) {
 			Enabled:     true,
 		}
 
-		event := newEvent(ctx, goiamuniverse.EventRoleUpdated, role, metadata)
+		event := newEvent(ctx, constants.EventRoleUpdated, role, metadata)
 
 		result := event.Payload()
 
@@ -666,7 +666,7 @@ func TestEvent_Payload(t *testing.T) {
 			UpdatedBy: "user2",
 		}
 
-		event := newEvent(ctx, goiamuniverse.EventRoleUpdated, role, metadata)
+		event := newEvent(ctx, constants.EventRoleUpdated, role, metadata)
 
 		result := event.Payload()
 
@@ -703,7 +703,7 @@ func TestEvent_Metadata(t *testing.T) {
 			ProjectIds: []string{"project1", "project2"},
 		}
 
-		event := newEvent(ctx, goiamuniverse.EventRoleUpdated, role, metadata)
+		event := newEvent(ctx, constants.EventRoleUpdated, role, metadata)
 
 		result := event.Metadata()
 
@@ -723,7 +723,7 @@ func TestEvent_Context(t *testing.T) {
 	t.Run("background_context", func(t *testing.T) {
 		ctx := context.Background()
 
-		event := newEvent(ctx, goiamuniverse.EventRoleUpdated, role, metadata)
+		event := newEvent(ctx, constants.EventRoleUpdated, role, metadata)
 
 		result := event.Context()
 
@@ -739,7 +739,7 @@ func TestEvent_Context(t *testing.T) {
 		}
 		ctx := middlewares.AddMetadata(context.Background(), contextMetadata)
 
-		event := newEvent(ctx, goiamuniverse.EventRoleUpdated, role, metadata)
+		event := newEvent(ctx, constants.EventRoleUpdated, role, metadata)
 
 		result := event.Context()
 
@@ -755,7 +755,7 @@ func TestEvent_Context(t *testing.T) {
 func TestNewEvent(t *testing.T) {
 	t.Run("create_event_with_all_parameters", func(t *testing.T) {
 		ctx := context.Background()
-		eventName := goiamuniverse.EventRoleUpdated
+		eventName := constants.EventRoleUpdated
 		role := sdk.Role{
 			Id:          "role1",
 			Name:        "Test Role",

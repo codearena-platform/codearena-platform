@@ -92,7 +92,7 @@ func TestClientModel(t *testing.T) {
 		assert.Equal(t, "id", m.IdKey)
 		assert.Equal(t, "name", m.NameKey)
 		assert.Equal(t, "project_id", m.ProjectIdKey)
-		assert.Equal(t, "go_iam_client", m.GoIamClientKey)
+		assert.Equal(t, "iam_client", m.IAMClientKey)
 	})
 }
 

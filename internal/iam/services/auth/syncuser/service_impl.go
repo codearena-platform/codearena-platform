@@ -5,7 +5,7 @@ import (
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/auth"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 )
 
 type service struct {
@@ -22,7 +22,7 @@ func (s *service) HandleEvent(event utils.Event[sdk.User]) {
 	if event == nil {
 		return
 	}
-	if event.Name() == goiamuniverse.EventUserUpdated {
+	if event.Name() == constants.EventUserUpdated {
 		user := event.Payload()
 		if user.Id == "" {
 			return

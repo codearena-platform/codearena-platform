@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils/test/services"
 	"github.com/stretchr/testify/assert"
 )
@@ -35,7 +35,7 @@ func TestAddResourcesToUser_HandleEvent_Success(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceCreated,
+		constants.EventResourceCreated,
 		resource,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)
@@ -82,7 +82,7 @@ func TestAddResourcesToUser_HandleEvent_PolicyCheckError(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceCreated,
+		constants.EventResourceCreated,
 		resource,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)
@@ -112,7 +112,7 @@ func TestAddResourcesToUser_HandleEvent_PolicyNotExists(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceCreated,
+		constants.EventResourceCreated,
 		resource,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)
@@ -146,7 +146,7 @@ func TestAddResourcesToUser_HandleEvent_NoUserIdInPolicy(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceCreated,
+		constants.EventResourceCreated,
 		resource,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)
@@ -187,7 +187,7 @@ func TestAddResourcesToUser_HandleEvent_EmptyUserId(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceCreated,
+		constants.EventResourceCreated,
 		resource,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)
@@ -231,7 +231,7 @@ func TestAddResourcesToUser_HandleEvent_AddResourceError(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceCreated,
+		constants.EventResourceCreated,
 		resource,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)
@@ -359,5 +359,5 @@ func TestAddResourcesToUser_PolicyDef(t *testing.T) {
 	assert.Len(t, policyDef.Definition.Arguments, 1)
 	assert.Equal(t, "@userId", policyDef.Definition.Arguments[0].Name)
 	assert.Equal(t, "The user to whom the resource access is granted.", policyDef.Definition.Arguments[0].Description)
-	assert.Equal(t, goiamuniverse.User, policyDef.Definition.Arguments[0].DataType)
+	assert.Equal(t, constants.User, policyDef.Definition.Arguments[0].DataType)
 }

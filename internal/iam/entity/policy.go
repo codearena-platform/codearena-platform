@@ -3,7 +3,7 @@ package entity
 import (
 	"errors"
 
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 )
 
 var ErrPolicyNotFound = errors.New("policy not found")
@@ -22,5 +22,5 @@ type PolicyDefinition struct {
 type PolicyArgument struct {
 	Name        string                 `json:"name,omitempty"`
 	Description string                 `json:"description,omitempty"`
-	DataType    goiamuniverse.DataType `json:"data_type,omitempty"`
+	DataType    constants.DataType `json:"data_type,omitempty"`
 }

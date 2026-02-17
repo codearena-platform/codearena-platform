@@ -2,6 +2,7 @@ package providers
 
 import (
 	"github.com/codearena-platform/codearena-platform/internal/iam/db"
+	"github.com/codearena-platform/codearena-platform/internal/iam/repository"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/auth"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/auth/syncuser"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/authprovider"
@@ -15,7 +16,8 @@ import (
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/resource"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/role"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/user"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/usecase"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 )
 
 // Service is a container that holds all business logic services for the Go IAM system.
@@ -31,56 +33,53 @@ type Service struct {
 	User          user.Service         // User management and authorization service
 	Role          role.Service         // Role-based access control service
 	Policy        policy.Service       // Policy management service
+
+	// UseCases
+	AuthUC     usecase.AuthUseCase
+	IdentityUC usecase.IdentityUseCase
+	AccessUC   usecase.AccessUseCase
+	AdminUC    usecase.AdminUseCase
 }
 
 // NewServices creates and configures all business logic services with their dependencies.
 // This function initializes services in the correct order to satisfy dependencies and
 // sets up event subscriptions for cross-service communication.
-//
-// Service initialization order:
-// 1. Core services (project, resource, role, user)
-// 2. Authentication services (auth provider, client, auth)
-// 3. Policy services
-// 4. Event subscriptions for reactive updates
-//
-// Parameters:
-//   - db: Database connection interface
-//   - cache: Cache service for performance optimization
-//   - enc: Encryption service for sensitive data
-//   - jwtSvc: JWT service for token operations
-//   - tokenTTL: Token time-to-live in minutes
-//   - refetchTTL: Auth provider refetch interval in minutes
-//
-// Returns:
-//   - *Service: Configured service container with all dependencies wired
 func NewServices(db db.DB, cache cache.Service, enc encrypt.Service, jwtSvc jwt.Service, tokenTTL int64, refetchTTL int64) *Service {
-	pstr := project.NewStore(db)
-	psvc := project.NewService(pstr)
-	cstr := client.NewStore(db)
+	// Initialize Repositories
+	userRepo := repository.NewUserRepository(db)
+	roleRepo := repository.NewRoleRepository(db)
+	resourceRepo := repository.NewResourceRepository(db)
+	projectRepo := repository.NewProjectRepository(db)
+	authProviderRepo := repository.NewAuthProviderRepository(db, enc)
+	clientRepo := repository.NewClientRepository(db)
+	policyRepo := repository.NewPolicyRepository()
 
-	rstr := resource.NewStore(db)
-	rsvc := resource.NewService(rstr)
-	roleStr := role.NewStore(db)
-	roleSvc := role.NewService(roleStr)
-	userStr := user.NewStore(db)
-	userSvc := user.NewService(userStr, roleSvc)
+	psvc := project.NewService(projectRepo)
+	rsvc := resource.NewService(resourceRepo)
+	roleSvc := role.NewService(roleRepo)
+	userSvc := user.NewService(userRepo, roleSvc)
 
 	// subscribing to role updates
-	roleSvc.Subscribe(goiamuniverse.EventRoleUpdated, userSvc)
+	roleSvc.Subscribe(constants.EventRoleUpdated, userSvc)
 	// subscribing to resource create updates
-	rsvc.Subscribe(goiamuniverse.EventResourceCreated, system.NewAccessToCreatedResource(userSvc))
-	rsvc.Subscribe(goiamuniverse.EventResourceCreated, system.NewAddResourcesToUser(userSvc))
-	rsvc.Subscribe(goiamuniverse.EventResourceCreated, system.NewAddResourcesToRole(userSvc, roleSvc))
+	rsvc.Subscribe(constants.EventResourceCreated, system.NewAccessToCreatedResource(userSvc))
+	rsvc.Subscribe(constants.EventResourceCreated, system.NewAddResourcesToUser(userSvc))
+	rsvc.Subscribe(constants.EventResourceCreated, system.NewAddResourcesToRole(userSvc, roleSvc))
 	// adding default policies to a user when gets created
-	userSvc.Subscribe(goiamuniverse.EventUserCreated, system.NewDefaultPoliciesOnUser(userSvc))
+	userSvc.Subscribe(constants.EventUserCreated, system.NewDefaultPoliciesOnUser(userSvc))
 
-	apStr := authprovider.NewStore(enc, db)
-	apSvc := authprovider.NewService(apStr, psvc)
-	csvc := client.NewService(cstr, psvc, apSvc, userSvc)
+	apSvc := authprovider.NewService(authProviderRepo, psvc)
+	csvc := client.NewService(clientRepo, psvc, apSvc, userSvc)
+
 	authSvc := auth.NewService(apSvc, csvc, cache, jwtSvc, enc, userSvc, tokenTTL, refetchTTL)
 	authSyncSvc := syncuser.NewService(authSvc)
-	polstr := policy.NewStore()
-	polSvc := policy.NewService(polstr)
+	polSvc := policy.NewService(policyRepo)
+
+	// UseCases
+	authUC := usecase.NewAuthUseCase(authSvc, apSvc)
+	identityUC := usecase.NewIdentityUseCase(userSvc)
+	accessUC := usecase.NewAccessUseCase(roleSvc, rsvc, polSvc)
+	adminUC := usecase.NewAdminUseCase(psvc, csvc)
 
 	return &Service{
 		Projects:      psvc,
@@ -92,5 +91,10 @@ func NewServices(db db.DB, cache cache.Service, enc encrypt.Service, jwtSvc jwt.
 		Role:          roleSvc,
 		Policy:        polSvc,
 		AuthSync:      authSyncSvc,
+
+		AuthUC:     authUC,
+		IdentityUC: identityUC,
+		AccessUC:   accessUC,
+		AdminUC:    adminUC,
 	}
 }

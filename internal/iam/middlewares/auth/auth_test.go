@@ -6,9 +6,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils/test/services"
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -23,10 +23,10 @@ func setupTestApp() (*fiber.App, *services.MockAuthService, *services.MockClient
 func setupTestAppWithAuthClient() (*fiber.App, *services.MockAuthService, *services.MockClientService, *Middlewares) {
 	app, mockAuthSvc, mockClientSvc := setupTestApp()
 
-	// Mock the GetGoIamClients call for middleware creation
+	// Mock the GetIAMClients call for middleware creation
 	testClient := createTestClient()
-	mockClientSvc.On("GetGoIamClients", mock.Anything, mock.MatchedBy(func(params sdk.ClientQueryParams) bool {
-		return params.GoIamClient == true
+	mockClientSvc.On("GetIAMClients", mock.Anything, mock.MatchedBy(func(params sdk.ClientQueryParams) bool {
+		return params.IAMClient == true
 	})).Return([]sdk.Client{*testClient}, nil)
 
 	middlewares, err := NewMiddlewares(mockAuthSvc, mockClientSvc)
@@ -39,9 +39,9 @@ func setupTestAppWithAuthClient() (*fiber.App, *services.MockAuthService, *servi
 func setupTestAppWithoutAuthClient() (*fiber.App, *services.MockAuthService, *services.MockClientService, *Middlewares) {
 	app, mockAuthSvc, mockClientSvc := setupTestApp()
 
-	// Mock the GetGoIamClients call to return empty slice (no auth client)
-	mockClientSvc.On("GetGoIamClients", mock.Anything, mock.MatchedBy(func(params sdk.ClientQueryParams) bool {
-		return params.GoIamClient == true
+	// Mock the GetIAMClients call to return empty slice (no auth client)
+	mockClientSvc.On("GetIAMClients", mock.Anything, mock.MatchedBy(func(params sdk.ClientQueryParams) bool {
+		return params.IAMClient == true
 	})).Return([]sdk.Client{}, nil)
 
 	middlewares, err := NewMiddlewares(mockAuthSvc, mockClientSvc)
@@ -69,10 +69,10 @@ func createTestClient() *sdk.Client {
 func TestNewMiddlewares(t *testing.T) {
 	_, mockAuthSvc, mockClientSvc := setupTestApp()
 
-	// Mock the GetGoIamClients call that happens during NewMiddlewares
+	// Mock the GetIAMClients call that happens during NewMiddlewares
 	testClient := createTestClient()
-	mockClientSvc.On("GetGoIamClients", mock.Anything, mock.MatchedBy(func(params sdk.ClientQueryParams) bool {
-		return params.GoIamClient == true
+	mockClientSvc.On("GetIAMClients", mock.Anything, mock.MatchedBy(func(params sdk.ClientQueryParams) bool {
+		return params.IAMClient == true
 	})).Return([]sdk.Client{*testClient}, nil)
 
 	middlewares, err := NewMiddlewares(mockAuthSvc, mockClientSvc)
@@ -90,9 +90,9 @@ func TestNewMiddlewares(t *testing.T) {
 func TestNewMiddlewares_NoAuthClient(t *testing.T) {
 	_, mockAuthSvc, mockClientSvc := setupTestApp()
 
-	// Mock the GetGoIamClients call to return empty slice (no auth client)
-	mockClientSvc.On("GetGoIamClients", mock.Anything, mock.MatchedBy(func(params sdk.ClientQueryParams) bool {
-		return params.GoIamClient == true
+	// Mock the GetIAMClients call to return empty slice (no auth client)
+	mockClientSvc.On("GetIAMClients", mock.Anything, mock.MatchedBy(func(params sdk.ClientQueryParams) bool {
+		return params.IAMClient == true
 	})).Return([]sdk.Client{}, nil)
 
 	middlewares, err := NewMiddlewares(mockAuthSvc, mockClientSvc)
@@ -106,12 +106,12 @@ func TestNewMiddlewares_NoAuthClient(t *testing.T) {
 	mockClientSvc.AssertExpectations(t)
 }
 
-func TestNewMiddlewares_GetGoIamClientsError(t *testing.T) {
+func TestNewMiddlewares_GetIAMClientsError(t *testing.T) {
 	_, mockAuthSvc, mockClientSvc := setupTestApp()
 
-	// Mock the GetGoIamClients call to return an error
-	mockClientSvc.On("GetGoIamClients", mock.Anything, mock.MatchedBy(func(params sdk.ClientQueryParams) bool {
-		return params.GoIamClient == true
+	// Mock the GetIAMClients call to return an error
+	mockClientSvc.On("GetIAMClients", mock.Anything, mock.MatchedBy(func(params sdk.ClientQueryParams) bool {
+		return params.IAMClient == true
 	})).Return(nil, errors.New("database error"))
 
 	middlewares, err := NewMiddlewares(mockAuthSvc, mockClientSvc)

@@ -1,0 +1,50 @@
+﻿=== RUN   TestNewService
+--- PASS: TestNewService (0.00s)
+=== RUN   TestService_GetAll
+=== RUN   TestService_GetAll/successful_get_all
+=== RUN   TestService_GetAll/store_error
+--- PASS: TestService_GetAll (0.00s)
+    --- PASS: TestService_GetAll/successful_get_all (0.00s)
+    --- PASS: TestService_GetAll/store_error (0.00s)
+=== RUN   TestService_Get
+=== RUN   TestService_Get/successful_get
+=== RUN   TestService_Get/empty_project_ID
+=== RUN   TestService_Get/project_not_found
+=== RUN   TestService_Get/store_error
+--- PASS: TestService_Get (0.00s)
+    --- PASS: TestService_Get/successful_get (0.00s)
+    --- PASS: TestService_Get/empty_project_ID (0.00s)
+    --- PASS: TestService_Get/project_not_found (0.00s)
+    --- PASS: TestService_Get/store_error (0.00s)
+=== RUN   TestService_GetByName
+=== RUN   TestService_GetByName/successful_get_by_name
+=== RUN   TestService_GetByName/empty_project_name
+=== RUN   TestService_GetByName/project_not_found
+=== RUN   TestService_GetByName/store_error
+--- PASS: TestService_GetByName (0.00s)
+    --- PASS: TestService_GetByName/successful_get_by_name (0.00s)
+    --- PASS: TestService_GetByName/empty_project_name (0.00s)
+    --- PASS: TestService_GetByName/project_not_found (0.00s)
+    --- PASS: TestService_GetByName/store_error (0.00s)
+=== RUN   TestService_Create
+=== RUN   TestService_Create/successful_create
+=== RUN   TestService_Create/store_error
+--- PASS: TestService_Create (0.00s)
+    --- PASS: TestService_Create/successful_create (0.00s)
+    --- PASS: TestService_Create/store_error (0.00s)
+=== RUN   TestService_Update
+=== RUN   TestService_Update/successful_update
+=== RUN   TestService_Update/store_error
+--- PASS: TestService_Update (0.00s)
+    --- PASS: TestService_Update/successful_update (0.00s)
+    --- PASS: TestService_Update/store_error (0.00s)
+=== RUN   TestService_ErrorConstants
+--- PASS: TestService_ErrorConstants (0.00s)
+=== RUN   TestService_IntegrationScenarios
+=== RUN   TestService_IntegrationScenarios/create_and_get_project_flow
+=== RUN   TestService_IntegrationScenarios/get_by_name_after_creation
+--- PASS: TestService_IntegrationScenarios (0.00s)
+    --- PASS: TestService_IntegrationScenarios/create_and_get_project_flow (0.00s)
+    --- PASS: TestService_IntegrationScenarios/get_by_name_after_creation (0.00s)
+PASS
+ok  	github.com/codearena-platform/codearena-platform/internal/iam/services/project	1.194s

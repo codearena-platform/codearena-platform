@@ -29,7 +29,7 @@ func (h *IAMHandler) GetAllPolicies(c *fiber.Ctx) error {
 			query.Limit = val
 		}
 	}
-	policies, err := h.prv.S.Policy.GetAll(c.Context(), query)
+	policies, err := h.prv.S.AccessUC.GetAllPolicies(c.Context(), query)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(sdk.PoliciesResponse{Success: false, Message: err.Error()})
 	}

@@ -29,7 +29,7 @@ func (h *IAMHandler) CreateRole(c *fiber.Ctx) error {
 			Message: fmt.Sprintf("invalid request. %v", err),
 		})
 	}
-	err := h.prv.S.Role.Create(c.Context(), payload)
+	err := h.prv.S.AccessUC.CreateRole(c.Context(), payload)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(sdk.RoleResponse{
 			Success: false,
@@ -59,7 +59,7 @@ func (h *IAMHandler) SearchRoles(c *fiber.Ctx) error {
 			query.Limit = val
 		}
 	}
-	roles, err := h.prv.S.Role.GetAll(c.Context(), query)
+	roles, err := h.prv.S.AccessUC.GetAllRoles(c.Context(), query)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(sdk.RoleListResponse{
 			Success: false,
@@ -74,7 +74,7 @@ func (h *IAMHandler) SearchRoles(c *fiber.Ctx) error {
 
 func (h *IAMHandler) GetRoleById(c *fiber.Ctx) error {
 	id := c.Params("id")
-	role, err := h.prv.S.Role.GetById(c.Context(), id)
+	role, err := h.prv.S.AccessUC.GetRole(c.Context(), id)
 	if err != nil {
 		status := http.StatusInternalServerError
 		if errors.Is(err, sdk.ErrRoleNotFound) {
@@ -101,7 +101,7 @@ func (h *IAMHandler) UpdateRole(c *fiber.Ctx) error {
 		})
 	}
 	payload.Id = id
-	err := h.prv.S.Role.Update(c.Context(), payload)
+	err := h.prv.S.AccessUC.UpdateRole(c.Context(), payload)
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(sdk.RoleResponse{
 			Success: false,

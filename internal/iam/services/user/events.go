@@ -3,16 +3,16 @@ package user
 import (
 	"context"
 
-	"github.com/gofiber/fiber/v2/log"
 	"github.com/codearena-platform/codearena-platform/internal/iam/middlewares"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 func (s *service) HandleEvent(e utils.Event[sdk.Role]) {
 	switch e.Name() {
-	case goiamuniverse.EventRoleUpdated:
+	case constants.EventRoleUpdated:
 		s.handleRoleUpdate(e)
 	default:
 		return
@@ -33,7 +33,7 @@ func (s *service) fetchAndUpdateUsersWithRole(ctx context.Context, role sdk.Role
 	page := 1
 	limit := 10
 	for {
-		users, err := s.store.GetAll(ctx, sdk.UserQuery{
+		users, err := s.repo.GetAll(ctx, sdk.UserQuery{
 			RoleId: role.Id,
 			ProjectIds: []string{
 				role.ProjectId,
@@ -80,10 +80,10 @@ func (s *service) updateUser(ctx context.Context, role sdk.Role, user *sdk.User)
 	// add the role to the user obj
 	addRoleToUserObj(user, role)
 	// update the user
-	err := s.store.Update(ctx, user)
+	err := s.repo.Update(ctx, user)
 	if err != nil {
 		return err
 	}
-	s.Emit(newEvent(ctx, goiamuniverse.EventUserUpdated, *user, middlewares.GetMetadata(ctx)))
+	s.Emit(newEvent(ctx, constants.EventUserUpdated, *user, middlewares.GetMetadata(ctx)))
 	return nil
 }

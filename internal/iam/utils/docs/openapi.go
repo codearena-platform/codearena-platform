@@ -56,7 +56,7 @@ func GenerateOpenAPI() ([]byte, error) {
 	swagger := &openapi3.T{
 		OpenAPI: "3.0.3",
 		Info: &openapi3.Info{
-			Title:       "Go IAM APIs",
+			Title:       "IAM APIs",
 			Description: intoDescription,
 			Version:     "1.0.0",
 		},
@@ -79,7 +79,7 @@ func GenerateOpenAPI() ([]byte, error) {
 		"BearerAuth": &openapi3.SecuritySchemeRef{
 			Value: &openapi3.SecurityScheme{
 				Type:         "http",
-				Description:  "Auth is required if and only if go IAM is configured to use auth providers. By default only `/me/v1` requires authentication.",
+				Description:  "Auth is required if and only if IAM is configured to use auth providers. By default only `/me/v1` requires authentication.",
 				Scheme:       "bearer",
 				BearerFormat: "JWT",
 			},

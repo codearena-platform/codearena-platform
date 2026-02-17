@@ -3,19 +3,20 @@ package policy
 import (
 	"context"
 
+	"github.com/codearena-platform/codearena-platform/internal/iam/repository"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 )
 
 type service struct {
-	store Store
+	repo repository.PolicyRepository
 }
 
-func NewService(store Store) Service {
+func NewService(repo repository.PolicyRepository) Service {
 	return &service{
-		store: store,
+		repo: repo,
 	}
 }
 
 func (s *service) GetAll(ctx context.Context, query sdk.PolicyQuery) (*sdk.PolicyList, error) {
-	return s.store.GetAll(ctx, query)
+	return s.repo.GetAll(ctx, query)
 }

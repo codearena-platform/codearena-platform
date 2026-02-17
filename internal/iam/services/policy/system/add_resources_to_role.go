@@ -6,7 +6,7 @@ import (
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/role"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/user"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 )
 
 type addResourcesToRole struct {
@@ -80,7 +80,7 @@ func (a addResourcesToRole) PolicyDef() sdk.Policy {
 				{
 					Name:        "@roleId",
 					Description: "The role to which the resource access is granted.",
-					DataType:    goiamuniverse.Role,
+					DataType:    constants.Role,
 				},
 			},
 		},

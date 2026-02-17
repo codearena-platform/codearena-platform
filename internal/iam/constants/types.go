@@ -1,4 +1,4 @@
-package goiamuniverse
+package constants
 
 type DataType string
 

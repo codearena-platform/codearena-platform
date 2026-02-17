@@ -5,7 +5,7 @@ import (
 
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -42,6 +42,6 @@ func (m *MockResourceService) Emit(event utils.Event[sdk.Resource]) {
 	m.Called(event)
 }
 
-func (m *MockResourceService) Subscribe(eventName goiamuniverse.Event, subscriber utils.Subscriber[utils.Event[sdk.Resource], sdk.Resource]) {
+func (m *MockResourceService) Subscribe(eventName constants.Event, subscriber utils.Subscriber[utils.Event[sdk.Resource], sdk.Resource]) {
 	m.Called(eventName, subscriber)
 }

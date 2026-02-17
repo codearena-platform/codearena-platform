@@ -5,60 +5,61 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/gofiber/fiber/v2/log"
 	"github.com/codearena-platform/codearena-platform/internal/iam/middlewares"
+	"github.com/codearena-platform/codearena-platform/internal/iam/repository"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/role"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 type service struct {
-	store   Store
+	repo    repository.UserRepository
 	e       utils.Emitter[utils.Event[sdk.User], sdk.User]
 	roleSvc role.Service
 }
 
-func NewService(store Store, roleSvc role.Service) Service {
+func NewService(repo repository.UserRepository, roleSvc role.Service) Service {
 	return &service{
-		store:   store,
+		repo:    repo,
 		roleSvc: roleSvc,
 		e:       utils.NewEmitter[utils.Event[sdk.User]](),
 	}
 }
 
 func (s *service) Create(ctx context.Context, user *sdk.User) error {
-	err := s.store.Create(ctx, user)
+	err := s.repo.Create(ctx, user)
 	if err != nil {
 		return err
 	}
-	s.Emit(newEvent(ctx, goiamuniverse.EventUserCreated, *user, middlewares.GetMetadata(ctx)))
+	s.Emit(newEvent(ctx, constants.EventUserCreated, *user, middlewares.GetMetadata(ctx)))
 	return nil
 }
 
 func (s *service) Update(ctx context.Context, user *sdk.User) error {
-	err := s.store.Update(ctx, user)
+	err := s.repo.Update(ctx, user)
 	if err != nil {
 		return err
 	}
-	s.Emit(newEvent(ctx, goiamuniverse.EventUserUpdated, *user, middlewares.GetMetadata(ctx)))
+	s.Emit(newEvent(ctx, constants.EventUserUpdated, *user, middlewares.GetMetadata(ctx)))
 	return nil
 }
 
 func (s *service) GetByEmail(ctx context.Context, email string, projectId string) (*sdk.User, error) {
-	return s.store.GetByEmail(ctx, email, projectId)
+	return s.repo.GetByEmail(ctx, email, projectId)
 }
 
 func (s *service) GetById(ctx context.Context, id string) (*sdk.User, error) {
-	return s.store.GetById(ctx, id)
+	return s.repo.GetById(ctx, id)
 }
 
 func (s *service) GetByPhone(ctx context.Context, phone string, projectId string) (*sdk.User, error) {
-	return s.store.GetByPhone(ctx, phone, projectId)
+	return s.repo.GetByPhone(ctx, phone, projectId)
 }
 
 func (s *service) GetAll(ctx context.Context, query sdk.UserQuery) (*sdk.UserList, error) {
-	return s.store.GetAll(ctx, query)
+	return s.repo.GetAll(ctx, query)
 }
 
 func (s *service) AddRoleToUser(ctx context.Context, userId, roleId string) error {
@@ -84,12 +85,12 @@ func (s *service) AddRoleToUser(ctx context.Context, userId, roleId string) erro
 
 	addRoleToUserObj(user, *role)
 
-	err = s.store.Update(ctx, user)
+	err = s.repo.Update(ctx, user)
 	if err != nil {
 		return fmt.Errorf("failed to add role to user: %w", err)
 	}
 
-	s.Emit(newEvent(ctx, goiamuniverse.EventUserUpdated, *user, middlewares.GetMetadata(ctx)))
+	s.Emit(newEvent(ctx, constants.EventUserUpdated, *user, middlewares.GetMetadata(ctx)))
 	return nil
 }
 
@@ -118,17 +119,17 @@ func (s *service) RemoveRoleFromUser(ctx context.Context, userId, roleId string)
 	removeRoleFromUserObj(user, *role)
 
 	// Update user in the database
-	err = s.store.Update(ctx, user)
+	err = s.repo.Update(ctx, user)
 	if err != nil {
 		return fmt.Errorf("failed to update user: %w", err)
 	}
 
-	s.Emit(newEvent(ctx, goiamuniverse.EventUserUpdated, *user, middlewares.GetMetadata(ctx)))
+	s.Emit(newEvent(ctx, constants.EventUserUpdated, *user, middlewares.GetMetadata(ctx)))
 	return nil
 }
 
 func (s *service) AddResourceToUser(ctx context.Context, userId string, request sdk.AddUserResourceRequest) error {
-	usr, err := s.store.GetById(ctx, userId)
+	usr, err := s.repo.GetById(ctx, userId)
 	if err != nil {
 		return err
 	}
@@ -136,17 +137,17 @@ func (s *service) AddResourceToUser(ctx context.Context, userId string, request 
 	addResourceToUserObj(usr, request)
 
 	// Update user in the database
-	err = s.store.Update(ctx, usr)
+	err = s.repo.Update(ctx, usr)
 	if err != nil {
 		return fmt.Errorf("failed to update user: %w", err)
 	}
 
-	s.Emit(newEvent(ctx, goiamuniverse.EventUserUpdated, *usr, middlewares.GetMetadata(ctx)))
+	s.Emit(newEvent(ctx, constants.EventUserUpdated, *usr, middlewares.GetMetadata(ctx)))
 	return nil
 }
 
 func (s *service) AddPolicyToUser(ctx context.Context, userId string, policies map[string]sdk.UserPolicy) error {
-	usr, err := s.store.GetById(ctx, userId)
+	usr, err := s.repo.GetById(ctx, userId)
 	if err != nil {
 		return err
 	}
@@ -154,17 +155,17 @@ func (s *service) AddPolicyToUser(ctx context.Context, userId string, policies m
 	addPoliciesToUserObj(usr, policies)
 
 	// Update user in the database
-	err = s.store.Update(ctx, usr)
+	err = s.repo.Update(ctx, usr)
 	if err != nil {
 		return fmt.Errorf("failed to update user: %w", err)
 	}
 
-	s.Emit(newEvent(ctx, goiamuniverse.EventUserUpdated, *usr, middlewares.GetMetadata(ctx)))
+	s.Emit(newEvent(ctx, constants.EventUserUpdated, *usr, middlewares.GetMetadata(ctx)))
 	return nil
 }
 
 func (s *service) RemovePolicyFromUser(ctx context.Context, userId string, policyIds []string) error {
-	usr, err := s.store.GetById(ctx, userId)
+	usr, err := s.repo.GetById(ctx, userId)
 	if err != nil {
 		return err
 	}
@@ -172,11 +173,11 @@ func (s *service) RemovePolicyFromUser(ctx context.Context, userId string, polic
 	removePoliciesFromUserObj(usr, policyIds)
 
 	// Update user in the database
-	err = s.store.Update(ctx, usr)
+	err = s.repo.Update(ctx, usr)
 	if err != nil {
 		return fmt.Errorf("failed to update user: %w", err)
 	}
-	s.Emit(newEvent(ctx, goiamuniverse.EventUserUpdated, *usr, middlewares.GetMetadata(ctx)))
+	s.Emit(newEvent(ctx, constants.EventUserUpdated, *usr, middlewares.GetMetadata(ctx)))
 	return nil
 }
 
@@ -227,11 +228,11 @@ func (s *service) TransferOwnership(ctx context.Context, userId, newOwnerId stri
 	}
 
 	// Update new owner in the database
-	err = s.store.Update(ctx, newOwner)
+	err = s.repo.Update(ctx, newOwner)
 	if err != nil {
 		return fmt.Errorf("failed to update new owner: %w", err)
 	}
-	s.Emit(newEvent(ctx, goiamuniverse.EventUserUpdated, *newOwner, middlewares.GetMetadata(ctx)))
+	s.Emit(newEvent(ctx, constants.EventUserUpdated, *newOwner, middlewares.GetMetadata(ctx)))
 
 	// remove all roles, resources, policies from old user
 	user.Roles = make(map[string]sdk.UserRole)
@@ -239,18 +240,18 @@ func (s *service) TransferOwnership(ctx context.Context, userId, newOwnerId stri
 	user.Policies = make(map[string]sdk.UserPolicy)
 
 	// Update old user in the database
-	err = s.store.Update(ctx, user)
+	err = s.repo.Update(ctx, user)
 	if err != nil {
 		return fmt.Errorf("failed to update old user: %w", err)
 	}
 
-	s.Emit(newEvent(ctx, goiamuniverse.EventUserUpdated, *user, middlewares.GetMetadata(ctx)))
+	s.Emit(newEvent(ctx, constants.EventUserUpdated, *user, middlewares.GetMetadata(ctx)))
 
 	return nil
 }
 
 func (s *service) RemoveResourceFromAll(ctx context.Context, resourceKey string) error {
-	return s.store.RemoveResourceFromAll(ctx, resourceKey)
+	return s.repo.RemoveResourceFromAll(ctx, resourceKey)
 }
 
 func (s *service) CopyUserResources(ctx context.Context, sourceUserId, targetUserId string) error {
@@ -270,7 +271,7 @@ func (s *service) CopyUserResources(ctx context.Context, sourceUserId, targetUse
 	}
 
 	// Update target user in the database
-	err = s.store.Update(ctx, targetUser)
+	err = s.repo.Update(ctx, targetUser)
 	if err != nil {
 		return fmt.Errorf("failed to update target user: %w", err)
 	}
@@ -279,7 +280,7 @@ func (s *service) CopyUserResources(ctx context.Context, sourceUserId, targetUse
 	metadata.User = targetUser
 	metadata.ProjectIds = []string{targetUser.ProjectId}
 
-	s.Emit(newEvent(ctx, goiamuniverse.EventUserUpdated, *targetUser, metadata))
+	s.Emit(newEvent(ctx, constants.EventUserUpdated, *targetUser, metadata))
 	return nil
 }
 
@@ -290,18 +291,18 @@ func (s service) Emit(event utils.Event[sdk.User]) {
 	s.e.Emit(event)
 }
 
-func (s service) Subscribe(eventName goiamuniverse.Event, subscriber utils.Subscriber[utils.Event[sdk.User], sdk.User]) {
+func (s service) Subscribe(eventName constants.Event, subscriber utils.Subscriber[utils.Event[sdk.User], sdk.User]) {
 	s.e.Subscribe(eventName, subscriber)
 }
 
 type event struct {
-	name     goiamuniverse.Event
+	name     constants.Event
 	payload  sdk.User
 	metadata sdk.Metadata
 	ctx      context.Context
 }
 
-func (e event) Name() goiamuniverse.Event {
+func (e event) Name() constants.Event {
 	return e.name
 }
 
@@ -317,6 +318,6 @@ func (e event) Context() context.Context {
 	return e.ctx
 }
 
-func newEvent(ctx context.Context, name goiamuniverse.Event, payload sdk.User, metadata sdk.Metadata) utils.Event[sdk.User] {
+func newEvent(ctx context.Context, name constants.Event, payload sdk.User, metadata sdk.Metadata) utils.Event[sdk.User] {
 	return event{ctx: ctx, name: name, payload: payload, metadata: metadata}
 }

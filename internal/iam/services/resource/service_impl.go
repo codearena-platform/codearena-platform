@@ -3,54 +3,55 @@ package resource
 import (
 	"context"
 
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/codearena-platform/codearena-platform/internal/iam/middlewares"
+	"github.com/codearena-platform/codearena-platform/internal/iam/repository"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
 )
 
 type service struct {
-	s Store
-	e utils.Emitter[utils.Event[sdk.Resource], sdk.Resource]
+	repo repository.ResourceRepository
+	e    utils.Emitter[utils.Event[sdk.Resource], sdk.Resource]
 }
 
-func NewService(s Store) Service {
-	return service{s: s,
+func NewService(repo repository.ResourceRepository) Service {
+	return service{repo: repo,
 		e: utils.NewEmitter[utils.Event[sdk.Resource]]()}
 }
 
 func (s service) Search(ctx context.Context, query sdk.ResourceQuery) (*sdk.ResourceList, error) {
 	query.ProjectIds = middlewares.GetProjects(ctx)
-	return s.s.Search(ctx, query)
+	return s.repo.GetAll(ctx, query)
 }
 
-func (s service) Get(ctx context.Context, id string) (*sdk.Resource, error) {
-	return s.s.Get(ctx, id)
+func (s service) GetById(ctx context.Context, id string) (*sdk.Resource, error) {
+	return s.repo.GetById(ctx, id)
 }
 
 func (s service) Create(ctx context.Context, resource *sdk.Resource) error {
-	_, err := s.s.Create(ctx, resource)
+	_, err := s.repo.Create(ctx, resource)
 	if err != nil {
 		return err
 	}
-	s.Emit(newEvent(ctx, goiamuniverse.EventResourceCreated, *resource, middlewares.GetMetadata(ctx)))
+	s.Emit(newEvent(ctx, constants.EventResourceCreated, *resource, middlewares.GetMetadata(ctx)))
 	return nil
 }
 
 func (s service) Update(ctx context.Context, resource *sdk.Resource) error {
-	return s.s.Update(ctx, resource)
+	return s.repo.Update(ctx, resource)
 }
 
 func (s service) Delete(ctx context.Context, id string) error {
-	vl, err := s.s.Get(ctx, id)
+	vl, err := s.repo.GetById(ctx, id)
 	if err != nil {
 		return err
 	}
-	err = s.s.Delete(ctx, id)
+	err = s.repo.Delete(ctx, id)
 	if err != nil {
 		return err
 	}
-	s.Emit(newEvent(ctx, goiamuniverse.EventResourceDeleted, *vl, middlewares.GetMetadata(ctx)))
+	s.Emit(newEvent(ctx, constants.EventResourceDeleted, *vl, middlewares.GetMetadata(ctx)))
 	return nil
 }
 
@@ -61,18 +62,18 @@ func (s service) Emit(event utils.Event[sdk.Resource]) {
 	s.e.Emit(event)
 }
 
-func (s service) Subscribe(eventName goiamuniverse.Event, subscriber utils.Subscriber[utils.Event[sdk.Resource], sdk.Resource]) {
+func (s service) Subscribe(eventName constants.Event, subscriber utils.Subscriber[utils.Event[sdk.Resource], sdk.Resource]) {
 	s.e.Subscribe(eventName, subscriber)
 }
 
 type event struct {
-	name     goiamuniverse.Event
+	name     constants.Event
 	payload  sdk.Resource
 	metadata sdk.Metadata
 	ctx      context.Context
 }
 
-func (e event) Name() goiamuniverse.Event {
+func (e event) Name() constants.Event {
 	return e.name
 }
 
@@ -88,6 +89,6 @@ func (e event) Context() context.Context {
 	return e.ctx
 }
 
-func newEvent(ctx context.Context, name goiamuniverse.Event, payload sdk.Resource, metadata sdk.Metadata) utils.Event[sdk.Resource] {
+func newEvent(ctx context.Context, name constants.Event, payload sdk.Resource, metadata sdk.Metadata) utils.Event[sdk.Resource] {
 	return event{ctx: ctx, name: name, payload: payload, metadata: metadata}
 }

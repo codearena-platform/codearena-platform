@@ -1,32 +1,16 @@
 package sdk
 
 import (
-	"errors"
-	"time"
+	"github.com/codearena-platform/codearena-platform/internal/iam/entity"
 )
 
 var (
 	// ErrResourceNotFound is returned when a requested resource cannot be found.
-	ErrResourceNotFound = errors.New("resource not found")
+	ErrResourceNotFound = entity.ErrResourceNotFound
 )
 
 // Resource represents a resource in the Go IAM system.
-// Resources are entities that can be protected by access control policies.
-// They can represent anything from API endpoints to data objects, files,
-// or any other system component that needs authorization.
-type Resource struct {
-	ID          string     `json:"id"`                   // Unique identifier for the resource
-	Name        string     `json:"name"`                 // Display name of the resource
-	Description string     `json:"description"`          // Description of what this resource represents
-	Key         string     `json:"key"`                  // Unique key identifying the resource type/category
-	Enabled     bool       `json:"enabled"`              // Whether this resource is active
-	ProjectId   string     `json:"project_id"`           // ID of the project this resource belongs to
-	CreatedAt   *time.Time `json:"created_at"`           // Timestamp when resource was created
-	CreatedBy   string     `json:"created_by"`           // ID of the user who created this resource
-	UpdatedAt   *time.Time `json:"updated_at"`           // Timestamp when resource was last updated
-	UpdatedBy   string     `json:"updated_by"`           // ID of the user who last updated this resource
-	DeletedAt   *time.Time `json:"deleted_at,omitempty"` // Timestamp when resource was deleted (soft delete)
-}
+type Resource = entity.Resource
 
 // ResourceQuery represents search and filtering criteria for resource queries.
 // This is used for listing resources with various filters and pagination.

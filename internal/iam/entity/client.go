@@ -17,7 +17,7 @@ type Client struct {
 	Scopes                []string   `json:"scopes"`
 	ProjectId             string     `json:"project_id"`
 	DefaultAuthProviderId string     `json:"default_auth_provider_id"`
-	GoIamClient           bool       `json:"go_iam_client"`
+	IAMClient             bool       `json:"iam_client"`
 	LinkedUserId          string     `json:"linked_user_id"`
 	ServiceAccountEmail   string     `json:"service_account_email"`
 	Enabled               bool       `json:"enabled"`
@@ -28,9 +28,9 @@ type Client struct {
 }
 
 func (c Client) IsServiceAccount() bool {
-	return c.HasGoIamAuthProvider() && c.LinkedUserId != ""
+	return c.HasIAMAuthProvider() && c.LinkedUserId != ""
 }
 
-func (c Client) HasGoIamAuthProvider() bool {
+func (c Client) HasIAMAuthProvider() bool {
 	return c.DefaultAuthProviderId == ""
 }

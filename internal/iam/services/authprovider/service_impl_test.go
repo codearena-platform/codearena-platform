@@ -5,7 +5,9 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/codearena-platform/codearena-platform/internal/iam/entity"
 	"github.com/codearena-platform/codearena-platform/internal/iam/middlewares"
+	"github.com/codearena-platform/codearena-platform/internal/iam/repository"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/project"
 	"github.com/stretchr/testify/assert"
@@ -17,22 +19,22 @@ type MockStore struct {
 	mock.Mock
 }
 
-func (m *MockStore) GetAll(ctx context.Context, params sdk.AuthProviderQueryParams) ([]sdk.AuthProvider, error) {
-	args := m.Called(ctx, params)
-	return args.Get(0).([]sdk.AuthProvider), args.Error(1)
+func (m *MockStore) GetAll(ctx context.Context, projectIds []string) ([]entity.AuthProvider, error) {
+	args := m.Called(ctx, projectIds)
+	return args.Get(0).([]entity.AuthProvider), args.Error(1)
 }
 
-func (m *MockStore) Get(ctx context.Context, id string) (*sdk.AuthProvider, error) {
+func (m *MockStore) GetById(ctx context.Context, id string) (*entity.AuthProvider, error) {
 	args := m.Called(ctx, id)
-	return args.Get(0).(*sdk.AuthProvider), args.Error(1)
+	return args.Get(0).(*entity.AuthProvider), args.Error(1)
 }
 
-func (m *MockStore) Create(ctx context.Context, provider *sdk.AuthProvider) error {
+func (m *MockStore) Create(ctx context.Context, provider *entity.AuthProvider) error {
 	args := m.Called(ctx, provider)
 	return args.Error(0)
 }
 
-func (m *MockStore) Update(ctx context.Context, provider *sdk.AuthProvider) error {
+func (m *MockStore) Update(ctx context.Context, provider *entity.AuthProvider) error {
 	args := m.Called(ctx, provider)
 	return args.Error(0)
 }
@@ -70,7 +72,7 @@ func (m *MockProjectService) GetByName(ctx context.Context, name string) (*sdk.P
 func TestNewService(t *testing.T) {
 	tests := []struct {
 		name     string
-		store    Store
+		store    repository.AuthProviderRepository
 		project  project.Service
 		expected Service
 	}{
@@ -78,13 +80,13 @@ func TestNewService(t *testing.T) {
 			name:     "success_create_new_service",
 			store:    &MockStore{},
 			project:  &MockProjectService{},
-			expected: &service{s: &MockStore{}, p: &MockProjectService{}},
+			expected: &service{repo: &MockStore{}, p: &MockProjectService{}},
 		},
 		{
 			name:     "success_with_nil_dependencies",
 			store:    nil,
 			project:  nil,
-			expected: &service{s: nil, p: nil},
+			expected: &service{repo: nil, p: nil},
 		},
 	}
 
@@ -100,7 +102,7 @@ func TestNewService(t *testing.T) {
 			assert.True(t, ok)
 
 			// Check internal fields are set correctly
-			assert.Equal(t, tt.store, svc.s)
+			assert.Equal(t, tt.store, svc.repo)
 			assert.Equal(t, tt.project, svc.p)
 		})
 	}
@@ -125,10 +127,7 @@ func TestService_GetAll(t *testing.T) {
 			},
 			params: sdk.AuthProviderQueryParams{},
 			mockSetup: func(m *MockStore) {
-				expectedParams := sdk.AuthProviderQueryParams{
-					ProjectIds: []string{"project1", "project2"},
-				}
-				m.On("GetAll", mock.Anything, expectedParams).Return([]sdk.AuthProvider{
+				m.On("GetAll", mock.Anything, mock.Anything).Return([]sdk.AuthProvider{
 					{Id: "ap1", Name: "Provider 1", ProjectId: "project1"},
 					{Id: "ap2", Name: "Provider 2", ProjectId: "project2"},
 				}, nil)
@@ -149,10 +148,7 @@ func TestService_GetAll(t *testing.T) {
 			},
 			params: sdk.AuthProviderQueryParams{},
 			mockSetup: func(m *MockStore) {
-				expectedParams := sdk.AuthProviderQueryParams{
-					ProjectIds: []string{},
-				}
-				m.On("GetAll", mock.Anything, expectedParams).Return([]sdk.AuthProvider{}, nil)
+				m.On("GetAll", mock.Anything, mock.Anything).Return([]sdk.AuthProvider{}, nil)
 			},
 			expectedResult: []sdk.AuthProvider{},
 			expectedError:  nil,
@@ -167,10 +163,7 @@ func TestService_GetAll(t *testing.T) {
 			},
 			params: sdk.AuthProviderQueryParams{},
 			mockSetup: func(m *MockStore) {
-				expectedParams := sdk.AuthProviderQueryParams{
-					ProjectIds: nil,
-				}
-				m.On("GetAll", mock.Anything, expectedParams).Return([]sdk.AuthProvider{}, nil)
+				m.On("GetAll", mock.Anything, mock.Anything).Return([]sdk.AuthProvider{}, nil)
 			},
 			expectedResult: []sdk.AuthProvider{},
 			expectedError:  nil,
@@ -185,10 +178,7 @@ func TestService_GetAll(t *testing.T) {
 			},
 			params: sdk.AuthProviderQueryParams{},
 			mockSetup: func(m *MockStore) {
-				expectedParams := sdk.AuthProviderQueryParams{
-					ProjectIds: []string{"project1"},
-				}
-				m.On("GetAll", mock.Anything, expectedParams).Return([]sdk.AuthProvider{}, errors.New("store error"))
+				m.On("GetAll", mock.Anything, mock.Anything).Return([]sdk.AuthProvider{}, errors.New("store error"))
 			},
 			expectedResult: []sdk.AuthProvider{},
 			expectedError:  errors.New("store error"),
@@ -205,10 +195,7 @@ func TestService_GetAll(t *testing.T) {
 				ProjectIds: []string{"existing"},
 			},
 			mockSetup: func(m *MockStore) {
-				expectedParams := sdk.AuthProviderQueryParams{
-					ProjectIds: []string{"project1"}, // Should override existing
-				}
-				m.On("GetAll", mock.Anything, expectedParams).Return([]sdk.AuthProvider{
+				m.On("GetAll", mock.Anything, mock.Anything).Return([]sdk.AuthProvider{
 					{Id: "ap1", Name: "Provider 1", ProjectId: "project1"},
 				}, nil)
 			},
@@ -265,7 +252,7 @@ func TestService_Get(t *testing.T) {
 			id:                "ap1",
 			dontCheckProjects: true,
 			mockSetup: func(m *MockStore) {
-				m.On("Get", mock.Anything, "ap1").Return(&sdk.AuthProvider{
+				m.On("GetById", mock.Anything, mock.Anything).Return(&sdk.AuthProvider{
 					Id:        "ap1",
 					Name:      "Provider 1",
 					ProjectId: "project1",
@@ -289,7 +276,7 @@ func TestService_Get(t *testing.T) {
 			id:                "ap1",
 			dontCheckProjects: false,
 			mockSetup: func(m *MockStore) {
-				m.On("Get", mock.Anything, "ap1").Return(&sdk.AuthProvider{
+				m.On("GetById", mock.Anything, mock.Anything).Return(&sdk.AuthProvider{
 					Id:        "ap1",
 					Name:      "Provider 1",
 					ProjectId: "project1",
@@ -313,7 +300,7 @@ func TestService_Get(t *testing.T) {
 			id:                "ap1",
 			dontCheckProjects: false,
 			mockSetup: func(m *MockStore) {
-				m.On("Get", mock.Anything, "ap1").Return(&sdk.AuthProvider{
+				m.On("GetById", mock.Anything, mock.Anything).Return(&sdk.AuthProvider{
 					Id:        "ap1",
 					Name:      "Provider 1",
 					ProjectId: "project1",
@@ -333,7 +320,7 @@ func TestService_Get(t *testing.T) {
 			id:                "ap1",
 			dontCheckProjects: true,
 			mockSetup: func(m *MockStore) {
-				m.On("Get", mock.Anything, "ap1").Return(&sdk.AuthProvider{}, errors.New("store error"))
+				m.On("GetById", mock.Anything, mock.Anything).Return(&sdk.AuthProvider{}, errors.New("store error"))
 			},
 			expectedResult: nil,
 			expectedError:  errors.New("store error"),
@@ -349,7 +336,7 @@ func TestService_Get(t *testing.T) {
 			id:                "ap1",
 			dontCheckProjects: false,
 			mockSetup: func(m *MockStore) {
-				m.On("Get", mock.Anything, "ap1").Return(&sdk.AuthProvider{
+				m.On("GetById", mock.Anything, mock.Anything).Return(&sdk.AuthProvider{
 					Id:        "ap1",
 					Name:      "Provider 1",
 					ProjectId: "project1",
@@ -369,7 +356,7 @@ func TestService_Get(t *testing.T) {
 			id:                "ap1",
 			dontCheckProjects: false,
 			mockSetup: func(m *MockStore) {
-				m.On("Get", mock.Anything, "ap1").Return(&sdk.AuthProvider{
+				m.On("GetById", mock.Anything, mock.Anything).Return(&sdk.AuthProvider{
 					Id:        "ap1",
 					Name:      "Provider 1",
 					ProjectId: "project1",

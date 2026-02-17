@@ -32,9 +32,9 @@ func TestUser(t *testing.T) {
 }
 
 func TestClient(t *testing.T) {
-	t.Run("IsServiceAccount returns true for Go-IAM client with linked user", func(t *testing.T) {
+	t.Run("IsServiceAccount returns true for IAM client with linked user", func(t *testing.T) {
 		client := Client{
-			GoIamClient:  true,
+			IAMClient:    true,
 			LinkedUserId: "user-123",
 		}
 		assert.True(t, client.IsServiceAccount())
@@ -42,21 +42,21 @@ func TestClient(t *testing.T) {
 
 	t.Run("IsServiceAccount returns false for client without linked user", func(t *testing.T) {
 		client := Client{
-			GoIamClient: true,
+			IAMClient: true,
 		}
 		assert.False(t, client.IsServiceAccount())
 	})
 
-	t.Run("HasGoIamAuthProvider returns true when DefaultAuthProviderId is empty", func(t *testing.T) {
+	t.Run("HasIAMAuthProvider returns true when DefaultAuthProviderId is empty", func(t *testing.T) {
 		client := Client{}
-		assert.True(t, client.HasGoIamAuthProvider())
+		assert.True(t, client.HasIAMAuthProvider())
 	})
 
-	t.Run("HasGoIamAuthProvider returns false when DefaultAuthProviderId is set", func(t *testing.T) {
+	t.Run("HasIAMAuthProvider returns false when DefaultAuthProviderId is set", func(t *testing.T) {
 		client := Client{
 			DefaultAuthProviderId: "provider-123",
 		}
-		assert.False(t, client.HasGoIamAuthProvider())
+		assert.False(t, client.HasIAMAuthProvider())
 	})
 }
 
@@ -206,6 +206,7 @@ func TestAuthProviderErrorResponses(t *testing.T) {
 		assert.Equal(t, http.StatusInternalServerError, resp.StatusCode)
 	})
 }
+
 // TestAuthMetadataType is a test implementation of AuthMetadataType
 type TestAuthMetadataType struct{}
 

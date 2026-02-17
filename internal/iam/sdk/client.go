@@ -67,6 +67,6 @@ func ClientsInternalServerError(msg string, c *fiber.Ctx) error {
 // ClientQueryParams represents query parameters for filtering and sorting OAuth2 clients.
 type ClientQueryParams struct {
 	ProjectIds      []string `json:"project_id"`         // Filter clients by project IDs
-	GoIamClient     bool     `json:"go_iam_client"`      // Filter by Go-IAM internal clients
+	IAMClient       bool     `json:"iam_client"`         // Filter by IAM internal clients
 	SortByUpdatedAt bool     `json:"sort_by_updated_at"` // Sort results by update timestamp
 }

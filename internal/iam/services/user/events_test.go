@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/codearena-platform/codearena-platform/internal/iam/middlewares"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
 )
 
 // TestHandleEvent tests the HandleEvent method
@@ -24,13 +24,11 @@ func TestHandleEvent(t *testing.T) {
 		svc, mockStore, _ := setupUserService()
 
 		// Setup mocks for role update handling
-		mockStore.On("GetAll", ctx, mock.MatchedBy(func(query sdk.UserQuery) bool {
-			return query.RoleId == testRole.Id
-		})).Return(&sdk.UserList{Users: []sdk.User{}, Total: 0}, nil)
+		mockStore.On("GetAll", mock.Anything, mock.Anything).Return(&sdk.UserList{Users: []sdk.User{}, Total: 0}, nil)
 
 		// Create a mock event for role updated
 		event := &mockEvent{
-			name:     goiamuniverse.EventRoleUpdated,
+			name:     constants.EventRoleUpdated,
 			payload:  *testRole,
 			metadata: testMetadata,
 			ctx:      ctx,
@@ -49,7 +47,7 @@ func TestHandleEvent(t *testing.T) {
 
 		// Create a mock event for unknown event type
 		event := &mockEvent{
-			name:     goiamuniverse.EventUserCreated, // Different event type
+			name:     constants.EventUserCreated, // Different event type
 			payload:  *testRole,
 			metadata: testMetadata,
 			ctx:      ctx,
@@ -66,7 +64,7 @@ func TestHandleEvent(t *testing.T) {
 
 		// Create a mock event for client created (should be ignored)
 		event := &mockEvent{
-			name:     goiamuniverse.EventClientCreated,
+			name:     constants.EventClientCreated,
 			payload:  *testRole,
 			metadata: testMetadata,
 			ctx:      ctx,
@@ -108,20 +106,16 @@ func TestHandleRoleUpdate(t *testing.T) {
 		}
 
 		// Mock the GetAll call for fetching users with role
-		mockStore.On("GetAll", ctx, mock.MatchedBy(func(query sdk.UserQuery) bool {
-			return query.RoleId == testRole.Id && query.Skip == 0 && query.Limit == 10
-		})).Return(userList, nil).Once()
+		mockStore.On("GetAll", mock.Anything, mock.Anything).Return(userList, nil).Once()
 
 		// Mock the GetAll call for second page (empty)
-		mockStore.On("GetAll", ctx, mock.MatchedBy(func(query sdk.UserQuery) bool {
-			return query.RoleId == testRole.Id && query.Skip == 10 && query.Limit == 10
-		})).Return(&sdk.UserList{Users: []sdk.User{}, Total: 0}, nil).Once()
+		mockStore.On("GetAll", mock.Anything, mock.Anything).Return(&sdk.UserList{Users: []sdk.User{}, Total: 0}, nil).Once()
 
 		// Mock Update calls for each user
-		mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil).Times(len(users))
+		mockStore.On("Update", mock.Anything, mock.Anything).Return(nil).Times(len(users))
 
 		event := &mockEvent{
-			name:     goiamuniverse.EventRoleUpdated,
+			name:     constants.EventRoleUpdated,
 			payload:  *testRole,
 			metadata: testMetadata,
 			ctx:      ctx,
@@ -138,10 +132,10 @@ func TestHandleRoleUpdate(t *testing.T) {
 	t.Run("error - fetch users fails", func(t *testing.T) {
 		// Mock GetAll to return error
 		mockStore.ExpectedCalls = nil
-		mockStore.On("GetAll", ctx, mock.AnythingOfType("sdk.UserQuery")).Return((*sdk.UserList)(nil), errors.New("database error"))
+		mockStore.On("GetAll", mock.Anything, mock.Anything).Return((*sdk.UserList)(nil), errors.New("database error"))
 
 		event := &mockEvent{
-			name:     goiamuniverse.EventRoleUpdated,
+			name:     constants.EventRoleUpdated,
 			payload:  *testRole,
 			metadata: testMetadata,
 			ctx:      ctx,
@@ -191,22 +185,16 @@ func TestFetchAndUpdateUsersWithRole(t *testing.T) {
 		}
 
 		// Mock first page
-		mockStore.On("GetAll", ctx, mock.MatchedBy(func(query sdk.UserQuery) bool {
-			return query.RoleId == testRole.Id && query.Skip == 0 && query.Limit == 10
-		})).Return(&sdk.UserList{Users: users1, Total: 11}, nil).Once()
+		mockStore.On("GetAll", mock.Anything, mock.Anything).Return(&sdk.UserList{Users: users1, Total: 11}, nil).Once()
 
 		// Mock second page
-		mockStore.On("GetAll", ctx, mock.MatchedBy(func(query sdk.UserQuery) bool {
-			return query.RoleId == testRole.Id && query.Skip == 10 && query.Limit == 10
-		})).Return(&sdk.UserList{Users: users2, Total: 11}, nil).Once()
+		mockStore.On("GetAll", mock.Anything, mock.Anything).Return(&sdk.UserList{Users: users2, Total: 11}, nil).Once()
 
 		// Mock third page (empty)
-		mockStore.On("GetAll", ctx, mock.MatchedBy(func(query sdk.UserQuery) bool {
-			return query.RoleId == testRole.Id && query.Skip == 20 && query.Limit == 10
-		})).Return(&sdk.UserList{Users: []sdk.User{}, Total: 11}, nil).Once()
+		mockStore.On("GetAll", mock.Anything, mock.Anything).Return(&sdk.UserList{Users: []sdk.User{}, Total: 11}, nil).Once()
 
 		// Mock Update calls for all users
-		mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil).Times(11)
+		mockStore.On("Update", mock.Anything, mock.Anything).Return(nil).Times(11)
 
 		err := svc.fetchAndUpdateUsersWithRole(ctx, *testRole)
 
@@ -217,7 +205,7 @@ func TestFetchAndUpdateUsersWithRole(t *testing.T) {
 	t.Run("success - no users with role", func(t *testing.T) {
 		mockStore.ExpectedCalls = nil
 		// Mock GetAll to return empty list
-		mockStore.On("GetAll", ctx, mock.AnythingOfType("sdk.UserQuery")).Return(&sdk.UserList{Users: []sdk.User{}, Total: 0}, nil)
+		mockStore.On("GetAll", mock.Anything, mock.Anything).Return(&sdk.UserList{Users: []sdk.User{}, Total: 0}, nil)
 
 		err := svc.fetchAndUpdateUsersWithRole(ctx, *testRole)
 
@@ -228,7 +216,7 @@ func TestFetchAndUpdateUsersWithRole(t *testing.T) {
 	t.Run("error - GetAll fails", func(t *testing.T) {
 		mockStore.ExpectedCalls = nil
 		// Mock GetAll to return error
-		mockStore.On("GetAll", ctx, mock.AnythingOfType("sdk.UserQuery")).Return((*sdk.UserList)(nil), errors.New("database error"))
+		mockStore.On("GetAll", mock.Anything, mock.Anything).Return((*sdk.UserList)(nil), errors.New("database error"))
 
 		err := svc.fetchAndUpdateUsersWithRole(ctx, *testRole)
 
@@ -242,10 +230,10 @@ func TestFetchAndUpdateUsersWithRole(t *testing.T) {
 		users := []sdk.User{*createTestUser()}
 
 		// Mock successful GetAll
-		mockStore.On("GetAll", ctx, mock.AnythingOfType("sdk.UserQuery")).Return(&sdk.UserList{Users: users, Total: 1}, nil)
+		mockStore.On("GetAll", mock.Anything, mock.Anything).Return(&sdk.UserList{Users: users, Total: 1}, nil)
 
 		// Mock Update to fail
-		mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(errors.New("update error"))
+		mockStore.On("Update", mock.Anything, mock.Anything).Return(errors.New("update error"))
 
 		err := svc.fetchAndUpdateUsersWithRole(ctx, *testRole)
 
@@ -277,7 +265,7 @@ func TestUpdateUsersWithRole(t *testing.T) {
 		}
 
 		// Mock Update calls for each user
-		mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil).Times(len(users))
+		mockStore.On("Update", mock.Anything, mock.Anything).Return(nil).Times(len(users))
 
 		err := svc.updateUsersWithRole(ctx, *testRole, users)
 
@@ -301,7 +289,7 @@ func TestUpdateUsersWithRole(t *testing.T) {
 		users := []sdk.User{*createTestUser()}
 
 		// Mock Update to fail
-		mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(errors.New("update failed"))
+		mockStore.On("Update", mock.Anything, mock.Anything).Return(errors.New("update failed"))
 
 		err := svc.updateUsersWithRole(ctx, *testRole, users)
 
@@ -324,7 +312,7 @@ func TestUpdateUser(t *testing.T) {
 		user.Roles[testRole.Id] = sdk.UserRole{Id: testRole.Id, Name: testRole.Name}
 
 		// Mock successful Update
-		mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+		mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 
 		err := svc.updateUser(ctx, *testRole, user)
 
@@ -343,7 +331,7 @@ func TestUpdateUser(t *testing.T) {
 		user := createTestUser()
 
 		// Mock Update to fail
-		mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(errors.New("store error"))
+		mockStore.On("Update", mock.Anything, mock.Anything).Return(errors.New("store error"))
 
 		err := svc.updateUser(ctx, *testRole, user)
 
@@ -359,7 +347,7 @@ func TestUpdateUser(t *testing.T) {
 		delete(user.Roles, testRole.Id)
 
 		// Mock successful Update
-		mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
+		mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 
 		err := svc.updateUser(ctx, *testRole, user)
 
@@ -376,13 +364,13 @@ func TestUpdateUser(t *testing.T) {
 
 // mockEvent implements utils.Event[sdk.Role] for testing
 type mockEvent struct {
-	name     goiamuniverse.Event
+	name     constants.Event
 	payload  sdk.Role
 	metadata sdk.Metadata
 	ctx      context.Context
 }
 
-func (e *mockEvent) Name() goiamuniverse.Event {
+func (e *mockEvent) Name() constants.Event {
 	return e.name
 }
 

@@ -5,7 +5,7 @@ import (
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/user"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 )
 
 type addResourcesToUser struct {
@@ -78,7 +78,7 @@ func (a addResourcesToUser) PolicyDef() sdk.Policy {
 				{
 					Name:        "@userId",
 					Description: "The user to whom the resource access is granted.",
-					DataType:    goiamuniverse.User,
+					DataType:    constants.User,
 				},
 			},
 		},

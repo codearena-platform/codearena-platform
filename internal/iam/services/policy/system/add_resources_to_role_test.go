@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils/test/services"
 	"github.com/stretchr/testify/assert"
 )
@@ -38,7 +38,7 @@ func TestAddResourcesToRole_HandleEvent_Success(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceCreated,
+		constants.EventResourceCreated,
 		resource,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)
@@ -87,7 +87,7 @@ func TestAddResourcesToRole_HandleEvent_PolicyCheckError(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceCreated,
+		constants.EventResourceCreated,
 		resource,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)
@@ -118,7 +118,7 @@ func TestAddResourcesToRole_HandleEvent_PolicyNotExists(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceCreated,
+		constants.EventResourceCreated,
 		resource,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)
@@ -153,7 +153,7 @@ func TestAddResourcesToRole_HandleEvent_NoRoleIdInPolicy(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceCreated,
+		constants.EventResourceCreated,
 		resource,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)
@@ -195,7 +195,7 @@ func TestAddResourcesToRole_HandleEvent_EmptyRoleId(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceCreated,
+		constants.EventResourceCreated,
 		resource,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)
@@ -240,7 +240,7 @@ func TestAddResourcesToRole_HandleEvent_AddResourceError(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceCreated,
+		constants.EventResourceCreated,
 		resource,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)
@@ -371,5 +371,5 @@ func TestAddResourcesToRole_PolicyDef(t *testing.T) {
 	assert.Len(t, policyDef.Definition.Arguments, 1)
 	assert.Equal(t, "@roleId", policyDef.Definition.Arguments[0].Name)
 	assert.Equal(t, "The role to which the resource access is granted.", policyDef.Definition.Arguments[0].Description)
-	assert.Equal(t, goiamuniverse.Role, policyDef.Definition.Arguments[0].DataType)
+	assert.Equal(t, constants.Role, policyDef.Definition.Arguments[0].DataType)
 }

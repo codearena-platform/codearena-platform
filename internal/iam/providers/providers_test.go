@@ -6,13 +6,13 @@ import (
 	"os"
 	"testing"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/codearena-platform/codearena-platform/internal/iam/config"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/codearena-platform/codearena-platform/internal/iam/middlewares/auth"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils/test"
 	testservices "github.com/codearena-platform/codearena-platform/internal/iam/utils/test/services"
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
@@ -154,7 +154,7 @@ func TestProvider_HandleEvent(t *testing.T) {
 		}
 
 		event := &testservices.MockEvent[sdk.Client]{}
-		event.On("Name").Return(goiamuniverse.Event("some-other-event"))
+		event.On("Name").Return(constants.Event("some-other-event"))
 
 		provider.HandleEvent(event)
 
@@ -166,9 +166,9 @@ func TestProvider_HandleEvent(t *testing.T) {
 			AuthClient: &sdk.Client{Id: "test-client"},
 		}
 
-		mockClient := &sdk.Client{Id: "test-client", GoIamClient: false}
+		mockClient := &sdk.Client{Id: "test-client", IAMClient: false}
 		event := &testservices.MockEvent[sdk.Client]{}
-		event.On("Name").Return(goiamuniverse.EventClientCreated)
+		event.On("Name").Return(constants.EventClientCreated)
 		event.On("Payload").Return(*mockClient)
 
 		provider.HandleEvent(event)
@@ -201,7 +201,7 @@ func TestProviderStruct(t *testing.T) {
 			C:          &testservices.MockCacheService{},
 			PM:         nil, // PM is a middleware, not a service
 			AM:         &auth.Middlewares{},
-			AuthClient: &sdk.Client{Id: "test-client", GoIamClient: true},
+			AuthClient: &sdk.Client{Id: "test-client", IAMClient: true},
 		}
 
 		assert.NotNil(t, provider.S)
@@ -210,7 +210,7 @@ func TestProviderStruct(t *testing.T) {
 		assert.NotNil(t, provider.AM)
 		assert.NotNil(t, provider.AuthClient)
 		assert.Equal(t, "test-client", provider.AuthClient.Id)
-		assert.True(t, provider.AuthClient.GoIamClient)
+		assert.True(t, provider.AuthClient.IAMClient)
 	})
 }
 

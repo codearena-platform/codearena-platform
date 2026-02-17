@@ -1,4 +1,4 @@
-package goiamclient
+package httpclient
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-func TestGetGoIamClient_Success(t *testing.T) {
+func TestGetIAMClient_Success(t *testing.T) {
 	// Create mock service
 	mockService := new(services.MockClientService)
 
@@ -20,15 +20,15 @@ func TestGetGoIamClient_Success(t *testing.T) {
 	now := time.Now()
 	expectedClient := sdk.Client{
 		Id:                    "test-client-id",
-		Name:                  "Test Go IAM Client",
-		Description:           "Test client for Go IAM",
+		Name:                  "Test IAM Client",
+		Description:           "Test client for IAM",
 		Secret:                "test-secret",
-		Tags:                  []string{"go-iam", "test"},
+		Tags:                  []string{"iam", "test"},
 		RedirectURLs:          []string{"http://localhost:3000/callback"},
 		Scopes:                []string{"read", "write"},
 		ProjectId:             "test-project-id",
 		DefaultAuthProviderId: "test-auth-provider-id",
-		GoIamClient:           true,
+		IAMClient:             true,
 		Enabled:               true,
 		CreatedAt:             &now,
 		CreatedBy:             "test-user",
@@ -37,12 +37,12 @@ func TestGetGoIamClient_Success(t *testing.T) {
 	}
 
 	// Set up mock expectations
-	mockService.On("GetGoIamClients", mock.AnythingOfType("context.backgroundCtx"), sdk.ClientQueryParams{
-		GoIamClient: true,
+	mockService.On("GetIAMClients", mock.AnythingOfType("context.backgroundCtx"), sdk.ClientQueryParams{
+		IAMClient: true,
 	}).Return([]sdk.Client{expectedClient}, nil)
 
 	// Call the function
-	result, err := GetGoIamClient(mockService)
+	result, err := GetIAMClient(mockService)
 
 	// Assertions
 	assert.NoError(t, err)
@@ -56,7 +56,7 @@ func TestGetGoIamClient_Success(t *testing.T) {
 	assert.Equal(t, expectedClient.Scopes, result.Scopes)
 	assert.Equal(t, expectedClient.ProjectId, result.ProjectId)
 	assert.Equal(t, expectedClient.DefaultAuthProviderId, result.DefaultAuthProviderId)
-	assert.True(t, result.GoIamClient)
+	assert.True(t, result.IAMClient)
 	assert.True(t, result.Enabled)
 	assert.Equal(t, expectedClient.CreatedAt, result.CreatedAt)
 	assert.Equal(t, expectedClient.CreatedBy, result.CreatedBy)
@@ -67,33 +67,33 @@ func TestGetGoIamClient_Success(t *testing.T) {
 	mockService.AssertExpectations(t)
 }
 
-func TestGetGoIamClient_MultipleClients(t *testing.T) {
+func TestGetIAMClient_MultipleClients(t *testing.T) {
 	// Create mock service
 	mockService := new(services.MockClientService)
 
 	// Create multiple test clients
 	now := time.Now()
 	client1 := sdk.Client{
-		Id:          "client-1",
-		Name:        "First Go IAM Client",
-		GoIamClient: true,
-		CreatedAt:   &now,
+		Id:        "client-1",
+		Name:      "First IAM Client",
+		IAMClient: true,
+		CreatedAt: &now,
 	}
 
 	client2 := sdk.Client{
-		Id:          "client-2",
-		Name:        "Second Go IAM Client",
-		GoIamClient: true,
-		CreatedAt:   &now,
+		Id:        "client-2",
+		Name:      "Second IAM Client",
+		IAMClient: true,
+		CreatedAt: &now,
 	}
 
 	// Set up mock expectations - should return first client
-	mockService.On("GetGoIamClients", mock.AnythingOfType("context.backgroundCtx"), sdk.ClientQueryParams{
-		GoIamClient: true,
+	mockService.On("GetIAMClients", mock.AnythingOfType("context.backgroundCtx"), sdk.ClientQueryParams{
+		IAMClient: true,
 	}).Return([]sdk.Client{client1, client2}, nil)
 
 	// Call the function
-	result, err := GetGoIamClient(mockService)
+	result, err := GetIAMClient(mockService)
 
 	// Assertions - should return the first client
 	assert.NoError(t, err)
@@ -105,18 +105,18 @@ func TestGetGoIamClient_MultipleClients(t *testing.T) {
 	mockService.AssertExpectations(t)
 }
 
-func TestGetGoIamClient_ServiceError(t *testing.T) {
+func TestGetIAMClient_ServiceError(t *testing.T) {
 	// Create mock service
 	mockService := new(services.MockClientService)
 
 	// Set up mock expectations to return an error
 	expectedError := errors.New("database connection failed")
-	mockService.On("GetGoIamClients", mock.AnythingOfType("context.backgroundCtx"), sdk.ClientQueryParams{
-		GoIamClient: true,
+	mockService.On("GetIAMClients", mock.AnythingOfType("context.backgroundCtx"), sdk.ClientQueryParams{
+		IAMClient: true,
 	}).Return([]sdk.Client{}, expectedError)
 
 	// Call the function
-	result, err := GetGoIamClient(mockService)
+	result, err := GetIAMClient(mockService)
 
 	// Assertions
 	assert.Nil(t, result)
@@ -126,17 +126,17 @@ func TestGetGoIamClient_ServiceError(t *testing.T) {
 	mockService.AssertExpectations(t)
 }
 
-func TestGetGoIamClient_NoClientsFound(t *testing.T) {
+func TestGetIAMClient_NoClientsFound(t *testing.T) {
 	// Create mock service
 	mockService := new(services.MockClientService)
 
 	// Set up mock expectations to return empty slice
-	mockService.On("GetGoIamClients", mock.AnythingOfType("context.backgroundCtx"), sdk.ClientQueryParams{
-		GoIamClient: true,
+	mockService.On("GetIAMClients", mock.AnythingOfType("context.backgroundCtx"), sdk.ClientQueryParams{
+		IAMClient: true,
 	}).Return([]sdk.Client{}, nil)
 
 	// Call the function
-	result, err := GetGoIamClient(mockService)
+	result, err := GetIAMClient(mockService)
 
 	// Assertions
 	assert.Nil(t, result)
@@ -146,58 +146,58 @@ func TestGetGoIamClient_NoClientsFound(t *testing.T) {
 	mockService.AssertExpectations(t)
 }
 
-func TestGetGoIamClient_EmptyClient(t *testing.T) {
+func TestGetIAMClient_EmptyClient(t *testing.T) {
 	// Create mock service
 	mockService := new(services.MockClientService)
 
 	// Create empty client (minimal required fields)
 	emptyClient := sdk.Client{
-		Id:          "",
-		Name:        "",
-		GoIamClient: true,
-		Enabled:     false,
+		Id:        "",
+		Name:      "",
+		IAMClient: true,
+		Enabled:   false,
 	}
 
 	// Set up mock expectations
-	mockService.On("GetGoIamClients", mock.AnythingOfType("context.backgroundCtx"), sdk.ClientQueryParams{
-		GoIamClient: true,
+	mockService.On("GetIAMClients", mock.AnythingOfType("context.backgroundCtx"), sdk.ClientQueryParams{
+		IAMClient: true,
 	}).Return([]sdk.Client{emptyClient}, nil)
 
 	// Call the function
-	result, err := GetGoIamClient(mockService)
+	result, err := GetIAMClient(mockService)
 
 	// Assertions
 	assert.NoError(t, err)
 	assert.NotNil(t, result)
 	assert.Equal(t, "", result.Id)
 	assert.Equal(t, "", result.Name)
-	assert.True(t, result.GoIamClient)
+	assert.True(t, result.IAMClient)
 	assert.False(t, result.Enabled)
 
 	// Verify mock expectations
 	mockService.AssertExpectations(t)
 }
 
-func TestGetGoIamClient_NilFields(t *testing.T) {
+func TestGetIAMClient_NilFields(t *testing.T) {
 	// Create mock service
 	mockService := new(services.MockClientService)
 
 	// Create client with nil timestamp fields
 	clientWithNilFields := sdk.Client{
-		Id:          "test-id",
-		Name:        "Test Client",
-		GoIamClient: true,
-		CreatedAt:   nil,
-		UpdatedAt:   nil,
+		Id:        "test-id",
+		Name:      "Test Client",
+		IAMClient: true,
+		CreatedAt: nil,
+		UpdatedAt: nil,
 	}
 
 	// Set up mock expectations
-	mockService.On("GetGoIamClients", mock.AnythingOfType("context.backgroundCtx"), sdk.ClientQueryParams{
-		GoIamClient: true,
+	mockService.On("GetIAMClients", mock.AnythingOfType("context.backgroundCtx"), sdk.ClientQueryParams{
+		IAMClient: true,
 	}).Return([]sdk.Client{clientWithNilFields}, nil)
 
 	// Call the function
-	result, err := GetGoIamClient(mockService)
+	result, err := GetIAMClient(mockService)
 
 	// Assertions
 	assert.NoError(t, err)
@@ -211,25 +211,25 @@ func TestGetGoIamClient_NilFields(t *testing.T) {
 	mockService.AssertExpectations(t)
 }
 
-func TestGetGoIamClient_CorrectQueryParams(t *testing.T) {
+func TestGetIAMClient_CorrectQueryParams(t *testing.T) {
 	// Create mock service
 	mockService := new(services.MockClientService)
 
 	// Create test client
 	testClient := sdk.Client{
-		Id:          "test-id",
-		GoIamClient: true,
+		Id:        "test-id",
+		IAMClient: true,
 	}
 
 	// Set up mock expectations with exact parameter matching
 	expectedParams := sdk.ClientQueryParams{
-		GoIamClient: true,
+		IAMClient: true,
 	}
 
-	mockService.On("GetGoIamClients", mock.AnythingOfType("context.backgroundCtx"), expectedParams).Return([]sdk.Client{testClient}, nil)
+	mockService.On("GetIAMClients", mock.AnythingOfType("context.backgroundCtx"), expectedParams).Return([]sdk.Client{testClient}, nil)
 
 	// Call the function
-	result, err := GetGoIamClient(mockService)
+	result, err := GetIAMClient(mockService)
 
 	// Assertions
 	assert.NoError(t, err)
@@ -239,36 +239,36 @@ func TestGetGoIamClient_CorrectQueryParams(t *testing.T) {
 	// Verify that the correct parameters were passed
 	mockService.AssertExpectations(t)
 
-	// Additional verification that GetGoIamClients was called with correct params
+	// Additional verification that GetIAMClients was called with correct params
 	calls := mockService.Calls
 	assert.Len(t, calls, 1)
-	assert.Equal(t, "GetGoIamClients", calls[0].Method)
+	assert.Equal(t, "GetIAMClients", calls[0].Method)
 
 	// Check the query params argument
 	actualParams := calls[0].Arguments[1].(sdk.ClientQueryParams)
-	assert.True(t, actualParams.GoIamClient)
+	assert.True(t, actualParams.IAMClient)
 	assert.Empty(t, actualParams.ProjectIds)
 	assert.False(t, actualParams.SortByUpdatedAt)
 }
 
-func TestGetGoIamClient_ContextPassing(t *testing.T) {
+func TestGetIAMClient_ContextPassing(t *testing.T) {
 	// Create mock service
 	mockService := new(services.MockClientService)
 
 	// Create test client
 	testClient := sdk.Client{
-		Id:          "test-id",
-		GoIamClient: true,
+		Id:        "test-id",
+		IAMClient: true,
 	}
 
 	// Set up mock with context verification
-	mockService.On("GetGoIamClients", mock.MatchedBy(func(ctx context.Context) bool {
+	mockService.On("GetIAMClients", mock.MatchedBy(func(ctx context.Context) bool {
 		// Verify that a context is passed (should be background context)
 		return ctx != nil
 	}), mock.AnythingOfType("sdk.ClientQueryParams")).Return([]sdk.Client{testClient}, nil)
 
 	// Call the function
-	result, err := GetGoIamClient(mockService)
+	result, err := GetIAMClient(mockService)
 
 	// Assertions
 	assert.NotNil(t, result)
@@ -278,7 +278,7 @@ func TestGetGoIamClient_ContextPassing(t *testing.T) {
 	mockService.AssertExpectations(t)
 }
 
-func TestGetGoIamClient_ClientWithAllFields(t *testing.T) {
+func TestGetIAMClient_ClientWithAllFields(t *testing.T) {
 	// Create mock service
 	mockService := new(services.MockClientService)
 
@@ -289,12 +289,12 @@ func TestGetGoIamClient_ClientWithAllFields(t *testing.T) {
 		Name:                  "Full Test Client",
 		Description:           "A comprehensive test client with all fields",
 		Secret:                "super-secret-key",
-		Tags:                  []string{"production", "go-iam", "auth"},
+		Tags:                  []string{"production", "iam", "auth"},
 		RedirectURLs:          []string{"https://app.example.com/callback", "http://localhost:3000/auth"},
 		Scopes:                []string{"read", "write", "admin", "delete"},
 		ProjectId:             "project-123",
 		DefaultAuthProviderId: "auth-provider-456",
-		GoIamClient:           true,
+		IAMClient:             true,
 		Enabled:               true,
 		CreatedAt:             &now,
 		CreatedBy:             "admin-user",
@@ -303,12 +303,12 @@ func TestGetGoIamClient_ClientWithAllFields(t *testing.T) {
 	}
 
 	// Set up mock expectations
-	mockService.On("GetGoIamClients", mock.AnythingOfType("context.backgroundCtx"), sdk.ClientQueryParams{
-		GoIamClient: true,
+	mockService.On("GetIAMClients", mock.AnythingOfType("context.backgroundCtx"), sdk.ClientQueryParams{
+		IAMClient: true,
 	}).Return([]sdk.Client{fullClient}, nil)
 
 	// Call the function
-	result, err := GetGoIamClient(mockService)
+	result, err := GetIAMClient(mockService)
 
 	// Comprehensive assertions
 	assert.NoError(t, err)
@@ -320,7 +320,7 @@ func TestGetGoIamClient_ClientWithAllFields(t *testing.T) {
 	assert.Equal(t, fullClient.Tags, result.Tags)
 	assert.Equal(t, len(fullClient.Tags), len(result.Tags))
 	assert.Contains(t, result.Tags, "production")
-	assert.Contains(t, result.Tags, "go-iam")
+	assert.Contains(t, result.Tags, "iam")
 	assert.Contains(t, result.Tags, "auth")
 	assert.Equal(t, fullClient.RedirectURLs, result.RedirectURLs)
 	assert.Equal(t, len(fullClient.RedirectURLs), len(result.RedirectURLs))
@@ -334,7 +334,7 @@ func TestGetGoIamClient_ClientWithAllFields(t *testing.T) {
 	assert.Contains(t, result.Scopes, "delete")
 	assert.Equal(t, fullClient.ProjectId, result.ProjectId)
 	assert.Equal(t, fullClient.DefaultAuthProviderId, result.DefaultAuthProviderId)
-	assert.True(t, result.GoIamClient)
+	assert.True(t, result.IAMClient)
 	assert.True(t, result.Enabled)
 	assert.Equal(t, fullClient.CreatedAt.Unix(), result.CreatedAt.Unix())
 	assert.Equal(t, fullClient.CreatedBy, result.CreatedBy)
@@ -345,7 +345,7 @@ func TestGetGoIamClient_ClientWithAllFields(t *testing.T) {
 	mockService.AssertExpectations(t)
 }
 
-func TestGetGoIamClient_ErrorTypes(t *testing.T) {
+func TestGetIAMClient_ErrorTypes(t *testing.T) {
 	testCases := []struct {
 		name           string
 		serviceError   error
@@ -379,12 +379,12 @@ func TestGetGoIamClient_ErrorTypes(t *testing.T) {
 			mockService := new(services.MockClientService)
 
 			// Set up mock expectations
-			mockService.On("GetGoIamClients", mock.AnythingOfType("context.backgroundCtx"), sdk.ClientQueryParams{
-				GoIamClient: true,
+			mockService.On("GetIAMClients", mock.AnythingOfType("context.backgroundCtx"), sdk.ClientQueryParams{
+				IAMClient: true,
 			}).Return([]sdk.Client{}, tc.serviceError)
 
 			// Call the function
-			result, err := GetGoIamClient(mockService)
+			result, err := GetIAMClient(mockService)
 
 			// Assertions
 			assert.Equal(t, tc.expectedResult, result)

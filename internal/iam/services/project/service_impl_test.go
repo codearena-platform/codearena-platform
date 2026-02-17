@@ -23,7 +23,7 @@ func (m *MockStore) GetAll(ctx context.Context) ([]sdk.Project, error) {
 	return args.Get(0).([]sdk.Project), args.Error(1)
 }
 
-func (m *MockStore) Get(ctx context.Context, id string) (*sdk.Project, error) {
+func (m *MockStore) GetById(ctx context.Context, id string) (*sdk.Project, error) {
 	args := m.Called(ctx, id)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -118,7 +118,7 @@ func TestService_Get(t *testing.T) {
 			name:      "successful get",
 			projectID: "project1",
 			setupMock: func(ms *MockStore) {
-				ms.On("Get", mock.Anything, "project1").Return(&sdk.Project{
+				ms.On("GetById", mock.Anything, "project1").Return(&sdk.Project{
 					Id:   "project1",
 					Name: "Test Project",
 				}, nil)
@@ -134,7 +134,7 @@ func TestService_Get(t *testing.T) {
 			name:      "project not found",
 			projectID: "nonexistent",
 			setupMock: func(ms *MockStore) {
-				ms.On("Get", mock.Anything, "nonexistent").Return(nil, errors.New("project not found"))
+				ms.On("GetById", mock.Anything, "nonexistent").Return(nil, errors.New("project not found"))
 			},
 			expectedError: "project not found",
 		},
@@ -142,7 +142,7 @@ func TestService_Get(t *testing.T) {
 			name:      "store error",
 			projectID: "project1",
 			setupMock: func(ms *MockStore) {
-				ms.On("Get", mock.Anything, "project1").Return(nil, errors.New("store error"))
+				ms.On("GetById", mock.Anything, "project1").Return(nil, errors.New("store error"))
 			},
 			expectedError: "store error",
 		},
@@ -156,7 +156,7 @@ func TestService_Get(t *testing.T) {
 
 			service := NewService(mockStore)
 
-			result, err := service.Get(context.Background(), tt.projectID)
+			result, err := service.GetById(context.Background(), tt.projectID)
 
 			if tt.expectedError != "" {
 				assert.Error(t, err)
@@ -370,14 +370,14 @@ func TestService_IntegrationScenarios(t *testing.T) {
 		mockStore.On("Create", mock.Anything, project).Return(nil)
 
 		// Mock get operation
-		mockStore.On("Get", mock.Anything, "project1").Return(project, nil)
+		mockStore.On("GetById", mock.Anything, "project1").Return(project, nil)
 
 		// Create project
 		err := service.Create(context.Background(), project)
 		assert.NoError(t, err)
 
 		// Get project
-		result, err := service.Get(context.Background(), "project1")
+		result, err := service.GetById(context.Background(), "project1")
 		assert.NoError(t, err)
 		assert.Equal(t, project.Id, result.Id)
 		assert.Equal(t, project.Name, result.Name)

@@ -171,7 +171,7 @@ func TestGenerateOpenAPI_Success(t *testing.T) {
 
 	info, ok := parsed["info"].(map[string]interface{})
 	require.True(t, ok)
-	assert.Equal(t, "Go IAM APIs", info["title"])
+	assert.Equal(t, "IAM APIs", info["title"])
 	assert.Equal(t, "1.0.0", info["version"])
 
 	paths, ok := parsed["paths"].(map[string]interface{})
@@ -679,9 +679,9 @@ func TestGenerateDocsForApi_ResponseError(t *testing.T) {
 func TestConstants(t *testing.T) {
 	// Test that the constants are defined and not empty
 	assert.NotEmpty(t, intoDescription)
-	assert.Contains(t, intoDescription, "Go IAM")
-	assert.Contains(t, intoDescription, "Identity and Access Management")
-	assert.Contains(t, strings.ToLower(intoDescription), "golang")
+	assert.Contains(t, intoDescription, "CodeArena")
+	assert.Contains(t, intoDescription, "IAM Service")
+	assert.Contains(t, strings.ToLower(intoDescription), "arena")
 }
 
 // Test to ensure global state is properly managed

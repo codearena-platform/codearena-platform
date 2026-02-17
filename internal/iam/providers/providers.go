@@ -7,9 +7,8 @@ package providers
 import (
 	"fmt"
 
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/log"
 	"github.com/codearena-platform/codearena-platform/internal/iam/config"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/codearena-platform/codearena-platform/internal/iam/db"
 	"github.com/codearena-platform/codearena-platform/internal/iam/middlewares/auth"
 	"github.com/codearena-platform/codearena-platform/internal/iam/middlewares/projects"
@@ -19,8 +18,9 @@ import (
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/jwt"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/policy/system"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	goiamclient "github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamclient"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/utils/httpclient"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 // Provider encapsulates all the core dependencies and services for the Go IAM system.
@@ -79,7 +79,7 @@ func InjectDefaultProviders(cnf config.AppConfig) (*Provider, error) {
 	if err != nil {
 		return nil, err
 	}
-	authClient, err := goiamclient.GetGoIamClient(svcs.Clients)
+	authClient, err := httpclient.GetIAMClient(svcs.Clients)
 	if err != nil {
 		return nil, err
 	}
@@ -94,17 +94,17 @@ func InjectDefaultProviders(cnf config.AppConfig) (*Provider, error) {
 	}
 
 	// subscribe to user update events
-	svcs.User.Subscribe(goiamuniverse.EventUserUpdated, svcs.AuthSync)
+	svcs.User.Subscribe(constants.EventUserUpdated, svcs.AuthSync)
 
 	// subscribe to client events for checking auth client
-	svcs.Clients.Subscribe(goiamuniverse.EventClientCreated, pvd)
-	svcs.Clients.Subscribe(goiamuniverse.EventClientUpdated, pvd)
-	svcs.Clients.Subscribe(goiamuniverse.EventClientCreated, svcs.Auth)
-	svcs.Clients.Subscribe(goiamuniverse.EventClientUpdated, svcs.Auth)
+	svcs.Clients.Subscribe(constants.EventClientCreated, pvd)
+	svcs.Clients.Subscribe(constants.EventClientUpdated, pvd)
+	svcs.Clients.Subscribe(constants.EventClientCreated, svcs.Auth)
+	svcs.Clients.Subscribe(constants.EventClientUpdated, svcs.Auth)
 
 	// subscribe to resource events for updating downstream dependencies
-	svcs.Resources.Subscribe(goiamuniverse.EventResourceDeleted, system.NewRemoveDeletedResourceFromRole(svcs.Role))
-	svcs.Resources.Subscribe(goiamuniverse.EventResourceDeleted, system.NewRemoveDeletedResourceFromUser(svcs.User))
+	svcs.Resources.Subscribe(constants.EventResourceDeleted, system.NewRemoveDeletedResourceFromRole(svcs.Role))
+	svcs.Resources.Subscribe(constants.EventResourceDeleted, system.NewRemoveDeletedResourceFromUser(svcs.User))
 
 	// creating default project if it doesn't exist
 	err = CheckAndAddDefaultProject(svcs.Projects)
@@ -170,14 +170,14 @@ func GetProviders(c *fiber.Ctx) *Provider {
 // Parameters:
 //   - e: Event containing client information
 func (p *Provider) HandleEvent(e utils.Event[sdk.Client]) {
-	if e.Name() != goiamuniverse.EventClientCreated && e.Name() != goiamuniverse.EventClientUpdated {
+	if e.Name() != constants.EventClientCreated && e.Name() != constants.EventClientUpdated {
 		return
 	}
-	if !e.Payload().GoIamClient {
+	if !e.Payload().IAMClient {
 		return
 	}
 	var err error
-	p.AuthClient, err = goiamclient.GetGoIamClient(p.S.Clients)
+	p.AuthClient, err = httpclient.GetIAMClient(p.S.Clients)
 	if err != nil {
 		log.Errorw("failed to get Go IAM client", "error", err)
 		return

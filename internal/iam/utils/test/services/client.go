@@ -3,9 +3,9 @@ package services
 import (
 	"context"
 
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -22,7 +22,7 @@ func (m *MockClientService) GetAll(ctx context.Context, queryParams sdk.ClientQu
 	return args.Get(0).([]sdk.Client), args.Error(1)
 }
 
-func (m *MockClientService) GetGoIamClients(ctx context.Context, params sdk.ClientQueryParams) ([]sdk.Client, error) {
+func (m *MockClientService) GetIAMClients(ctx context.Context, params sdk.ClientQueryParams) ([]sdk.Client, error) {
 	args := m.Called(ctx, params)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -52,7 +52,7 @@ func (m *MockClientService) Emit(event utils.Event[sdk.Client]) {
 	m.Called(event)
 }
 
-func (m *MockClientService) Subscribe(eventName goiamuniverse.Event, subscriber utils.Subscriber[utils.Event[sdk.Client], sdk.Client]) {
+func (m *MockClientService) Subscribe(eventName constants.Event, subscriber utils.Subscriber[utils.Event[sdk.Client], sdk.Client]) {
 	m.Called(eventName, subscriber)
 }
 

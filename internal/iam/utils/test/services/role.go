@@ -5,7 +5,7 @@ import (
 
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -41,6 +41,6 @@ func (m *MockRoleService) Emit(event utils.Event[sdk.Role]) {
 	m.Called(event)
 }
 
-func (m *MockRoleService) Subscribe(eventName goiamuniverse.Event, subscriber utils.Subscriber[utils.Event[sdk.Role], sdk.Role]) {
+func (m *MockRoleService) Subscribe(eventName constants.Event, subscriber utils.Subscriber[utils.Event[sdk.Role], sdk.Role]) {
 	m.Called(eventName, subscriber)
 }

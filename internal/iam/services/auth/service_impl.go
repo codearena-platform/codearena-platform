@@ -10,8 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofiber/fiber/v2/log"
-	"github.com/google/uuid"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/authprovider"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/cache"
@@ -19,6 +17,8 @@ import (
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/encrypt"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/jwt"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/user"
+	"github.com/gofiber/fiber/v2/log"
+	"github.com/google/uuid"
 )
 
 type service struct {
@@ -211,7 +211,7 @@ func (s service) GetIdentity(ctx context.Context, accessToken string, forceFetch
 
 	// Handle based on provider type
 	if len(token.ServiceAccountUserId) > 0 {
-		// For GoIAM/CLIENT, extract user from token
+		// For IAM, extract user from token
 		usr, err = s.getServiceAccountUser(ctx, token)
 		if err != nil {
 			return nil, fmt.Errorf("error getting service account user: %w", err)
@@ -624,7 +624,7 @@ func (s service) ClientCredentials(ctx context.Context, clientId, clientSecret s
 		return nil, fmt.Errorf("authentication failed: %w", err)
 	}
 
-	// Step 2: Check if client uses GoIAM/CLIENT auth provider
+	// Step 2: Check if client uses IAM auth provider
 	if !cl.IsServiceAccount() {
 		return nil, errors.New("client does not support service account flow")
 	}

@@ -6,20 +6,20 @@ import (
 	"testing"
 
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils/test/services"
 	"github.com/stretchr/testify/assert"
 )
 
 // mockUserEvent implements utils.Event[sdk.User] for testing
 type mockUserEvent struct {
-	name     goiamuniverse.Event
+	name     constants.Event
 	payload  sdk.User
 	metadata sdk.Metadata
 	ctx      context.Context
 }
 
-func (e mockUserEvent) Name() goiamuniverse.Event {
+func (e mockUserEvent) Name() constants.Event {
 	return e.name
 }
 
@@ -35,7 +35,7 @@ func (e mockUserEvent) Context() context.Context {
 	return e.ctx
 }
 
-func newMockUserEvent(ctx context.Context, name goiamuniverse.Event, payload sdk.User, metadata sdk.Metadata) mockUserEvent {
+func newMockUserEvent(ctx context.Context, name constants.Event, payload sdk.User, metadata sdk.Metadata) mockUserEvent {
 	return mockUserEvent{ctx: ctx, name: name, payload: payload, metadata: metadata}
 }
 
@@ -60,7 +60,7 @@ func TestDefaultPoliciesOnUser_HandleEvent_Success(t *testing.T) {
 
 	event := newMockUserEvent(
 		ctx,
-		goiamuniverse.EventUserCreated,
+		constants.EventUserCreated,
 		user,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)
@@ -94,7 +94,7 @@ func TestDefaultPoliciesOnUser_HandleEvent_AddPolicyError(t *testing.T) {
 
 	event := newMockUserEvent(
 		ctx,
-		goiamuniverse.EventUserCreated,
+		constants.EventUserCreated,
 		user,
 		sdk.Metadata{User: &sdk.User{Id: userId}},
 	)
@@ -129,7 +129,7 @@ func TestDefaultPoliciesOnUser_HandleEvent_DifferentUser(t *testing.T) {
 
 	event := newMockUserEvent(
 		ctx,
-		goiamuniverse.EventUserCreated,
+		constants.EventUserCreated,
 		user,
 		sdk.Metadata{User: &sdk.User{Id: originalUserId}},
 	)

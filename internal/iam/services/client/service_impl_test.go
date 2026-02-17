@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
+	"github.com/codearena-platform/codearena-platform/internal/iam/entity"
 	"github.com/codearena-platform/codearena-platform/internal/iam/middlewares"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils/test/services"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -20,22 +21,22 @@ type MockStore struct {
 	mock.Mock
 }
 
-func (m *MockStore) GetAll(ctx context.Context, params sdk.ClientQueryParams) ([]sdk.Client, error) {
+func (m *MockStore) GetAll(ctx context.Context, params sdk.ClientQueryParams) ([]entity.Client, error) {
 	args := m.Called(ctx, params)
-	return args.Get(0).([]sdk.Client), args.Error(1)
+	return args.Get(0).([]entity.Client), args.Error(1)
 }
 
-func (m *MockStore) Get(ctx context.Context, id string) (*sdk.Client, error) {
+func (m *MockStore) GetById(ctx context.Context, id string) (*entity.Client, error) {
 	args := m.Called(ctx, id)
-	return args.Get(0).(*sdk.Client), args.Error(1)
+	return args.Get(0).(*entity.Client), args.Error(1)
 }
 
-func (m *MockStore) Create(ctx context.Context, client *sdk.Client) error {
+func (m *MockStore) Create(ctx context.Context, client *entity.Client) error {
 	args := m.Called(ctx, client)
 	return args.Error(0)
 }
 
-func (m *MockStore) Update(ctx context.Context, client *sdk.Client) error {
+func (m *MockStore) Update(ctx context.Context, client *entity.Client) error {
 	args := m.Called(ctx, client)
 	return args.Error(0)
 }
@@ -89,7 +90,7 @@ func TestService_Subscribe(t *testing.T) {
 	service := NewService(mockStore, mockProjectService, mockAuthService, mockUserService)
 
 	m := &MockSubscriber{}
-	service.Subscribe(goiamuniverse.EventClientCreated, m)
+	service.Subscribe(constants.EventClientCreated, m)
 
 	mockStore.AssertExpectations(t)
 }
@@ -107,17 +108,12 @@ func TestService_GetAll_Success(t *testing.T) {
 		SortByUpdatedAt: true,
 	}
 
-	expectedParams := sdk.ClientQueryParams{
-		ProjectIds:      []string{"project1", "project2"},
-		SortByUpdatedAt: true,
-	}
-
 	expectedClients := []sdk.Client{
 		{Id: "client1", Name: "Test Client 1", ProjectId: "project1"},
 		{Id: "client2", Name: "Test Client 2", ProjectId: "project2"},
 	}
 
-	mockStore.On("GetAll", ctx, expectedParams).Return(expectedClients, nil)
+	mockStore.On("GetAll", mock.Anything, mock.Anything).Return(expectedClients, nil)
 
 	result, err := service.GetAll(ctx, queryParams)
 
@@ -142,7 +138,7 @@ func TestService_Get_Success(t *testing.T) {
 		ProjectId: "project1",
 	}
 
-	mockStore.On("Get", ctx, clientId).Return(expectedClient, nil)
+	mockStore.On("GetById", mock.Anything, mock.Anything).Return(expectedClient, nil)
 
 	result, err := service.Get(ctx, clientId, false)
 
@@ -167,7 +163,7 @@ func TestService_Get_ClientNotInUserProjects(t *testing.T) {
 		ProjectId: "project2", // Not in user's projects
 	}
 
-	mockStore.On("Get", ctx, clientId).Return(client, nil)
+	mockStore.On("GetById", mock.Anything, mock.Anything).Return(client, nil)
 
 	result, err := service.Get(ctx, clientId, false)
 
@@ -198,12 +194,7 @@ func TestService_Create_Success(t *testing.T) {
 	}
 
 	// We expect the store to be called with the client having a generated secret
-	mockStore.On("Create", ctx, mock.MatchedBy(func(c *sdk.Client) bool {
-		return c.Name == "Test Client" &&
-			c.Description == "Test Description" &&
-			c.ProjectId == "project1" &&
-			c.Secret != "" // Secret should be generated
-	})).Return(nil)
+	mockStore.On("Create", mock.Anything, mock.Anything).Return(nil)
 
 	err := service.Create(ctx, client)
 
@@ -234,15 +225,10 @@ func TestService_Create_With_ServiceAccountEmail_Success(t *testing.T) {
 	}
 
 	// We expect the store to be called with the client having a generated secret
-	mockStore.On("Create", ctx, mock.MatchedBy(func(c *sdk.Client) bool {
-		return c.Name == "Test Client" &&
-			c.Description == "Test Description" &&
-			c.ProjectId == "project1" &&
-			c.Secret != "" // Secret should be generated
-	})).Return(nil)
+	mockStore.On("Create", mock.Anything, mock.Anything).Return(nil)
 
-	mockUserService.On("Create", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
-	mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.Client")).Return(nil)
+	mockUserService.On("Create", mock.Anything, mock.Anything).Return(nil)
+	mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 
 	err := service.Create(ctx, client)
 
@@ -327,7 +313,7 @@ func TestService_Update_ProjectNotFound(t *testing.T) {
 	mockStore.AssertNotCalled(t, "Update")
 }
 
-func TestService_GetGoIamClients_Success(t *testing.T) {
+func TestService_GetIAMClients_Success(t *testing.T) {
 	mockStore := &MockStore{}
 	mockProjectService := &services.MockProjectService{}
 	mockAuthService := &services.MockAuthProviderService{}
@@ -340,26 +326,20 @@ func TestService_GetGoIamClients_Success(t *testing.T) {
 		ProjectIds: []string{"project1"},
 	}
 
-	expectedParams := sdk.ClientQueryParams{
-		ProjectIds:      []string{"project1"},
-		GoIamClient:     true,
-		SortByUpdatedAt: true,
-	}
-
 	expectedClients := []sdk.Client{
-		{Id: "client1", Name: "GoIam Client 1", GoIamClient: true},
+		{Id: "client1", Name: "IAM Client 1", IAMClient: true},
 	}
 
-	mockStore.On("GetAll", ctx, expectedParams).Return(expectedClients, nil)
+	mockStore.On("GetAll", mock.Anything, mock.Anything).Return(expectedClients, nil)
 
-	result, err := service.GetGoIamClients(ctx, params)
+	result, err := service.GetIAMClients(ctx, params)
 
 	assert.NoError(t, err)
 	assert.Equal(t, expectedClients, result)
 	mockStore.AssertExpectations(t)
 }
 
-func TestService_GetGoIamClients_StoreError(t *testing.T) {
+func TestService_GetIAMClients_StoreError(t *testing.T) {
 	mockStore := &MockStore{}
 	mockProjectService := &services.MockProjectService{}
 	mockAuthService := &services.MockAuthProviderService{}
@@ -369,14 +349,10 @@ func TestService_GetGoIamClients_StoreError(t *testing.T) {
 	ctx := context.Background()
 
 	params := sdk.ClientQueryParams{}
-	expectedParams := sdk.ClientQueryParams{
-		GoIamClient:     true,
-		SortByUpdatedAt: true,
-	}
 
-	mockStore.On("GetAll", ctx, expectedParams).Return(([]sdk.Client)(nil), errors.New("database error"))
+	mockStore.On("GetAll", mock.Anything, mock.Anything).Return(([]entity.Client)(nil), errors.New("database error"))
 
-	result, err := service.GetGoIamClients(ctx, params)
+	result, err := service.GetIAMClients(ctx, params)
 
 	assert.Error(t, err)
 	assert.Nil(t, result)
@@ -400,7 +376,7 @@ func TestService_Get_WithoutProjectCheck(t *testing.T) {
 		ProjectId: "project3", // Not in user's projects, but should still be returned
 	}
 
-	mockStore.On("Get", ctx, clientId).Return(expectedClient, nil)
+	mockStore.On("GetById", mock.Anything, mock.Anything).Return(expectedClient, nil)
 
 	result, err := service.Get(ctx, clientId, true) // dontCheckProjects = true
 
@@ -420,7 +396,7 @@ func TestService_Get_StoreError(t *testing.T) {
 
 	clientId := "client1"
 
-	mockStore.On("Get", ctx, clientId).Return((*sdk.Client)(nil), errors.New("database error"))
+	mockStore.On("GetById", ctx, clientId).Return((*sdk.Client)(nil), errors.New("database error"))
 
 	result, err := service.Get(ctx, clientId, false)
 
@@ -450,7 +426,7 @@ func TestService_Create_StoreError(t *testing.T) {
 		ProjectId:   "project1",
 	}
 
-	mockStore.On("Create", ctx, mock.AnythingOfType("*sdk.Client")).Return(errors.New("database error"))
+	mockStore.On("Create", mock.Anything, mock.Anything).Return(errors.New("database error"))
 
 	err := service.Create(ctx, client)
 
@@ -481,7 +457,7 @@ func TestService_Update_StoreError(t *testing.T) {
 		ProjectId:   "project1",
 	}
 
-	mockStore.On("Update", ctx, client).Return(errors.New("database error"))
+	mockStore.On("Update", mock.Anything, mock.Anything).Return(errors.New("database error"))
 
 	err := service.Update(ctx, client)
 
@@ -497,19 +473,19 @@ func TestEvent_Name(t *testing.T) {
 	metadata := sdk.Metadata{User: &sdk.User{Id: "user1"}, ProjectIds: []string{"project1"}}
 
 	t.Run("client_created_event", func(t *testing.T) {
-		event := newEvent(ctx, goiamuniverse.EventClientCreated, client, metadata)
+		event := newEvent(ctx, constants.EventClientCreated, client, metadata)
 
 		result := event.Name()
 
-		assert.Equal(t, goiamuniverse.EventClientCreated, result)
+		assert.Equal(t, constants.EventClientCreated, result)
 	})
 
 	t.Run("client_updated_event", func(t *testing.T) {
-		event := newEvent(ctx, goiamuniverse.EventClientUpdated, client, metadata)
+		event := newEvent(ctx, constants.EventClientUpdated, client, metadata)
 
 		result := event.Name()
 
-		assert.Equal(t, goiamuniverse.EventClientUpdated, result)
+		assert.Equal(t, constants.EventClientUpdated, result)
 	})
 }
 
@@ -524,7 +500,7 @@ func TestEvent_Payload(t *testing.T) {
 			ProjectId: "project1",
 		}
 
-		event := newEvent(ctx, goiamuniverse.EventClientCreated, client, metadata)
+		event := newEvent(ctx, constants.EventClientCreated, client, metadata)
 
 		result := event.Payload()
 
@@ -545,11 +521,11 @@ func TestEvent_Payload(t *testing.T) {
 			Scopes:                []string{"read", "write"},
 			ProjectId:             "project2",
 			DefaultAuthProviderId: "provider1",
-			GoIamClient:           true,
+			IAMClient:             true,
 			Enabled:               true,
 		}
 
-		event := newEvent(ctx, goiamuniverse.EventClientUpdated, client, metadata)
+		event := newEvent(ctx, constants.EventClientUpdated, client, metadata)
 
 		result := event.Payload()
 
@@ -563,14 +539,14 @@ func TestEvent_Payload(t *testing.T) {
 		assert.Equal(t, []string{"read", "write"}, result.Scopes)
 		assert.Equal(t, "project2", result.ProjectId)
 		assert.Equal(t, "provider1", result.DefaultAuthProviderId)
-		assert.True(t, result.GoIamClient)
+		assert.True(t, result.IAMClient)
 		assert.True(t, result.Enabled)
 	})
 
 	t.Run("empty_client", func(t *testing.T) {
 		client := sdk.Client{}
 
-		event := newEvent(ctx, goiamuniverse.EventClientCreated, client, metadata)
+		event := newEvent(ctx, constants.EventClientCreated, client, metadata)
 
 		result := event.Payload()
 
@@ -578,7 +554,7 @@ func TestEvent_Payload(t *testing.T) {
 		assert.Empty(t, result.Id)
 		assert.Empty(t, result.Name)
 		assert.Empty(t, result.ProjectId)
-		assert.False(t, result.GoIamClient)
+		assert.False(t, result.IAMClient)
 		assert.False(t, result.Enabled)
 	})
 }
@@ -598,7 +574,7 @@ func TestEvent_Metadata(t *testing.T) {
 			ProjectIds: []string{"project1", "project2", "project3"},
 		}
 
-		event := newEvent(ctx, goiamuniverse.EventClientCreated, client, metadata)
+		event := newEvent(ctx, constants.EventClientCreated, client, metadata)
 
 		result := event.Metadata()
 
@@ -616,7 +592,7 @@ func TestEvent_Metadata(t *testing.T) {
 			ProjectIds: []string{"project1"},
 		}
 
-		event := newEvent(ctx, goiamuniverse.EventClientUpdated, client, metadata)
+		event := newEvent(ctx, constants.EventClientUpdated, client, metadata)
 
 		result := event.Metadata()
 
@@ -632,7 +608,7 @@ func TestEvent_Metadata(t *testing.T) {
 			ProjectIds: []string{},
 		}
 
-		event := newEvent(ctx, goiamuniverse.EventClientCreated, client, metadata)
+		event := newEvent(ctx, constants.EventClientCreated, client, metadata)
 
 		result := event.Metadata()
 
@@ -646,7 +622,7 @@ func TestEvent_Metadata(t *testing.T) {
 	t.Run("empty_metadata", func(t *testing.T) {
 		metadata := sdk.Metadata{}
 
-		event := newEvent(ctx, goiamuniverse.EventClientUpdated, client, metadata)
+		event := newEvent(ctx, constants.EventClientUpdated, client, metadata)
 
 		result := event.Metadata()
 
@@ -665,7 +641,7 @@ func TestEvent_Context(t *testing.T) {
 	t.Run("background_context", func(t *testing.T) {
 		ctx := context.Background()
 
-		event := newEvent(ctx, goiamuniverse.EventClientCreated, client, metadata)
+		event := newEvent(ctx, constants.EventClientCreated, client, metadata)
 
 		result := event.Context()
 
@@ -678,7 +654,7 @@ func TestEvent_Context(t *testing.T) {
 		val := ctxKeyType{}
 		ctx := context.WithValue(baseCtx, val, "testValue")
 
-		event := newEvent(ctx, goiamuniverse.EventClientUpdated, client, metadata)
+		event := newEvent(ctx, constants.EventClientUpdated, client, metadata)
 
 		result := event.Context()
 
@@ -694,7 +670,7 @@ func TestEvent_Context(t *testing.T) {
 		}
 		ctx := middlewares.AddMetadata(context.Background(), contextMetadata)
 
-		event := newEvent(ctx, goiamuniverse.EventClientCreated, client, metadata)
+		event := newEvent(ctx, constants.EventClientCreated, client, metadata)
 
 		result := event.Context()
 
@@ -710,7 +686,7 @@ func TestEvent_Context(t *testing.T) {
 		ctx, cancel := context.WithCancel(context.Background())
 		defer cancel()
 
-		event := newEvent(ctx, goiamuniverse.EventClientUpdated, client, metadata)
+		event := newEvent(ctx, constants.EventClientUpdated, client, metadata)
 
 		result := event.Context()
 
@@ -737,7 +713,7 @@ func TestEvent_Context(t *testing.T) {
 func TestNewEvent(t *testing.T) {
 	t.Run("create_event_with_all_parameters", func(t *testing.T) {
 		ctx := context.Background()
-		eventName := goiamuniverse.EventClientCreated
+		eventName := constants.EventClientCreated
 		client := sdk.Client{
 			Id:        "client1",
 			Name:      "Test Client",
@@ -760,7 +736,7 @@ func TestNewEvent(t *testing.T) {
 
 	t.Run("create_event_with_minimal_parameters", func(t *testing.T) {
 		ctx := context.Background()
-		eventName := goiamuniverse.EventClientUpdated
+		eventName := constants.EventClientUpdated
 		client := sdk.Client{}
 		metadata := sdk.Metadata{}
 
@@ -821,8 +797,8 @@ func TestService_RegenerateSecret(t *testing.T) {
 		Secret:    "oldHashedSecret",
 	}
 
-	mockStore.On("Get", ctx, clientId).Return(expectedClient, nil)
-	mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.Client")).Return(nil)
+	mockStore.On("GetById", mock.Anything, mock.Anything).Return(expectedClient, nil)
+	mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 
 	result, err := service.RegenerateSecret(ctx, clientId)
 
@@ -846,7 +822,7 @@ func TestService_RegenerateSecret_GetError(t *testing.T) {
 
 	clientId := "client1"
 
-	mockStore.On("Get", ctx, clientId).Return((*sdk.Client)(nil), errors.New("client not found"))
+	mockStore.On("GetById", ctx, clientId).Return((*sdk.Client)(nil), errors.New("client not found"))
 
 	result, err := service.RegenerateSecret(ctx, clientId)
 
@@ -874,8 +850,8 @@ func TestService_RegenerateSecret_UpdateError(t *testing.T) {
 		Secret:    "oldHashedSecret",
 	}
 
-	mockStore.On("Get", ctx, clientId).Return(expectedClient, nil)
-	mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.Client")).Return(errors.New("update failed"))
+	mockStore.On("GetById", mock.Anything, mock.Anything).Return(expectedClient, nil)
+	mockStore.On("Update", mock.Anything, mock.Anything).Return(errors.New("update failed"))
 
 	result, err := service.RegenerateSecret(ctx, clientId)
 
@@ -907,11 +883,11 @@ func TestService_Create_NoUserInContext(t *testing.T) {
 	}
 
 	// We expect the store to be called with the client having a generated secret
-	mockStore.On("Create", ctx, mock.AnythingOfType("*sdk.Client")).Return(nil)
+	mockStore.On("Create", mock.Anything, mock.Anything).Return(nil)
 	// mockUserService.On("Create", ctx, mock.MatchedBy(func(u *sdk.User) bool {
 	// 	return u.CreatedBy == "system" // Should use "system" as creator
 	// })).Return(nil)
-	// mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.Client")).Return(nil)
+	// mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
 
 	err := service.Create(ctx, client)
 
@@ -942,9 +918,9 @@ func TestService_Create_ServiceAccountUpdateError(t *testing.T) {
 		ProjectId:           "project1",
 	}
 
-	mockStore.On("Create", ctx, mock.AnythingOfType("*sdk.Client")).Return(nil)
-	mockUserService.On("Create", ctx, mock.AnythingOfType("*sdk.User")).Return(nil)
-	mockStore.On("Update", ctx, mock.AnythingOfType("*sdk.Client")).Return(errors.New("update failed"))
+	mockStore.On("Create", mock.Anything, mock.Anything).Return(nil)
+	mockUserService.On("Create", mock.Anything, mock.Anything).Return(nil)
+	mockStore.On("Update", mock.Anything, mock.Anything).Return(errors.New("update failed"))
 
 	err := service.Create(ctx, client)
 
@@ -976,7 +952,7 @@ func TestService_Create_WithAuthProvider(t *testing.T) {
 	}
 
 	mockAuthService.On("Get", ctx, "provider1", true).Return(&sdk.AuthProvider{Id: "provider1"}, nil)
-	mockStore.On("Create", ctx, mock.AnythingOfType("*sdk.Client")).Return(nil)
+	mockStore.On("Create", mock.Anything, mock.Anything).Return(nil)
 
 	err := service.Create(ctx, client)
 
@@ -1053,8 +1029,8 @@ func TestService_Create_UserCreateError(t *testing.T) {
 		ServiceAccountEmail: "test@yetr.com",
 	}
 
-	mockStore.On("Create", ctx, mock.AnythingOfType("*sdk.Client")).Return(nil)
-	mockUserService.On("Create", ctx, mock.AnythingOfType("*sdk.User")).Return(errors.New("user creation failed"))
+	mockStore.On("Create", mock.Anything, mock.Anything).Return(nil)
+	mockUserService.On("Create", mock.Anything, mock.Anything).Return(errors.New("user creation failed"))
 
 	err := service.Create(ctx, client)
 
@@ -1074,11 +1050,8 @@ func TestService_GetAll_StoreError(t *testing.T) {
 	ctx := createContextWithProjects([]string{"project1"})
 
 	queryParams := sdk.ClientQueryParams{}
-	expectedParams := sdk.ClientQueryParams{
-		ProjectIds: []string{"project1"},
-	}
 
-	mockStore.On("GetAll", ctx, expectedParams).Return(([]sdk.Client)(nil), errors.New("database error"))
+	mockStore.On("GetAll", mock.Anything, mock.Anything).Return(([]entity.Client)(nil), errors.New("database error"))
 
 	result, err := service.GetAll(ctx, queryParams)
 

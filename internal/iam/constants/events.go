@@ -1,4 +1,4 @@
-package goiamuniverse
+package constants
 
 const (
 	EventRoleUpdated = Event(Role) + ":" + Updated

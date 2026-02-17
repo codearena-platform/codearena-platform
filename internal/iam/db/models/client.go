@@ -13,7 +13,7 @@ type Client struct {
 	Tags                  []string   `bson:"tags"`                     // Tags for categorizing and filtering clients
 	RedirectURLs          []string   `bson:"redirect_urls"`            // Allowed redirect URLs for OAuth2 flows
 	DefaultAuthProviderId string     `bson:"default_auth_provider_id"` // Default authentication provider for this client
-	GoIamClient           bool       `bson:"go_iam_client"`            // Indicates if this is a Go-IAM system client
+	IAMClient             bool       `bson:"iam_client"`               // Indicates if this is an IAM system client
 	ProjectId             string     `bson:"project_id"`               // ID of the project this client belongs to
 	ServiceAccountEmail   string     `bson:"service_account_email"`    // Email for service account authentication
 	Scopes                []string   `bson:"scopes"`                   // OAuth2 scopes this client can request
@@ -34,7 +34,7 @@ type ClientModel struct {
 	TagsKey         string // BSON field key for client tags
 	DescriptionKey  string // BSON field key for client description
 	ProjectIdKey    string // BSON field key for project ID
-	GoIamClientKey  string // BSON field key for Go-IAM client flag
+	IAMClientKey    string // BSON field key for IAM client flag
 	LinkedUserIdKey string // BSON field key for linked user ID (service accounts)
 	UpdatedAtKey    string // BSON field key for last updated timestamp
 }
@@ -56,7 +56,7 @@ func GetClientModel() ClientModel {
 		TagsKey:         "tags",
 		DescriptionKey:  "description",
 		ProjectIdKey:    "project_id",
-		GoIamClientKey:  "go_iam_client",
+		IAMClientKey:    "iam_client",
 		LinkedUserIdKey: "linked_user_id",
 		UpdatedAtKey:    "updated_at",
 	}

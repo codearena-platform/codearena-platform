@@ -4,27 +4,28 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/gofiber/fiber/v2/log"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/codearena-platform/codearena-platform/internal/iam/middlewares"
+	"github.com/codearena-platform/codearena-platform/internal/iam/repository"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/authprovider"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/project"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/user"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 type service struct {
-	s      Store
+	repo   repository.ClientRepository
 	p      project.Service
 	e      utils.Emitter[utils.Event[sdk.Client], sdk.Client]
 	authP  authprovider.Service
 	usrSvc user.Service
 }
 
-func NewService(s Store, p project.Service, authP authprovider.Service, usrSvc user.Service) Service {
+func NewService(repo repository.ClientRepository, p project.Service, authP authprovider.Service, usrSvc user.Service) Service {
 	return service{
-		s:      s,
+		repo:   repo,
 		p:      p,
 		e:      utils.NewEmitter[utils.Event[sdk.Client]](),
 		authP:  authP,
@@ -34,13 +35,13 @@ func NewService(s Store, p project.Service, authP authprovider.Service, usrSvc u
 
 func (s service) GetAll(ctx context.Context, queryParams sdk.ClientQueryParams) ([]sdk.Client, error) {
 	queryParams.ProjectIds = middlewares.GetProjects(ctx)
-	return s.s.GetAll(ctx, queryParams)
+	return s.repo.GetAll(ctx, queryParams)
 }
 
-func (s service) GetGoIamClients(ctx context.Context, params sdk.ClientQueryParams) ([]sdk.Client, error) {
-	params.GoIamClient = true
+func (s service) GetIAMClients(ctx context.Context, params sdk.ClientQueryParams) ([]sdk.Client, error) {
+	params.IAMClient = true
 	params.SortByUpdatedAt = true
-	providers, err := s.s.GetAll(ctx, params)
+	providers, err := s.repo.GetAll(ctx, params)
 	if err != nil {
 		return nil, err
 	}
@@ -48,7 +49,7 @@ func (s service) GetGoIamClients(ctx context.Context, params sdk.ClientQueryPara
 }
 
 func (s service) Get(ctx context.Context, id string, dontCheckProjects bool) (*sdk.Client, error) {
-	cl, err := s.s.Get(ctx, id)
+	cl, err := s.repo.GetById(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -76,29 +77,30 @@ func (s service) Create(ctx context.Context, client *sdk.Client) error {
 		}
 	}
 	// create a random string secret
-	sec, err := generateRandomSecret(32)
+	sec, err := repository.GenerateRandomSecret(32) // Uses public helper from repository
 	if err != nil {
 		return fmt.Errorf("error while creating client secret: %w", err)
 	}
 	client.Secret = sec
-	// we does the secret hasing inside the store create method
-	err = s.s.Create(ctx, client)
+	// we does the secret hasing inside the repo create method
+	err = s.repo.Create(ctx, client)
 	if err != nil {
 		return fmt.Errorf("error while creating client: %w", err)
 	}
-	hashedSec, err := hashSecret(sec)
-	if err != nil {
-		return fmt.Errorf("error hashing client secret: %w", err)
-	}
-	client.Secret = hashedSec
+
+	// Prepare for event/output (hashed secret for internal state, but plain secret returned in some contexts)
+	// Actually, the repo.Create hashes the secret in the client object, so it's already hashed now.
+
 	if len(client.ServiceAccountEmail) > 0 {
 		err = s.createAndLinkServiceAccountUser(ctx, client, client.ServiceAccountEmail)
 		if err != nil {
 			return fmt.Errorf("failed to create service account user: %w", err)
 		}
 	}
-	client.Secret = sec // return the plain secret only during creation
-	s.Emit(newEvent(ctx, goiamuniverse.EventClientCreated, *client, middlewares.GetMetadata(ctx)))
+
+	plainSec := sec
+	client.Secret = plainSec // return the plain secret only during creation
+	s.Emit(newEvent(ctx, constants.EventClientCreated, *client, middlewares.GetMetadata(ctx)))
 	return nil
 }
 func (s service) Update(ctx context.Context, client *sdk.Client) error {
@@ -107,11 +109,11 @@ func (s service) Update(ctx context.Context, client *sdk.Client) error {
 	if _, ok := projectIdsMap[client.ProjectId]; !ok {
 		return sdk.ErrProjectNotFound
 	}
-	err := s.s.Update(ctx, client)
+	err := s.repo.Update(ctx, client)
 	if err != nil {
 		return fmt.Errorf("error while updating client: %w", err)
 	}
-	s.Emit(newEvent(ctx, goiamuniverse.EventClientUpdated, *client, middlewares.GetMetadata(ctx)))
+	s.Emit(newEvent(ctx, constants.EventClientUpdated, *client, middlewares.GetMetadata(ctx)))
 	return nil
 }
 
@@ -151,7 +153,7 @@ func (s service) RegenerateSecret(ctx context.Context, clientId string) (*sdk.Cl
 		return nil, fmt.Errorf("error hashing client secret: %w", err)
 	}
 	client.Secret = hashedSec
-	err = s.s.Update(ctx, client)
+	err = s.repo.Update(ctx, client)
 	if err != nil {
 		return nil, fmt.Errorf("error updating client with new secret: %w", err)
 	}
@@ -208,18 +210,18 @@ func (s service) Emit(event utils.Event[sdk.Client]) {
 	s.e.Emit(event)
 }
 
-func (s service) Subscribe(eventName goiamuniverse.Event, subscriber utils.Subscriber[utils.Event[sdk.Client], sdk.Client]) {
+func (s service) Subscribe(eventName constants.Event, subscriber utils.Subscriber[utils.Event[sdk.Client], sdk.Client]) {
 	s.e.Subscribe(eventName, subscriber)
 }
 
 type event struct {
-	name     goiamuniverse.Event
+	name     constants.Event
 	payload  sdk.Client
 	metadata sdk.Metadata
 	ctx      context.Context
 }
 
-func (e event) Name() goiamuniverse.Event {
+func (e event) Name() constants.Event {
 	return e.name
 }
 
@@ -235,6 +237,6 @@ func (e event) Context() context.Context {
 	return e.ctx
 }
 
-func newEvent(ctx context.Context, name goiamuniverse.Event, payload sdk.Client, metadata sdk.Metadata) utils.Event[sdk.Client] {
+func newEvent(ctx context.Context, name constants.Event, payload sdk.Client, metadata sdk.Metadata) utils.Event[sdk.Client] {
 	return event{ctx: ctx, name: name, payload: payload, metadata: metadata}
 }

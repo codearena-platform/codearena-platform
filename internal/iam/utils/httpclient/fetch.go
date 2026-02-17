@@ -1,16 +1,16 @@
-package goiamclient
+package httpclient
 
 import (
 	"context"
 
-	"github.com/gofiber/fiber/v2/log"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/client"
+	"github.com/gofiber/fiber/v2/log"
 )
 
-func GetGoIamClient(svc client.Service) (*sdk.Client, error) {
-	prvs, err := svc.GetGoIamClients(context.Background(), sdk.ClientQueryParams{
-		GoIamClient: true,
+func GetIAMClient(svc client.Service) (*sdk.Client, error) {
+	prvs, err := svc.GetIAMClients(context.Background(), sdk.ClientQueryParams{
+		IAMClient: true,
 	})
 	if err != nil {
 		return nil, err

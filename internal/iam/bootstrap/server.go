@@ -1,12 +1,12 @@
-package server
+package bootstrap
 
 import (
-	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/log"
-	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/codearena-platform/codearena-platform/internal/iam/config"
 	"github.com/codearena-platform/codearena-platform/internal/iam/providers"
 	"github.com/codearena-platform/codearena-platform/internal/iam/routes"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 )
 
 func SetupServer(app *fiber.App) *config.AppConfig {

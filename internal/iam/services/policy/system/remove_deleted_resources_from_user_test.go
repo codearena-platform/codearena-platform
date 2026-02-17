@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
-	"github.com/codearena-platform/codearena-platform/internal/iam/utils/goiamuniverse"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils/test/services"
 	"github.com/stretchr/testify/assert"
 )
@@ -46,7 +46,7 @@ func TestRemoveDeletedResourceFromUser_HandleEvent(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceDeleted,
+		constants.EventResourceDeleted,
 		resource,
 		sdk.Metadata{},
 	)
@@ -71,7 +71,7 @@ func TestRemoveDeletedResourceFromUser_HandleEvent_Error(t *testing.T) {
 
 	event := newMockEvent(
 		ctx,
-		goiamuniverse.EventResourceDeleted,
+		constants.EventResourceDeleted,
 		resource,
 		sdk.Metadata{},
 	)

@@ -21,23 +21,25 @@ func (h *IAMHandler) CreateProject(c *fiber.Ctx) error {
 	if err := c.BodyParser(payload); err != nil {
 		return c.Status(http.StatusBadRequest).JSON(sdk.ProjectResponse{Success: false, Message: err.Error()})
 	}
-	if err := h.prv.S.Projects.Create(c.Context(), payload); err != nil {
+	if err := h.prv.S.AdminUC.CreateProject(c.Context(), payload); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(sdk.ProjectResponse{Success: false, Message: err.Error()})
 	}
 	return c.Status(http.StatusCreated).JSON(sdk.ProjectResponse{Success: true, Data: payload})
 }
 
 func (h *IAMHandler) GetAllProjects(c *fiber.Ctx) error {
-	projects, err := h.prv.S.Projects.GetAll(c.Context())
+	projects, err := h.prv.S.AdminUC.GetAllProjects(c.Context())
 	if err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(sdk.ProjectsResponse{Success: false, Message: err.Error()})
 	}
+	// Note: GetAllProjects returns []entity.Project, and sdk.ProjectsResponse expects []sdk.Project.
+	// Since sdk.Project is an alias to entity.Project, we can pass it directly or cast if needed.
 	return c.JSON(sdk.ProjectsResponse{Success: true, Data: projects})
 }
 
 func (h *IAMHandler) GetProjectById(c *fiber.Ctx) error {
 	id := c.Params("id")
-	project, err := h.prv.S.Projects.Get(c.Context(), id)
+	project, err := h.prv.S.AdminUC.GetProject(c.Context(), id)
 	if err != nil {
 		status := http.StatusInternalServerError
 		if errors.Is(err, sdk.ErrProjectNotFound) {
@@ -55,7 +57,7 @@ func (h *IAMHandler) UpdateProject(c *fiber.Ctx) error {
 		return c.Status(http.StatusBadRequest).JSON(sdk.ProjectResponse{Success: false, Message: err.Error()})
 	}
 	payload.Id = id
-	if err := h.prv.S.Projects.Update(c.Context(), payload); err != nil {
+	if err := h.prv.S.AdminUC.UpdateProject(c.Context(), payload); err != nil {
 		return c.Status(http.StatusInternalServerError).JSON(sdk.ProjectResponse{Success: false, Message: err.Error()})
 	}
 	return c.JSON(sdk.ProjectResponse{Success: true, Data: payload})
