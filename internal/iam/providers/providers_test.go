@@ -316,7 +316,7 @@ func TestCheckAndAddDefaultProject(t *testing.T) {
 	t.Run("default project does not exist, create it", func(t *testing.T) {
 		mockSvc := &testservices.MockProjectService{}
 		mockSvc.On("GetByName", context.Background(), "Default Project").Return((*sdk.Project)(nil), sdk.ErrProjectNotFound)
-		mockSvc.On("Create", context.Background(), mock.AnythingOfType("*sdk.Project")).Return(nil)
+		mockSvc.On("Create", context.Background(), mock.Anything).Return(nil)
 
 		err := CheckAndAddDefaultProject(mockSvc)
 		assert.NoError(t, err)

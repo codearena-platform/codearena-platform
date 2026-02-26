@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
+	"github.com/gofiber/fiber/v2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )
@@ -27,7 +27,7 @@ func (m *MockProjectService) GetAll(ctx context.Context) ([]sdk.Project, error) 
 	return args.Get(0).([]sdk.Project), args.Error(1)
 }
 
-func (m *MockProjectService) Get(ctx context.Context, id string) (*sdk.Project, error) {
+func (m *MockProjectService) GetById(ctx context.Context, id string) (*sdk.Project, error) {
 	args := m.Called(ctx, id)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
