@@ -25,7 +25,7 @@ func (m *MockProjectService) Create(ctx context.Context, project *sdk.Project) e
 	return args.Error(0)
 }
 
-func (m *MockProjectService) Get(ctx context.Context, id string) (*sdk.Project, error) {
+func (m *MockProjectService) GetById(ctx context.Context, id string) (*sdk.Project, error) {
 	args := m.Called(ctx, id)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)

@@ -282,6 +282,29 @@ func (r *MemoryBotRepository) GetByUserID(userID string) ([]*entity.Bot, error) 
 	return list, nil
 }
 
+func (r *MemoryBotRepository) GetTop(limit int) ([]*entity.Bot, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	var all []*entity.Bot
+	for _, b := range r.bots {
+		all = append(all, b)
+	}
+
+	for i := 0; i < len(all)-1; i++ {
+		for j := 0; j < len(all)-i-1; j++ {
+			if all[j].Rating < all[j+1].Rating {
+				all[j], all[j+1] = all[j+1], all[j]
+			}
+		}
+	}
+
+	if len(all) > limit {
+		return all[:limit], nil
+	}
+	return all, nil
+}
+
 func (r *MemoryBotRepository) UpdateRating(botID string, newRating float64) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -386,4 +409,38 @@ func (r *MemoryHubRepository) GetMemberships(hubID string) ([]*entity.HubMembers
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	return r.memberships[hubID], nil
+}
+
+type MemoryBotVersionRepository struct {
+	mu       sync.RWMutex
+	versions map[string][]*entity.BotVersion
+}
+
+func NewMemoryBotVersionRepository() *MemoryBotVersionRepository {
+	return &MemoryBotVersionRepository{
+		versions: make(map[string][]*entity.BotVersion),
+	}
+}
+
+func (r *MemoryBotVersionRepository) Save(version *entity.BotVersion) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.versions[version.BotID] = append(r.versions[version.BotID], version)
+	return nil
+}
+
+func (r *MemoryBotVersionRepository) GetLatest(botID string) (*entity.BotVersion, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	vers := r.versions[botID]
+	if len(vers) > 0 {
+		return vers[len(vers)-1], nil
+	}
+	return nil, fmt.Errorf("no versions found")
+}
+
+func (r *MemoryBotVersionRepository) GetVersions(botID string) ([]*entity.BotVersion, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	return r.versions[botID], nil
 }

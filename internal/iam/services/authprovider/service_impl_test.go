@@ -49,7 +49,7 @@ func (m *MockProjectService) GetAll(ctx context.Context) ([]sdk.Project, error) 
 	return args.Get(0).([]sdk.Project), args.Error(1)
 }
 
-func (m *MockProjectService) Get(ctx context.Context, id string) (*sdk.Project, error) {
+func (m *MockProjectService) GetById(ctx context.Context, id string) (*sdk.Project, error) {
 	args := m.Called(ctx, id)
 	return args.Get(0).(*sdk.Project), args.Error(1)
 }

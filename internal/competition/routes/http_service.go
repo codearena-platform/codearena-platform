@@ -20,9 +20,10 @@ type CompetitionHTTPHandler struct {
 	historyUsecase    *services.HistoryUsecase
 	analyticsUsecase  *services.AnalyticsUsecase
 	hubUsecase        *services.HubUsecase
+	botUsecase        *services.BotUsecase
 }
 
-func RegisterCompetitionRoutes(app *fiber.App, mu *services.MatchUsecase, tu *services.TournamentUsecase, lu *services.LeagueUsecase, ss *services.ScoreboardService, hu *services.HistoryUsecase, au *services.AnalyticsUsecase, hbu *services.HubUsecase) {
+func RegisterCompetitionRoutes(app *fiber.App, mu *services.MatchUsecase, tu *services.TournamentUsecase, lu *services.LeagueUsecase, ss *services.ScoreboardService, hu *services.HistoryUsecase, au *services.AnalyticsUsecase, hbu *services.HubUsecase, bu *services.BotUsecase) {
 	h := &CompetitionHTTPHandler{
 		matchUsecase:      mu,
 		tournamentUsecase: tu,
@@ -31,6 +32,7 @@ func RegisterCompetitionRoutes(app *fiber.App, mu *services.MatchUsecase, tu *se
 		historyUsecase:    hu,
 		analyticsUsecase:  au,
 		hubUsecase:        hbu,
+		botUsecase:        bu,
 	}
 
 	api := app.Group("/api/v1/competition")
@@ -187,6 +189,42 @@ func RegisterCompetitionRoutes(app *fiber.App, mu *services.MatchUsecase, tu *se
 	api.Get("/hubs", h.ListHubs)
 	api.Get("/hubs/:id/tournaments", h.GetHubTournaments)
 	api.Post("/hubs/:id/members", h.AddHubMember)
+
+	// Bots
+	api.Post("/bots", h.SubmitBot)
+
+	// Leaderboard
+	api.Get("/leaderboard", h.GetLeaderboard)
+}
+
+func (h *CompetitionHTTPHandler) GetLeaderboard(c *fiber.Ctx) error {
+	topBots, err := h.scoreboardService.GetGlobalHallOfFame()
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
+	}
+	return c.JSON(topBots)
+}
+
+func (h *CompetitionHTTPHandler) SubmitBot(c *fiber.Ctx) error {
+	var req struct {
+		Name       string `json:"name"`
+		Chassis    string `json:"chassis"`
+		SourceCode string `json:"source_code"` // Contains the raw script logic submitted by user
+	}
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
+	}
+
+	userID := c.Get("X-User-ID", "internal_admin")
+	ctx := c.Context()
+
+	bot, err := h.botUsecase.SubmitBot(ctx, userID, req.Name, req.Chassis, req.SourceCode)
+	if err != nil {
+		// Differentiate plagiarism (business error) vs server error
+		return c.Status(406).JSON(fiber.Map{"error": err.Error(), "type": "PlagiarismDetected"})
+	}
+
+	return c.Status(201).JSON(bot)
 }
 
 func (h *CompetitionHTTPHandler) CreateTournament(c *fiber.Ctx) error {

@@ -52,6 +52,31 @@ func (r *InMemoryBotRepository) GetByUserID(userID string) ([]*entity.Bot, error
 	return result, nil
 }
 
+func (r *InMemoryBotRepository) GetTop(limit int) ([]*entity.Bot, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	// A naive selection for memory:
+	var all []*entity.Bot
+	for _, b := range r.bots {
+		all = append(all, b)
+	}
+
+	// Simple bubble sort by rating desc
+	for i := 0; i < len(all)-1; i++ {
+		for j := 0; j < len(all)-i-1; j++ {
+			if all[j].Rating < all[j+1].Rating {
+				all[j], all[j+1] = all[j+1], all[j]
+			}
+		}
+	}
+
+	if len(all) > limit {
+		return all[:limit], nil
+	}
+	return all, nil
+}
+
 func (r *InMemoryBotRepository) UpdateRating(botID string, newRating float64) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()

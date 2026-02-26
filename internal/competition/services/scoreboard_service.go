@@ -28,7 +28,6 @@ func (s *ScoreboardService) GetDivisionStandings(divisionID string) ([]*entity.S
 }
 
 func (s *ScoreboardService) GetGlobalHallOfFame() ([]*entity.Bot, error) {
-	// Simple implementation: top 10 by Elo
-	// We'd add a method to BotRepository for this in full impl
-	return nil, nil
+	// Implementation: top 10 by Elo
+	return s.botRepo.GetTop(10)
 }

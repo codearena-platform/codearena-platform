@@ -14,11 +14,12 @@ import (
 
 type JudgeService struct {
 	matchRepo repository.MatchRepository
+	botRepo   repository.BotRepository
 	simClient pb.SimulationServiceClient
 	simAddr   string
 }
 
-func NewJudgeService(mr repository.MatchRepository, simAddr string) *JudgeService {
+func NewJudgeService(mr repository.MatchRepository, br repository.BotRepository, simAddr string) *JudgeService {
 	conn, err := grpc.Dial(simAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Printf("WARNING: Judge could not connect to Simulation Engine at %s: %v", simAddr, err)
@@ -26,6 +27,7 @@ func NewJudgeService(mr repository.MatchRepository, simAddr string) *JudgeServic
 
 	return &JudgeService{
 		matchRepo: mr,
+		botRepo:   br,
 		simClient: pb.NewSimulationServiceClient(conn),
 		simAddr:   simAddr,
 	}
@@ -73,7 +75,19 @@ func (s *JudgeService) ProcessResult(matchID string, winnerID string, metrics ma
 	match.Metadata = metrics
 	match.EndedAt = 0 // Update time here if needed
 
-	// ELO update logic would normally be called here or in a separate place
+	// Basic ELO calculation
+	// In a real scenario, we'll fetch both bots and calculate for both
+	// For MVP: Simple K-factor increment if we find the winner
+	bot, err := s.botRepo.GetByID(winnerID)
+	if err == nil && bot != nil {
+		K := 32.0
+		// Assuming expected outcome was 0.5 (equal level)
+		expected := 0.5
+		newRating := bot.Rating + K*(1.0-expected)
+
+		s.botRepo.UpdateRating(bot.ID, newRating)
+		log.Printf("Judge: Updated ELO for %s: %.2f -> %.2f", winnerID, bot.Rating, newRating)
+	}
 
 	return s.matchRepo.Save(match)
 }

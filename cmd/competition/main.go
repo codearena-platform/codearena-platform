@@ -53,6 +53,7 @@ func main() {
 	// Repositories
 	var matchRepo repository.MatchRepository
 	var botRepo repository.BotRepository
+	var versionRepo repository.BotVersionRepository
 	var scoreRepo repository.ScoreRepository
 	var tournamentRepo repository.TournamentRepository
 	var leagueRepo repository.LeagueRepository
@@ -60,6 +61,7 @@ func main() {
 
 	if db != nil && mongoClient != nil {
 		botRepo = postgres.NewPGBotRepository(db)
+		versionRepo = repository.NewMemoryBotVersionRepository() // TODO: Implement PG variant
 		scoreRepo = postgres.NewPGScoreRepository(db)
 		matchRepo = mongo.NewMongoMatchRepository(mongoClient, "codearena")
 		tournamentRepo = postgres.NewPGTournamentRepository(db)
@@ -72,6 +74,7 @@ func main() {
 		leagueRepo = repository.NewMemoryLeagueRepository()
 		matchRepo = repository.NewMemoryMatchRepository()
 		botRepo = repository.NewMemoryBotRepository()
+		versionRepo = repository.NewMemoryBotVersionRepository()
 		scoreRepo = repository.NewMemoryScoreRepository()
 		hubRepo = repository.NewMemoryHubRepository()
 		log.Println("Memory Repositories Initialized")
@@ -82,8 +85,10 @@ func main() {
 	if simAddr == "" {
 		simAddr = "simulation:50051"
 	}
-	judgeService := services.NewJudgeService(matchRepo, simAddr)
+	judgeService := services.NewJudgeService(matchRepo, botRepo, simAddr)
+	plagiarismSvc := services.NewPlagiarismService()
 
+	botUsecase := services.NewBotUsecase(botRepo, versionRepo, plagiarismSvc)
 	matchUsecase := services.NewMatchUsecase(matchRepo, scoreRepo, botRepo, leagueRepo, judgeService)
 	tournamentUsecase := services.NewTournamentUsecase(tournamentRepo, matchRepo)
 	leagueUsecase := services.NewLeagueUsecase(leagueRepo, botRepo)
@@ -97,10 +102,10 @@ func main() {
 	go StartMatchServer(":50052", matchUsecase)
 
 	// Run HTTP Server
-	StartHTTPServer(":7001", matchUsecase, tournamentUsecase, leagueUsecase, scoreboardService, historyUsecase, analyticsUsecase, hubUsecase)
+	StartHTTPServer(":7001", matchUsecase, tournamentUsecase, leagueUsecase, scoreboardService, historyUsecase, analyticsUsecase, hubUsecase, botUsecase)
 }
 
-func StartHTTPServer(addr string, mu *services.MatchUsecase, tu *services.TournamentUsecase, lu *services.LeagueUsecase, ss *services.ScoreboardService, hu *services.HistoryUsecase, au *services.AnalyticsUsecase, hbu *services.HubUsecase) {
+func StartHTTPServer(addr string, mu *services.MatchUsecase, tu *services.TournamentUsecase, lu *services.LeagueUsecase, ss *services.ScoreboardService, hu *services.HistoryUsecase, au *services.AnalyticsUsecase, hbu *services.HubUsecase, bu *services.BotUsecase) {
 	app := fiber.New(fiber.Config{
 		AppName: "CodeArena Competition Manager v1.0.0",
 	})
@@ -113,7 +118,7 @@ func StartHTTPServer(addr string, mu *services.MatchUsecase, tu *services.Tourna
 		})
 	})
 
-	routes.RegisterCompetitionRoutes(app, mu, tu, lu, ss, hu, au, hbu)
+	routes.RegisterCompetitionRoutes(app, mu, tu, lu, ss, hu, au, hbu, bu)
 
 	log.Printf("Competition HTTP Server listening at %s", addr)
 	log.Fatal(app.Listen(addr))

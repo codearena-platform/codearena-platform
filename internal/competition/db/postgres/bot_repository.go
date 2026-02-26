@@ -74,6 +74,34 @@ func (r *PGBotRepository) GetByUserID(userID string) ([]*entity.Bot, error) {
 	return bots, nil
 }
 
+func (r *PGBotRepository) GetTop(limit int) ([]*entity.Bot, error) {
+	query := `
+		SELECT id, user_id, name, avatar_url, rating, matches, wins, created_at 
+		FROM bots 
+		ORDER BY rating DESC 
+		LIMIT $1
+	`
+	rows, err := r.db.Query(query, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var bots []*entity.Bot
+	for rows.Next() {
+		var bot entity.Bot
+		err := rows.Scan(
+			&bot.ID, &bot.UserID, &bot.Name, &bot.AvatarURL,
+			&bot.Rating, &bot.Matches, &bot.Wins, &bot.CreatedAt,
+		)
+		if err != nil {
+			return nil, err
+		}
+		bots = append(bots, &bot)
+	}
+	return bots, nil
+}
+
 func (r *PGBotRepository) UpdateRating(botID string, newRating float64) error {
 	query := `UPDATE bots SET rating = $1 WHERE id = $2`
 	_, err := r.db.Exec(query, newRating, botID)

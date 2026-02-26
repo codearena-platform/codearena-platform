@@ -6,6 +6,7 @@ type BotRepository interface {
 	Save(bot *entity.Bot) error
 	GetByID(id string) (*entity.Bot, error)
 	GetByUserID(userID string) ([]*entity.Bot, error)
+	GetTop(limit int) ([]*entity.Bot, error)
 	UpdateRating(botID string, newRating float64) error
 }
 
