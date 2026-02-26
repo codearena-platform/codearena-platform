@@ -1,15 +1,11 @@
-FROM golang:1.22-alpine AS builder
+FROM golang:1.25-alpine AS builder
 
 WORKDIR /app
-
-# Copy go mod and sum files
-COPY go.mod go.sum ./
+COPY codearena-core ./codearena-core
+COPY codearena-platform ./codearena-platform
+WORKDIR /app/codearena-platform
 RUN go mod download
 
-# Copy source code
-COPY . .
-
-# Build the binary
 RUN CGO_ENABLED=0 GOOS=linux go build -o gateway ./cmd/gateway
 
 # Final Stage
@@ -17,7 +13,7 @@ FROM alpine:latest
 
 WORKDIR /root/
 
-COPY --from=builder /app/gateway .
+COPY --from=builder /app/codearena-platform/gateway .
 
 EXPOSE 8080
 
