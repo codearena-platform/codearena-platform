@@ -8,7 +8,11 @@ import (
 	"github.com/codearena-platform/codearena-platform/internal/competition/services/entity"
 	"github.com/codearena-platform/codearena-platform/internal/competition/services/repository"
 	"github.com/codearena-platform/codearena-platform/internal/competition/services/service"
+	"github.com/google/uuid"
+	"go.opentelemetry.io/otel"
 )
+
+var tracer = otel.Tracer("competition-service")
 
 type MatchUsecase struct {
 	matchRepo  repository.MatchRepository
@@ -29,8 +33,11 @@ func NewMatchUsecase(mr repository.MatchRepository, sr repository.ScoreRepositor
 }
 
 func (u *MatchUsecase) CreateMatch(challengeID string, participants []string) (*entity.Match, error) {
+	_, span := tracer.Start(context.Background(), "CreateMatch")
+	defer span.End()
+
 	match := &entity.Match{
-		ID:           fmt.Sprintf("m_%d", time.Now().UnixNano()),
+		ID:           "m_" + uuid.New().String(),
 		ChallengeID:  challengeID,
 		Status:       entity.MatchReady,
 		Participants: participants,
@@ -45,6 +52,9 @@ func (u *MatchUsecase) CreateMatch(challengeID string, participants []string) (*
 }
 
 func (u *MatchUsecase) StartMatch(ctx context.Context, matchID string) error {
+	ctx, span := tracer.Start(ctx, "StartMatch")
+	defer span.End()
+
 	match, err := u.matchRepo.GetByID(matchID)
 	if err != nil {
 		return err
@@ -137,7 +147,7 @@ func (u *MatchUsecase) CompleteMatch(matchID string, winnerID string, metrics ma
 }
 func (u *MatchUsecase) RegisterBot(userID, name, version, sourceCode, language string) (*entity.Bot, *entity.BotVersion, error) {
 	bot := &entity.Bot{
-		ID:        fmt.Sprintf("bot_%d", time.Now().UnixNano()),
+		ID:        "bot_" + uuid.New().String(),
 		UserID:    userID,
 		Name:      name,
 		Rating:    1200, // Default ranking
@@ -149,7 +159,7 @@ func (u *MatchUsecase) RegisterBot(userID, name, version, sourceCode, language s
 	}
 
 	botVersion := &entity.BotVersion{
-		ID:        fmt.Sprintf("v_%d", time.Now().UnixNano()),
+		ID:        "v_" + uuid.New().String(),
 		BotID:     bot.ID,
 		Version:   version,
 		SourceURL: sourceCode, // In v1 we store source directly or mock S3 URL
