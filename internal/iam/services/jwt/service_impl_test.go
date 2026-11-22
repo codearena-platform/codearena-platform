@@ -508,15 +508,11 @@ func TestService_ErrorHandling(t *testing.T) {
 		claims := map[string]interface{}{"user_id": "123"}
 		expiryTime := time.Now().Add(time.Hour).Unix()
 
-		// Should still work with empty secret (though not secure)
+		// Signing with an empty secret is refused: it would create tokens
+		// anyone can forge.
 		token, err := service.GenerateToken(claims, expiryTime)
-		assert.NoError(t, err)
-		assert.NotEmpty(t, token)
-
-		// Should be able to validate with same empty secret
-		retrievedClaims, err := service.ValidateToken(token)
-		assert.NoError(t, err)
-		assert.Equal(t, claims["user_id"], retrievedClaims["user_id"])
+		assert.Error(t, err)
+		assert.Empty(t, token)
 	})
 
 	t.Run("special_characters_in_secret", func(t *testing.T) {
@@ -730,6 +726,83 @@ func TestService_ValidateToken_TokenNotValid(t *testing.T) {
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "error parsing jwt token")
 	assert.Empty(t, result)
+}
+
+func TestService_ValidateToken_RejectsUnexpectedAlgorithm(t *testing.T) {
+	secret := sdk.MaskedBytes("test-secret-key-for-jwt")
+	service := NewService(secret)
+
+	// HS384 uses the same HMAC family and secret but is not the algorithm we
+	// issue; it must not be accepted.
+	claims := jwtp.MapClaims{
+		"id":  "token-id",
+		"exp": time.Now().Add(time.Hour).Unix(),
+		"iss": tokenIssuer,
+		"aud": tokenAudience,
+	}
+	token := jwtp.NewWithClaims(jwtp.SigningMethodHS384, claims)
+	signed, err := token.SignedString([]byte(secret))
+	assert.NoError(t, err)
+
+	result, err := service.ValidateToken(signed)
+	assert.Error(t, err)
+	assert.Contains(t, err.Error(), "unexpected signing method")
+	assert.Empty(t, result)
+}
+
+func TestService_ValidateToken_RequiresIssuerAndAudience(t *testing.T) {
+	secret := sdk.MaskedBytes("test-secret-key-for-jwt")
+	service := NewService(secret)
+
+	tests := []struct {
+		name   string
+		issuer interface{}
+		audio  interface{}
+	}{
+		{name: "missing issuer", audio: tokenAudience},
+		{name: "missing audience", issuer: tokenIssuer},
+		{name: "wrong issuer", issuer: "another-service", audio: tokenAudience},
+		{name: "wrong audience", issuer: tokenIssuer, audio: "another-app"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			claims := jwtp.MapClaims{
+				"id":  "token-id",
+				"exp": time.Now().Add(time.Hour).Unix(),
+			}
+			if tt.issuer != nil {
+				claims["iss"] = tt.issuer
+			}
+			if tt.audio != nil {
+				claims["aud"] = tt.audio
+			}
+			token := jwtp.NewWithClaims(jwtp.SigningMethodHS256, claims)
+			signed, err := token.SignedString([]byte(secret))
+			assert.NoError(t, err)
+
+			result, err := service.ValidateToken(signed)
+			assert.Error(t, err)
+			assert.Empty(t, result)
+		})
+	}
+}
+
+func TestService_GenerateToken_DoesNotExposeRegisteredClaims(t *testing.T) {
+	service := NewService(sdk.MaskedBytes("test-secret-key-for-jwt"))
+	signed, err := service.GenerateToken(map[string]interface{}{
+		"id":  "token-id",
+		"iss": "forged-issuer",
+		"aud": "forged-audience",
+		"exp": int64(1),
+	}, time.Now().Add(time.Hour).Unix())
+	assert.NoError(t, err)
+
+	claims, err := service.ValidateToken(signed)
+	assert.NoError(t, err)
+	assert.Equal(t, "token-id", claims["id"])
+	assert.NotContains(t, claims, "iss")
+	assert.NotContains(t, claims, "aud")
+	assert.NotContains(t, claims, "exp")
 }
 
 func TestService_ValidateToken_ClaimsTypeAssertionFails(t *testing.T) {

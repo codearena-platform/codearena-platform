@@ -267,6 +267,16 @@ func TestService_Decrypt(t *testing.T) {
 		assert.Empty(t, decryptedMessage)
 	})
 
+	t.Run("decrypt_short_ciphertext_does_not_panic", func(t *testing.T) {
+		// A valid hex string shorter than nonce + authentication tag used to
+		// panic in Decrypt. It must return an error instead.
+		assert.NotPanics(t, func() {
+			decryptedMessage, err := service.Decrypt("deadbeef")
+			assert.Error(t, err)
+			assert.Empty(t, decryptedMessage)
+		})
+	})
+
 	t.Run("decrypt_invalid_encrypted_data", func(t *testing.T) {
 		// Valid hex but too short for valid encrypted data (need at least nonce + tag)
 		// GCM needs 12 bytes nonce + 16 bytes tag = 28 bytes minimum = 56 hex chars

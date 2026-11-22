@@ -45,8 +45,12 @@ func (s service) Decrypt(encryptedMessage string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("error decoding encrypted message: %w", err)
 	}
-	nonceSuze := s.cipher.NonceSize()
-	decryptedData, err := s.cipher.Open(nil, by[:nonceSuze], by[nonceSuze:], nil)
+	nonceSize := s.cipher.NonceSize()
+	if len(by) < nonceSize+s.cipher.Overhead() {
+		// Reject truncated input instead of panicking on the slice bounds.
+		return "", fmt.Errorf("error decrypting message: ciphertext too short")
+	}
+	decryptedData, err := s.cipher.Open(nil, by[:nonceSize], by[nonceSize:], nil)
 	if err != nil {
 		return "", fmt.Errorf("error decrypting message: %w", err)
 	}
