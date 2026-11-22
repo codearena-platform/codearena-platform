@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"crypto/subtle"
 	"fmt"
 
 	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
@@ -129,7 +130,9 @@ func (s service) VerifySecret(plainSecret, hashedSecret string) error {
 		return fmt.Errorf("failed to hash secret for verification: %w", err)
 	}
 
-	if hashedPlain != hashedSecret {
+	// Compare the encoded digests in constant time to avoid leaking the
+	// matching prefix through response timing.
+	if subtle.ConstantTimeCompare([]byte(hashedPlain), []byte(hashedSecret)) != 1 {
 		return fmt.Errorf("secret verification failed: invalid secret")
 	}
 

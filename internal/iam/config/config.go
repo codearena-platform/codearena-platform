@@ -4,10 +4,12 @@
 package config
 
 import (
+	"bytes"
 	"encoding/hex"
 	"fmt"
 	"os"
 	"strconv"
+	"strings"
 
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/gofiber/fiber/v2"
@@ -210,20 +212,30 @@ func (a *AppConfig) LoadDBConfig() {
 // The key must be a valid hex-encoded string.
 //
 // Environment variables:
-//   - ENCRYPTER_KEY: Hex-encoded encryption key (default: 64-character zero string)
+//   - ENCRYPTER_KEY: Hex-encoded 32-byte AES-256 encryption key (required in production)
 //
-// Panics if the encryption key cannot be decoded from hex.
+// Panics if the encryption key cannot be decoded from hex, is not 32 bytes,
+// or is the well-known all-zero default in production.
 func (a *AppConfig) LoadEncrypterConfig() {
-	// load the default values
-	// then load from env variables
-	defaultKeyStr := "0000000000000000000000000000000000000000000000000000000000000000"
+	const defaultKeyHex = "0000000000000000000000000000000000000000000000000000000000000000"
 	keyStr := os.Getenv("ENCRYPTER_KEY")
-	if keyStr != "" {
-		defaultKeyStr = keyStr
+	explicit := keyStr != ""
+	if !explicit {
+		if strings.EqualFold(a.Deployment.Environment, "production") {
+			panic("ENCRYPTER_KEY is required in production")
+		}
+		log.Warn("ENCRYPTER_KEY is not set; using the development-only default key")
+		keyStr = defaultKeyHex
 	}
-	key, err := hex.DecodeString(defaultKeyStr)
+	key, err := hex.DecodeString(keyStr)
 	if err != nil {
 		panic(fmt.Errorf("error decoding encrypter key: %w", err))
+	}
+	if len(key) != 32 {
+		panic(fmt.Errorf("encrypter key must be 32 bytes, got %d", len(key)))
+	}
+	if explicit && bytes.Equal(key, make([]byte, 32)) {
+		panic("ENCRYPTER_KEY must not be an all-zero key")
 	}
 	//goland:noinspection GoRedundantConversion
 	a.Encrypter.key = sdk.MaskedBytes(key)

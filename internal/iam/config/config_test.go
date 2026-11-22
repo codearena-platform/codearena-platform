@@ -609,6 +609,51 @@ func BenchmarkAppConfig_Handle(b *testing.B) {
 	}
 }
 
+func TestAppConfig_LoadEncrypterConfig_FailClosed(t *testing.T) {
+	tests := []struct {
+		name        string
+		env         map[string]string
+		shouldPanic bool
+	}{
+		{
+			name:        "production requires explicit key",
+			env:         map[string]string{"DEPLOYMENT_ENVIRONMENT": "production"},
+			shouldPanic: true,
+		},
+		{
+			name: "production accepts valid key",
+			env: map[string]string{
+				"DEPLOYMENT_ENVIRONMENT": "production",
+				"ENCRYPTER_KEY":          "1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef",
+			},
+		},
+		{
+			name:        "explicit all-zero key rejected",
+			env:         map[string]string{"ENCRYPTER_KEY": "0000000000000000000000000000000000000000000000000000000000000000"},
+			shouldPanic: true,
+		},
+		{
+			name:        "wrong key length rejected",
+			env:         map[string]string{"ENCRYPTER_KEY": "abcd"},
+			shouldPanic: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cleanEnv()
+			defer cleanEnv()
+			setEnvVars(tt.env)
+			cfg := &AppConfig{}
+			cfg.LoadDeploymentConfig()
+			if tt.shouldPanic {
+				assert.Panics(t, func() { cfg.LoadEncrypterConfig() })
+				return
+			}
+			assert.NotPanics(t, func() { cfg.LoadEncrypterConfig() })
+		})
+	}
+}
+
 // Helper functions
 
 func cleanEnv() {
