@@ -1,8 +1,10 @@
 package routes
 
 import (
+	"errors"
 	"net/http"
 
+	compAuth "github.com/codearena-platform/codearena-platform/internal/competition/auth"
 	"github.com/codearena-platform/codearena-platform/internal/competition/services"
 	"github.com/codearena-platform/codearena-platform/internal/competition/services/entity"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils/docs"
@@ -23,7 +25,7 @@ type CompetitionHTTPHandler struct {
 	botUsecase        *services.BotUsecase
 }
 
-func RegisterCompetitionRoutes(app *fiber.App, mu *services.MatchUsecase, tu *services.TournamentUsecase, lu *services.LeagueUsecase, ss *services.ScoreboardService, hu *services.HistoryUsecase, au *services.AnalyticsUsecase, hbu *services.HubUsecase, bu *services.BotUsecase) {
+func RegisterCompetitionRoutes(app *fiber.App, verifier compAuth.Verifier, mu *services.MatchUsecase, tu *services.TournamentUsecase, lu *services.LeagueUsecase, ss *services.ScoreboardService, hu *services.HistoryUsecase, au *services.AnalyticsUsecase, hbu *services.HubUsecase, bu *services.BotUsecase) {
 	h := &CompetitionHTTPHandler{
 		matchUsecase:      mu,
 		tournamentUsecase: tu,
@@ -39,7 +41,7 @@ func RegisterCompetitionRoutes(app *fiber.App, mu *services.MatchUsecase, tu *se
 	basePath := "/api/v1/competition"
 
 	// Tournaments
-	api.Post("/tournaments", h.CreateTournament)
+	api.Post("/tournaments", compAuth.RequireUser(verifier), h.CreateTournament)
 	docs.RegisterApi(docs.ApiWrapper{
 		Path:        basePath + "/tournaments",
 		Method:      http.MethodPost,
@@ -56,7 +58,7 @@ func RegisterCompetitionRoutes(app *fiber.App, mu *services.MatchUsecase, tu *se
 		Tags: routeTags,
 	})
 
-	api.Post("/tournaments/:id/brackets", h.GenerateBrackets)
+	api.Post("/tournaments/:id/brackets", compAuth.RequireUser(verifier), h.GenerateBrackets)
 	docs.RegisterApi(docs.ApiWrapper{
 		Path:        basePath + "/tournaments/:id/brackets",
 		Method:      http.MethodPost,
@@ -85,7 +87,7 @@ func RegisterCompetitionRoutes(app *fiber.App, mu *services.MatchUsecase, tu *se
 	})
 
 	// Leagues
-	api.Post("/leagues", h.CreateLeague)
+	api.Post("/leagues", compAuth.RequireUser(verifier), h.CreateLeague)
 	docs.RegisterApi(docs.ApiWrapper{
 		Path:        basePath + "/leagues",
 		Method:      http.MethodPost,
@@ -127,7 +129,7 @@ func RegisterCompetitionRoutes(app *fiber.App, mu *services.MatchUsecase, tu *se
 	})
 
 	// Judge Callbacks
-	api.Post("/matches/:id/result", h.ReceiveMatchResult)
+	api.Post("/matches/:id/result", compAuth.RequireUser(verifier), h.ReceiveMatchResult)
 	docs.RegisterApi(docs.ApiWrapper{
 		Path:        basePath + "/matches/:id/result",
 		Method:      http.MethodPost,
@@ -185,16 +187,38 @@ func RegisterCompetitionRoutes(app *fiber.App, mu *services.MatchUsecase, tu *se
 	api.Get("/analytics/bots/:id", h.GetBotAnalyticsStats)
 
 	// Hubs
-	api.Post("/hubs", h.CreateHub)
-	api.Get("/hubs", h.ListHubs)
+	api.Post("/hubs", compAuth.RequireUser(verifier), h.CreateHub)
+	// Listing hubs is scoped to the authenticated user instead of a header.
+	api.Get("/hubs", compAuth.RequireUser(verifier), h.ListHubs)
 	api.Get("/hubs/:id/tournaments", h.GetHubTournaments)
-	api.Post("/hubs/:id/members", h.AddHubMember)
+	api.Post("/hubs/:id/members", compAuth.RequireUser(verifier), h.AddHubMember)
 
 	// Bots
-	api.Post("/bots", h.SubmitBot)
+	api.Post("/bots", compAuth.RequireUser(verifier), h.SubmitBot)
 
 	// Leaderboard
 	api.Get("/leaderboard", h.GetLeaderboard)
+}
+
+// authorizeTournament checks hub membership for tournaments that belong to a
+// hub. Global tournaments (no hub) remain readable/writable by any verified
+// user because the data model does not record an owner for them yet.
+func (h *CompetitionHTTPHandler) authorizeTournament(tournamentID string, identity *compAuth.Identity) error {
+	tournament, err := h.tournamentUsecase.GetByID(tournamentID)
+	if err != nil {
+		return err
+	}
+	if tournament.HubID == "" {
+		return nil
+	}
+	member, err := h.hubUsecase.IsMember(tournament.HubID, identity.ID)
+	if err != nil {
+		return err
+	}
+	if !member {
+		return errors.New("caller is not a member of the tournament's hub")
+	}
+	return nil
 }
 
 func (h *CompetitionHTTPHandler) GetLeaderboard(c *fiber.Ctx) error {
@@ -215,10 +239,13 @@ func (h *CompetitionHTTPHandler) SubmitBot(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	userID := c.Get("X-User-ID", "internal_admin")
+	identity, err := compAuth.IdentityFromFiber(c)
+	if err != nil {
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": err.Error()})
+	}
 	ctx := c.Context()
 
-	bot, err := h.botUsecase.SubmitBot(ctx, userID, req.Name, req.Chassis, req.SourceCode)
+	bot, err := h.botUsecase.SubmitBot(ctx, identity.ID, req.Name, req.Chassis, req.SourceCode)
 	if err != nil {
 		// Differentiate plagiarism (business error) vs server error
 		return c.Status(406).JSON(fiber.Map{"error": err.Error(), "type": "PlagiarismDetected"})
@@ -246,6 +273,13 @@ func (h *CompetitionHTTPHandler) CreateTournament(c *fiber.Ctx) error {
 
 func (h *CompetitionHTTPHandler) GenerateBrackets(c *fiber.Ctx) error {
 	tournamentID := c.Params("id")
+	identity, err := compAuth.IdentityFromFiber(c)
+	if err != nil {
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": err.Error()})
+	}
+	if err := h.authorizeTournament(tournamentID, identity); err != nil {
+		return c.Status(http.StatusForbidden).JSON(fiber.Map{"error": err.Error()})
+	}
 	var req struct {
 		Participants []string `json:"participants"`
 	}
@@ -253,7 +287,7 @@ func (h *CompetitionHTTPHandler) GenerateBrackets(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	err := h.tournamentUsecase.GenerateBrackets(tournamentID, req.Participants)
+	err = h.tournamentUsecase.GenerateBrackets(tournamentID, req.Participants)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -271,12 +305,19 @@ func (h *CompetitionHTTPHandler) GetBrackets(c *fiber.Ctx) error {
 }
 
 func (h *CompetitionHTTPHandler) CreateLeague(c *fiber.Ctx) error {
+	identity, err := compAuth.IdentityFromFiber(c)
+	if err != nil {
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": err.Error()})
+	}
 	var req struct {
 		TournamentID string `json:"tournament_id"`
 		Season       string `json:"season"`
 	}
 	if err := c.BodyParser(&req); err != nil {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
+	}
+	if err := h.authorizeTournament(req.TournamentID, identity); err != nil {
+		return c.Status(http.StatusForbidden).JSON(fiber.Map{"error": err.Error()})
 	}
 
 	l, err := h.leagueUsecase.CreateLeague(req.TournamentID, req.Season)
@@ -305,6 +346,13 @@ func (h *CompetitionHTTPHandler) GetStandings(c *fiber.Ctx) error {
 }
 
 func (h *CompetitionHTTPHandler) ReceiveMatchResult(c *fiber.Ctx) error {
+	identity, err := compAuth.IdentityFromFiber(c)
+	if err != nil {
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": err.Error()})
+	}
+	if err := compAuth.AuthorizeMatchResult(identity); err != nil {
+		return c.Status(http.StatusForbidden).JSON(fiber.Map{"error": err.Error()})
+	}
 	matchID := c.Params("id")
 	var req struct {
 		WinnerID string         `json:"winner_id"`
@@ -377,10 +425,12 @@ func (h *CompetitionHTTPHandler) CreateHub(c *fiber.Ctx) error {
 		return c.Status(400).JSON(fiber.Map{"error": err.Error()})
 	}
 
-	// In a real scenario, ownerID would come from Auth context
-	ownerID := c.Get("X-User-ID", "internal_admin")
+	identity, err := compAuth.IdentityFromFiber(c)
+	if err != nil {
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": err.Error()})
+	}
 
-	hub, err := h.hubUsecase.CreateHub(req.Name, ownerID, req.Description, req.Type, req.Visibility)
+	hub, err := h.hubUsecase.CreateHub(req.Name, identity.ID, req.Description, req.Type, req.Visibility)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -389,8 +439,11 @@ func (h *CompetitionHTTPHandler) CreateHub(c *fiber.Ctx) error {
 }
 
 func (h *CompetitionHTTPHandler) ListHubs(c *fiber.Ctx) error {
-	userID := c.Get("X-User-ID", "internal_admin")
-	hubs, err := h.hubUsecase.ListUserHubs(userID)
+	identity, err := compAuth.IdentityFromFiber(c)
+	if err != nil {
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": err.Error()})
+	}
+	hubs, err := h.hubUsecase.ListUserHubs(identity.ID)
 	if err != nil {
 		return c.Status(500).JSON(fiber.Map{"error": err.Error()})
 	}
@@ -407,7 +460,18 @@ func (h *CompetitionHTTPHandler) GetHubTournaments(c *fiber.Ctx) error {
 }
 
 func (h *CompetitionHTTPHandler) AddHubMember(c *fiber.Ctx) error {
+	identity, err := compAuth.IdentityFromFiber(c)
+	if err != nil {
+		return c.Status(http.StatusUnauthorized).JSON(fiber.Map{"error": err.Error()})
+	}
 	hubID := c.Params("id")
+	hub, err := h.hubUsecase.GetHub(hubID)
+	if err != nil {
+		return c.Status(http.StatusNotFound).JSON(fiber.Map{"error": "hub not found"})
+	}
+	if hub.OwnerID != identity.ID {
+		return c.Status(http.StatusForbidden).JSON(fiber.Map{"error": "only the hub owner can add members"})
+	}
 	var req struct {
 		UserID string `json:"user_id"`
 		Role   string `json:"role"`

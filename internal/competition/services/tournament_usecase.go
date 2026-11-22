@@ -36,6 +36,11 @@ func (u *TournamentUsecase) CreateTournament(name string, tType entity.Tournamen
 	return tournament, nil
 }
 
+// GetByID returns a tournament so callers can perform ownership checks.
+func (u *TournamentUsecase) GetByID(id string) (*entity.Tournament, error) {
+	return u.tournamentRepo.GetByID(id)
+}
+
 func (u *TournamentUsecase) GenerateBrackets(tournamentID string, participantIDs []string) error {
 	// Simple bracket generation for power of 2 participants
 	// level 1: Final, level 2: Semi, level 4: Quarter

@@ -46,7 +46,12 @@ services:
       - POSTGRES_DSN=postgres://user:${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}@postgres:5432/competition?sslmode=disable
       - MONGO_URI=mongodb://mongo:27017
       - SIMULATION_URL=simulation:50051
+      # Competition introspects bearer tokens through IAM.
+      - IAM_URL=http://iam:7000
+      # Optional: restrict result callbacks to a specific IAM service account.
+      - MATCH_RESULT_SERVICE_EMAIL=${MATCH_RESULT_SERVICE_EMAIL:-}
     depends_on:
+      - iam
       - mongo
       - postgres
 
