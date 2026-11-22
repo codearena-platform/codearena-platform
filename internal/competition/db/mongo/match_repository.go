@@ -10,6 +10,17 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// Match document field names. These must match the bson tags on entity.Match;
+// match_fields_test.go enforces that invariant.
+const (
+	matchFieldID           = "id"
+	matchFieldTournamentID = "tournament_id"
+	matchFieldStatus       = "status"
+	matchFieldParticipants = "participants"
+	matchFieldWinnerID     = "winner_id"
+	matchFieldEndedAt      = "ended_at"
+)
+
 type MongoMatchRepository struct {
 	client     *mongo.Client
 	collection *mongo.Collection
@@ -22,12 +33,43 @@ func NewMongoMatchRepository(client *mongo.Client, dbName string) *MongoMatchRep
 	}
 }
 
+func matchIDFilter(id string) bson.M {
+	return bson.M{matchFieldID: id}
+}
+
+func finishedMatchesFilter() bson.M {
+	return bson.M{matchFieldStatus: bson.M{"$in": []entity.MatchStatus{entity.MatchFinished, entity.MatchCompleted}}}
+}
+
+func finishedMatchesSort() bson.M {
+	return bson.M{matchFieldEndedAt: -1}
+}
+
+func botMatchesFilter(botID string) bson.M {
+	return bson.M{matchFieldParticipants: botID}
+}
+
+func tournamentMatchesFilter(tournamentID string) bson.M {
+	return bson.M{matchFieldTournamentID: tournamentID}
+}
+
+func aggregateStatsPipeline() mongo.Pipeline {
+	return mongo.Pipeline{
+		{{Key: "$match", Value: bson.M{matchFieldStatus: entity.MatchCompleted}}},
+		{{Key: "$group", Value: bson.M{
+			"_id":           nil,
+			"total_matches": bson.M{"$sum": 1},
+			"winners":       bson.M{"$push": "$" + matchFieldWinnerID},
+		}}},
+	}
+}
+
 func (r *MongoMatchRepository) Save(match *entity.Match) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
 	opts := options.Update().SetUpsert(true)
-	filter := bson.M{"id": match.ID}
+	filter := matchIDFilter(match.ID)
 	update := bson.M{"$set": match}
 
 	_, err := r.collection.UpdateOne(ctx, filter, update, opts)
@@ -39,8 +81,7 @@ func (r *MongoMatchRepository) GetByID(id string) (*entity.Match, error) {
 	defer cancel()
 
 	var match entity.Match
-	filter := bson.M{"id": id}
-	err := r.collection.FindOne(ctx, filter).Decode(&match)
+	err := r.collection.FindOne(ctx, matchIDFilter(id)).Decode(&match)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +92,7 @@ func (r *MongoMatchRepository) ListActive() ([]*entity.Match, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	filter := bson.M{"status": entity.MatchRunning}
+	filter := bson.M{matchFieldStatus: entity.MatchRunning}
 	cursor, err := r.collection.Find(ctx, filter)
 	if err != nil {
 		return nil, err
@@ -69,10 +110,9 @@ func (r *MongoMatchRepository) ListFinished(limit int) ([]*entity.Match, error) 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	filter := bson.M{"status": bson.M{"$in": []entity.MatchStatus{entity.MatchFinished, entity.MatchCompleted}}}
-	opts := options.Find().SetLimit(int64(limit)).SetSort(bson.M{"ended_at": -1})
+	opts := options.Find().SetLimit(int64(limit)).SetSort(finishedMatchesSort())
 
-	cursor, err := r.collection.Find(ctx, filter, opts)
+	cursor, err := r.collection.Find(ctx, finishedMatchesFilter(), opts)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +129,7 @@ func (r *MongoMatchRepository) GetByBotID(botID string) ([]*entity.Match, error)
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	filter := bson.M{"participants": botID}
+	filter := botMatchesFilter(botID)
 	cursor, err := r.collection.Find(ctx, filter)
 	if err != nil {
 		return nil, err
@@ -107,7 +147,7 @@ func (r *MongoMatchRepository) GetByTournamentID(tournamentID string) ([]*entity
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	filter := bson.M{"tournament_id": tournamentID}
+	filter := tournamentMatchesFilter(tournamentID)
 	cursor, err := r.collection.Find(ctx, filter)
 	if err != nil {
 		return nil, err
@@ -125,17 +165,7 @@ func (r *MongoMatchRepository) GetAggregateStats(query map[string]any) (map[stri
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	// Initial basic aggregation: Count total matches and group by winner
-	pipeline := mongo.Pipeline{
-		{{Key: "$match", Value: bson.M{"status": entity.MatchCompleted}}},
-		{{Key: "$group", Value: bson.M{
-			"_id":           nil,
-			"total_matches": bson.M{"$sum": 1},
-			"winners":       bson.M{"$push": "$winner_id"},
-		}}},
-	}
-
-	cursor, err := r.collection.Aggregate(ctx, pipeline)
+	cursor, err := r.collection.Aggregate(ctx, aggregateStatsPipeline())
 	if err != nil {
 		return nil, err
 	}

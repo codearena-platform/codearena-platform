@@ -24,10 +24,16 @@ func CalculateELO(ratingA, ratingB float64, scoreA float64) (newA, newB float64)
 }
 
 // CalculateMultiELO calculates ratings for multiple bots (e.g., Battle Royale)
-// This is a simplified version where we treat it as series of 1v1s against average rank
+// as a series of 1v1 games between the winner and each other participant.
+// An out-of-range winnerIndex (including -1 for a draw or an invalid winner)
+// leaves all ratings unchanged instead of panicking.
 func CalculateMultiELO(ratings []float64, winnerIndex int) []float64 {
 	newRatings := make([]float64, len(ratings))
 	copy(newRatings, ratings)
+
+	if winnerIndex < 0 || winnerIndex >= len(ratings) {
+		return newRatings
+	}
 
 	for i := range ratings {
 		if i == winnerIndex {
@@ -37,6 +43,22 @@ func CalculateMultiELO(ratings []float64, winnerIndex int) []float64 {
 		newWinner, newLoser := CalculateELO(newRatings[winnerIndex], newRatings[i], 1.0)
 		newRatings[winnerIndex] = newWinner
 		newRatings[i] = newLoser
+	}
+
+	return newRatings
+}
+
+// CalculateMultiELODraw calculates ratings when no participant won. Each pair
+// is treated as a draw (score 0.5), so a field of equal ratings stays level.
+func CalculateMultiELODraw(ratings []float64) []float64 {
+	newRatings := make([]float64, len(ratings))
+	copy(newRatings, ratings)
+
+	for i := range ratings {
+		for j := i + 1; j < len(ratings); j++ {
+			newI, newJ := CalculateELO(newRatings[i], newRatings[j], 0.5)
+			newRatings[i], newRatings[j] = newI, newJ
+		}
 	}
 
 	return newRatings
