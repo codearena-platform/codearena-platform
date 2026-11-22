@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
@@ -60,6 +61,17 @@ func fromSdkToModel(client sdk.Client) models.Client {
 		UpdatedAt:             client.UpdatedAt,
 		UpdatedBy:             client.UpdatedBy,
 	}
+}
+
+// secretCacheInvalidator is registered by the auth service so that rotating a
+// client secret immediately evicts any cached digest. It is a package hook to
+// avoid a dependency cycle between the client and auth services.
+var secretCacheInvalidator func(context.Context, string)
+
+// SetSecretCacheInvalidator registers the callback invoked after a secret is
+// rotated. Passing nil disables invalidation (useful in isolated tests).
+func SetSecretCacheInvalidator(fn func(context.Context, string)) {
+	secretCacheInvalidator = fn
 }
 
 func hashSecret(secret string) (string, error) {

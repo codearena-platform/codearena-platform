@@ -160,6 +160,9 @@ func (s service) RegenerateSecret(ctx context.Context, clientId string) (*sdk.Cl
 	if err != nil {
 		return nil, fmt.Errorf("error updating client with new secret: %w", err)
 	}
+	if secretCacheInvalidator != nil {
+		secretCacheInvalidator(ctx, clientId)
+	}
 	client.Secret = newSecret // return the plain secret only during regeneration
 
 	return client, nil

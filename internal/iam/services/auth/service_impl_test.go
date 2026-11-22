@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
+	"strings"
 	"testing"
 	"time"
 
@@ -231,7 +232,7 @@ func TestCacheClientSecret(t *testing.T) {
 	clientId := "test-client"
 	secret := "test-secret"
 
-	mockCache.On("Set", ctx, "client-test-client", "test-secret", time.Hour*24*365).Return(nil)
+	mockCache.On("Set", ctx, "client-test-client", "test-secret", clientSecretCacheTTL).Return(nil)
 
 	svc.cacheClientSecret(ctx, clientId, secret)
 
@@ -250,7 +251,7 @@ func TestCacheClientSecretError(t *testing.T) {
 	clientId := "test-client"
 	secret := "test-secret"
 
-	mockCache.On("Set", ctx, "client-test-client", "test-secret", time.Hour*24*365).Return(errors.New("cache error"))
+	mockCache.On("Set", ctx, "client-test-client", "test-secret", clientSecretCacheTTL).Return(errors.New("cache error"))
 
 	// This should not panic even if cache fails
 	svc.cacheClientSecret(ctx, clientId, secret)
@@ -286,7 +287,7 @@ func TestGetClientSecret(t *testing.T) {
 					Id:     "test-client",
 					Secret: "db-secret",
 				}, nil)
-				mockCache.On("Set", ctx, "client-test-client", "db-secret", time.Hour*24*365).Return(nil)
+				mockCache.On("Set", ctx, "client-test-client", "db-secret", clientSecretCacheTTL).Return(nil)
 			},
 			expectedSecret: "db-secret",
 		},
@@ -299,7 +300,7 @@ func TestGetClientSecret(t *testing.T) {
 					Id:     "test-client",
 					Secret: "db-secret",
 				}, nil)
-				mockCache.On("Set", ctx, "client-test-client", "db-secret", time.Hour*24*365).Return(errors.New("cache error"))
+				mockCache.On("Set", ctx, "client-test-client", "db-secret", clientSecretCacheTTL).Return(errors.New("cache error"))
 			},
 			expectedSecret: "db-secret", // Should still return secret even if cache fails
 		},
@@ -504,33 +505,33 @@ func TestHandlePublicClient(t *testing.T) {
 		return base64.RawURLEncoding.EncodeToString(hash[:])
 	}
 
-	originalChallenge := "test-verifier-string"
-	expectedHash := generateExpectedHash(originalChallenge)
+	originalVerifier := "test-verifier-string"
+	expectedChallenge := generateExpectedHash(originalVerifier)
 
 	tests := []struct {
 		name          string
 		clientId      string
-		codeChallenge string // This is the hash that should match
+		codeChallenge string // This is the verifier supplied at token exchange
 		token         sdk.AuthToken
 		expectedError string
 	}{
 		{
 			name:          "success",
 			clientId:      "test-client",
-			codeChallenge: expectedHash, // Provide the correct hash
+			codeChallenge: originalVerifier,
 			token: sdk.AuthToken{
 				ClientId:            "test-client",
-				CodeChallenge:       originalChallenge, // Store the original verifier
+				CodeChallenge:       expectedChallenge, // Store the challenge from authorize
 				CodeChallengeMethod: "S256",
 			},
 		},
 		{
 			name:          "error - invalid code challenge method",
 			clientId:      "test-client",
-			codeChallenge: expectedHash,
+			codeChallenge: originalVerifier,
 			token: sdk.AuthToken{
 				ClientId:            "test-client",
-				CodeChallenge:       originalChallenge,
+				CodeChallenge:       expectedChallenge,
 				CodeChallengeMethod: "plain",
 			},
 			expectedError: "invalid code challenge",
@@ -538,10 +539,10 @@ func TestHandlePublicClient(t *testing.T) {
 		{
 			name:          "error - invalid code verifier",
 			clientId:      "test-client",
-			codeChallenge: "wrong-hash", // Wrong hash
+			codeChallenge: "wrong-verifier",
 			token: sdk.AuthToken{
 				ClientId:            "test-client",
-				CodeChallenge:       originalChallenge, // Correct original verifier
+				CodeChallenge:       expectedChallenge,
 				CodeChallengeMethod: "S256",
 			},
 			expectedError: "invalid code verifier",
@@ -549,10 +550,10 @@ func TestHandlePublicClient(t *testing.T) {
 		{
 			name:          "error - invalid client id",
 			clientId:      "wrong-client",
-			codeChallenge: expectedHash,
+			codeChallenge: originalVerifier,
 			token: sdk.AuthToken{
 				ClientId:            "test-client",
-				CodeChallenge:       originalChallenge,
+				CodeChallenge:       expectedChallenge,
 				CodeChallengeMethod: "S256",
 			},
 			expectedError: "invalid client id",
@@ -1244,12 +1245,12 @@ func TestClientCallback(t *testing.T) {
 		{
 			name:          "error - public client - client ID mismatch",
 			code:          "valid-code",
-			codeChallenge: calculatedHash, // Use the pre-calculated hash
+			codeChallenge: originalVerifier, // The verifier supplied at token exchange
 			clientId:      "different-client",
 			clientSecret:  "",
 			setupMocks: func() {
-				// Mock successful auth token retrieval with matching code challenge but different client ID
-				tokenJSON := `{"access_token":"at_123","refresh_token":"rt_123","client_id":"original-client","code_challenge":"` + originalVerifier + `","code_challenge_method":"S256"}`
+				// Mock successful auth token retrieval with matching PKCE challenge but different client ID
+				tokenJSON := `{"access_token":"at_123","refresh_token":"rt_123","client_id":"original-client","code_challenge":"` + calculatedHash + `","code_challenge_method":"S256"}`
 				mockCache.On("Get", ctx, "auth-code-valid-code").Return("encrypted-data", nil)
 				mockEncrypt.On("Decrypt", "encrypted-data").Return(tokenJSON, nil)
 			},
@@ -1371,12 +1372,12 @@ func TestClientCallback(t *testing.T) {
 		{
 			name:          "success - public client flow",
 			code:          "success-code-public",
-			codeChallenge: calculatedHash, // Use the pre-calculated hash
+			codeChallenge: originalVerifier, // The verifier supplied at token exchange
 			clientId:      "test-client",
 			clientSecret:  "",
 			setupMocks: func() {
 				// Mock complete successful public client flow
-				tokenJSON := `{"access_token":"at_123","refresh_token":"rt_123","client_id":"test-client","code_challenge":"` + originalVerifier + `","code_challenge_method":"S256"}`
+				tokenJSON := `{"access_token":"at_123","refresh_token":"rt_123","client_id":"test-client","code_challenge":"` + calculatedHash + `","code_challenge_method":"S256"}`
 				mockCache.On("Get", ctx, "auth-code-success-code-public").Return("encrypted-data", nil)
 				mockEncrypt.On("Decrypt", "encrypted-data").Return(tokenJSON, nil)
 				// No client secret validation needed for public client
@@ -1391,26 +1392,19 @@ func TestClientCallback(t *testing.T) {
 			expectedError: "", // Should succeed
 		},
 		{
-			name:          "success - neither private nor public client",
+			name:          "error - no client authentication",
 			code:          "success-code-neither",
 			codeChallenge: "",
 			clientId:      "test-client",
 			clientSecret:  "",
 			setupMocks: func() {
-				// Mock complete successful flow with neither private nor public client validation
+				// The code exists, but without a secret or PKCE verifier no
+				// client authentication took place.
 				tokenJSON := `{"access_token":"at_123","refresh_token":"rt_123","client_id":"test-client","code_challenge":"","code_challenge_method":""}`
 				mockCache.On("Get", ctx, "auth-code-success-code-neither").Return("encrypted-data", nil)
 				mockEncrypt.On("Decrypt", "encrypted-data").Return(tokenJSON, nil)
-				// No client validation needed
-				// Access token caching succeeds
-				mockEncrypt.On("Encrypt", mock.AnythingOfType("string")).Return("encrypted-access-token", nil)
-				mockCache.On("Set", ctx, mock.AnythingOfType("string"), "encrypted-access-token", mock.Anything).Return(nil)
-				// JWT generation succeeds
-				mockJWT.On("GenerateToken", mock.AnythingOfType("map[string]interface {}"), mock.AnythingOfType("int64")).Return("jwt-token", nil)
-				// Auth token invalidation succeeds
-				mockCache.On("Delete", ctx, "auth-code-success-code-neither").Return(nil)
 			},
-			expectedError: "", // Should succeed
+			expectedError: "client authentication required",
 		},
 	}
 
@@ -2170,7 +2164,7 @@ func TestHandleEvent(t *testing.T) {
 			name:  "client created event",
 			event: mockEvent,
 			setupMocks: func() {
-				mockCache.On("Set", ctx, "client-test-client", "test-secret", time.Hour*24*365).Return(nil)
+				mockCache.On("Set", ctx, "client-test-client", "test-secret", clientSecretCacheTTL).Return(nil)
 			},
 		},
 		{
@@ -2183,7 +2177,7 @@ func TestHandleEvent(t *testing.T) {
 				},
 			},
 			setupMocks: func() {
-				mockCache.On("Set", ctx, "client-test-client", "updated-secret", time.Hour*24*365).Return(nil)
+				mockCache.On("Set", ctx, "client-test-client", "updated-secret", clientSecretCacheTTL).Return(nil)
 			},
 		},
 		{
@@ -2379,6 +2373,35 @@ func TestGetServiceAccountUser(t *testing.T) {
 
 		mockUserService.AssertExpectations(t)
 	})
+}
+
+func TestRequireClientBinding(t *testing.T) {
+	token := sdk.AuthToken{ClientId: "bound-client"}
+	assert.NoError(t, requireClientBinding("bound-client", token))
+	assert.Error(t, requireClientBinding("other-client", token))
+	assert.Error(t, requireClientBinding("", token))
+}
+
+func TestRefreshAuthToken_CachesNewToken(t *testing.T) {
+	mockCacheService := &MockCacheService{}
+	mockEncryptService := &services.MockEncryptService{}
+	svc := service{cacheSvc: mockCacheService, encSvc: mockEncryptService, tokenTTL: 60}
+
+	ctx := context.Background()
+	newToken := &sdk.AuthToken{AccessToken: "new-access-token", RefreshToken: "new-refresh-token"}
+
+	mockProvider := &services.MockServiceProvider{}
+	mockProvider.On("RefreshToken", "old-refresh-token").Return(newToken, nil)
+	mockEncryptService.On("Encrypt", mock.MatchedBy(func(plain string) bool {
+		return strings.Contains(plain, "new-access-token") && strings.Contains(plain, "new-refresh-token")
+	})).Return("encrypted-new-token", nil)
+	mockCacheService.On("Set", ctx, "access-token-current-access-token", "encrypted-new-token", mock.Anything).Return(nil)
+
+	refreshed, err := svc.refreshAuthToken(ctx, "current-access-token", sdk.AuthToken{RefreshToken: "old-refresh-token"}, mockProvider)
+	require.NoError(t, err)
+	assert.Equal(t, "new-access-token", refreshed.AccessToken)
+	mockCacheService.AssertExpectations(t)
+	mockEncryptService.AssertExpectations(t)
 }
 
 // TestRefreshAuthToken tests the refreshAuthToken function
