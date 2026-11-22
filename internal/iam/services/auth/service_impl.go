@@ -33,7 +33,7 @@ type service struct {
 }
 
 func NewService(authP authprovider.Service, clientSvc client.Service, cacheSvc cache.Service, jwtSvc jwt.Service, encSvc encrypt.Service, usrSvc user.Service, tokenTTL int64, refetchTTL int64) *service {
-	return &service{
+	s := &service{
 		authP:      authP,
 		clientSvc:  clientSvc,
 		cacheSvc:   cacheSvc,
@@ -43,6 +43,8 @@ func NewService(authP authprovider.Service, clientSvc client.Service, cacheSvc c
 		tokenTTL:   tokenTTL,
 		refetchTTL: refetchTTL,
 	}
+	client.SetSecretCacheInvalidator(s.invalidateClientSecret)
+	return s
 }
 
 func (s service) GetLoginUrl(ctx context.Context, clientId, authProviderId, state, redirectUrl, codeChallengeMethod, codeChallenge string) (string, error) {
@@ -138,26 +140,33 @@ func (s service) ClientCallback(ctx context.Context, code, codeChallenge, client
 	 */
 
 	// get the auth token from cache
-
-	isPublicClient := len(codeChallenge) != 0
-	isPrivateClient := len(clientSecret) != 0
 	token, err := s.getAuthTokenFromCache(ctx, code)
 	if err != nil {
 		return nil, fmt.Errorf("error getting the token from cache %w", err)
 	}
 
-	if isPrivateClient {
-		err = s.handlePrivateClient(ctx, clientId, clientSecret)
-		if err != nil {
+	// Every exchange must authenticate. Confidential clients present a secret;
+	// public clients present the PKCE verifier together with their client_id.
+	if clientId == "" {
+		return nil, fmt.Errorf("client authentication required")
+	}
+	if clientSecret != "" && codeChallenge != "" {
+		return nil, fmt.Errorf("ambiguous client authentication")
+	}
+	switch {
+	case clientSecret != "":
+		if err := s.handlePrivateClient(ctx, clientId, clientSecret); err != nil {
 			return nil, fmt.Errorf("error handling private client %w", err)
 		}
-	}
-
-	if isPublicClient {
-		err = s.handlePublicClient(clientId, codeChallenge, *token)
-		if err != nil {
+	case codeChallenge != "":
+		if err := s.handlePublicClient(clientId, codeChallenge, *token); err != nil {
 			return nil, fmt.Errorf("error handling public client %w", err)
 		}
+	default:
+		return nil, fmt.Errorf("client authentication required")
+	}
+	if err := requireClientBinding(clientId, *token); err != nil {
+		return nil, fmt.Errorf("error handling client binding %w", err)
 	}
 
 	accessTokenId, err := s.cacheAccessToken(ctx, *token, "")
@@ -320,8 +329,9 @@ func (s service) refreshAuthToken(ctx context.Context, accessToken string, token
 	if err != nil {
 		return nil, fmt.Errorf("error refreshing the token with servivce provider%w", err)
 	}
-	// cache the service provider token
-	_, err = s.cacheAccessToken(ctx, token, accessToken)
+	// Cache the refreshed token, not the expired one, so subsequent requests
+	// reuse the new access/refresh token pair.
+	_, err = s.cacheAccessToken(ctx, *tk, accessToken)
 	if err != nil {
 		return nil, fmt.Errorf("error caching the access token %w", err)
 	}
@@ -603,7 +613,9 @@ func (s service) getRedirectUrl(ctx context.Context, clientId, redirectUrl, auth
 	}
 
 	if len(codeChallenge) != 0 {
-		redirectUrl = fmt.Sprintf("%s&code_challenge=%s", redirectUrl, generateCodeChallengeS256(codeChallenge))
+		// Return the challenge recorded at authorize time unchanged; hashing it
+		// again breaks the RFC 7636 verifier/challenge relationship.
+		redirectUrl = fmt.Sprintf("%s&code_challenge=%s", redirectUrl, url.QueryEscape(codeChallenge))
 	}
 	return redirectUrl, nil
 }

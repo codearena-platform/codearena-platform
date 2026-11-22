@@ -811,6 +811,26 @@ func TestService_RegenerateSecret(t *testing.T) {
 	mockStore.AssertExpectations(t)
 }
 
+func TestService_RegenerateSecret_InvalidatesCachedSecret(t *testing.T) {
+	var invalidated string
+	SetSecretCacheInvalidator(func(_ context.Context, clientID string) { invalidated = clientID })
+	defer SetSecretCacheInvalidator(nil)
+
+	mockStore := &MockStore{}
+	service := NewService(mockStore, &services.MockProjectService{}, &services.MockAuthProviderService{}, &services.MockUserService{})
+	ctx := createContextWithProjects([]string{"project1"})
+	mockStore.On("GetById", mock.Anything, "client1").Return(&sdk.Client{
+		Id: "client1", Name: "Test Client", ProjectId: "project1", Secret: "oldHashedSecret",
+	}, nil)
+	mockStore.On("Update", mock.Anything, mock.Anything).Return(nil)
+
+	result, err := service.RegenerateSecret(ctx, "client1")
+	assert.NoError(t, err)
+	assert.NotNil(t, result)
+	assert.Equal(t, "client1", invalidated)
+	mockStore.AssertExpectations(t)
+}
+
 func TestService_RegenerateSecret_GetError(t *testing.T) {
 	mockStore := &MockStore{}
 	mockProjectService := &services.MockProjectService{}
