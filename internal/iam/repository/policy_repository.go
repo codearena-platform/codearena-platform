@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/codearena-platform/codearena-platform/internal/iam/entity"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
-	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 )
 
 type PolicyRepository interface {

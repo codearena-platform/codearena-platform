@@ -9,10 +9,10 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
 	"github.com/joho/godotenv"
-	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 )
 
 // AppConfig holds all configuration settings for the Go IAM application.

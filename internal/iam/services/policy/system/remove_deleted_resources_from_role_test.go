@@ -5,12 +5,11 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
+	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils/test/services"
 	"github.com/stretchr/testify/assert"
 )
-
 
 func TestNewRemoveDeletedResourceFromRole(t *testing.T) {
 	roleSvc := &services.MockRoleService{}

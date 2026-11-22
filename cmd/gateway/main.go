@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"os"
 
 	"github.com/codearena-platform/codearena-platform/internal/gateway"
@@ -34,5 +35,7 @@ func main() {
 		RealtimeURL:    realtimeURL,
 	}
 
-	gateway.Start(cfg)
+	if err := gateway.Start(cfg); err != nil {
+		log.Fatalf("gateway stopped: %v", err)
+	}
 }

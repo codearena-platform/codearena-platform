@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
@@ -45,9 +46,18 @@ func (h *IAMHandler) HealthCheck(c *fiber.Ctx) error {
 		}
 	}
 
-	return c.JSON(HealthResponse{
-		Success: true,
-		Message: "Health check completed successfully",
+	httpStatus := http.StatusOK
+	message := "Health check completed successfully"
+	success := true
+	if status == "unhealthy" {
+		httpStatus = http.StatusServiceUnavailable
+		message = "Health check failed"
+		success = false
+	}
+
+	return c.Status(httpStatus).JSON(HealthResponse{
+		Success: success,
+		Message: message,
 		Data: HealthData{
 			Status:     status,
 			Version:    "1.0.0",

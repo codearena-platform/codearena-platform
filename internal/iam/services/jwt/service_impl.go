@@ -3,8 +3,8 @@ package jwt
 import (
 	"fmt"
 
-	jwtp "github.com/golang-jwt/jwt/v4"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
+	jwtp "github.com/golang-jwt/jwt/v4"
 )
 
 type service struct {

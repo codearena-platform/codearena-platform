@@ -13,8 +13,8 @@ type BotSignature struct {
 
 // PlagiarismReport details the findings when a Bot is compared against the database.
 type PlagiarismReport struct {
-	IsPlagiarized  bool    `json:"is_plagiarized"`
-	Similarity     float64 `json:"similarity"`      // 0.0 to 1.0 (Percentage of overlap)
-	MatchedBotID   string  `json:"matched_bot_id"`  // ID of the bot it was copied from (if any)
-	MatchedLines   int     `json:"matched_lines"`
+	IsPlagiarized bool    `json:"is_plagiarized"`
+	Similarity    float64 `json:"similarity"`     // 0.0 to 1.0 (Percentage of overlap)
+	MatchedBotID  string  `json:"matched_bot_id"` // ID of the bot it was copied from (if any)
+	MatchedLines  int     `json:"matched_lines"`
 }

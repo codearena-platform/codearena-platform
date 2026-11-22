@@ -3,8 +3,8 @@ package utils
 import (
 	"context"
 
-	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
+	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 )
 
 type Event[T any] interface {

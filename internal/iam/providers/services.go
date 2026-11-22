@@ -1,6 +1,7 @@
 package providers
 
 import (
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/codearena-platform/codearena-platform/internal/iam/db"
 	"github.com/codearena-platform/codearena-platform/internal/iam/repository"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/auth"
@@ -17,7 +18,6 @@ import (
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/role"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/user"
 	"github.com/codearena-platform/codearena-platform/internal/iam/usecase"
-	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 )
 
 // Service is a container that holds all business logic services for the Go IAM system.

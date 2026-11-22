@@ -16,7 +16,7 @@ func GetIAMClient(svc client.Service) (*sdk.Client, error) {
 		return nil, err
 	}
 	if len(prvs) == 0 {
-		log.Warn("IAM running in insecure mode. Create a client for Go IAM to make the application secure")
+		log.Warn("No IAM client found: authenticated routes will reject requests (set IAM_ALLOW_INSECURE=true only for local development)")
 		return nil, nil
 	}
 	return &prvs[0], nil

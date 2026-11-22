@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"testing"
 
+	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/log"
-	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

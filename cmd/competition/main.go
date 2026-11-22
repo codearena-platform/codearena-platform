@@ -31,13 +31,17 @@ func main() {
 		mongoURI = "mongodb://codearena:codearena_password@mongodb:27017"
 	}
 
+	// In production, losing the database must not silently switch to in-memory
+	// repositories: that would make results and rankings disappear unnoticed.
+	allowMemoryFallback := os.Getenv("ALLOW_IN_MEMORY_FALLBACK") == "true"
+
 	// Initialize Postgres
 	db, err := postgres.InitPostgres(pgDSN)
 	if err != nil {
-		log.Printf("Warning: Failed to connect to Postgres: %v. Falling back to Memory (for dev/test without docker)", err)
-		// For robustness in this dev env, if DB fails, we could fatal or fallback.
-		// Let's Fatal to encourage correct setup, or handle gracefully.
-		// log.Fatal(err)
+		if !allowMemoryFallback {
+			log.Fatalf("failed to connect to Postgres: %v", err)
+		}
+		log.Printf("WARNING: falling back to in-memory repositories: %v", err)
 	} else {
 		log.Println("Connected to PostgreSQL")
 	}
@@ -45,7 +49,10 @@ func main() {
 	// Initialize Mongo
 	mongoClient, err := mongo.InitMongo(mongoURI)
 	if err != nil {
-		log.Printf("Warning: Failed to connect to Mongo: %v. Match replays might not execute.", err)
+		if !allowMemoryFallback {
+			log.Fatalf("failed to connect to Mongo: %v", err)
+		}
+		log.Printf("WARNING: match replays will not be persisted: %v", err)
 	} else {
 		log.Println("Connected to MongoDB")
 	}
@@ -99,7 +106,7 @@ func main() {
 	// metricsService := services.NewMetricsService(matchRepo) // Planned but initialized inside scoreboard if needed
 
 	// Run gRPC Server
-	go StartMatchServer(":50052", matchUsecase)
+	go StartMatchServer(":50052", simAddr, matchUsecase)
 
 	// Run HTTP Server
 	StartHTTPServer(":7001", matchUsecase, tournamentUsecase, leagueUsecase, scoreboardService, historyUsecase, analyticsUsecase, hubUsecase, botUsecase)
@@ -124,13 +131,13 @@ func StartHTTPServer(addr string, mu *services.MatchUsecase, tu *services.Tourna
 	log.Fatal(app.Listen(addr))
 }
 
-func StartMatchServer(addr string, u *services.MatchUsecase) {
+func StartMatchServer(addr string, simAddr string, u *services.MatchUsecase) {
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 	s := grpc.NewServer()
-	srv := routes.NewMatchGRPCServer(u, "simulation:50051")
+	srv := routes.NewMatchGRPCServer(u, simAddr)
 	pb.RegisterMatchServiceServer(s, srv)
 
 	log.Printf("Match gRPC Server listening at %v", lis.Addr())

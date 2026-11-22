@@ -3,9 +3,9 @@ package auth
 import (
 	"context"
 
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 )
 
 func (s *service) HandleEvent(e utils.Event[sdk.Client]) {

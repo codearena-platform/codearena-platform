@@ -1,11 +1,11 @@
 package system
 
 import (
-	"github.com/gofiber/fiber/v2/log"
+	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/user"
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils"
-	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 type accessToCreatedResource struct {

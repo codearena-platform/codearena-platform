@@ -24,8 +24,5 @@ func RegisterRoutes(app *fiber.App, prv *providers.Provider) {
 	h.RegisterAuthRoutes(public)
 	h.RegisterHealthRoutes(public)
 
-	// Legacy /me redirect or direct access if needed
-	h.RegisterMeRoutes(app)
-
 	app.Static("/docs", "./docs")
 }

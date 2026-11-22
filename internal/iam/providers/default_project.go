@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/gofiber/fiber/v2/log"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/project"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 // CheckAndAddDefaultProject ensures that a default project exists in the system.

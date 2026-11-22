@@ -6,6 +6,8 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"net/url"
+	"strings"
+	"time"
 )
 
 type Config struct {
@@ -15,20 +17,29 @@ type Config struct {
 	RealtimeURL    string
 }
 
-func NewServer(cfg Config) *http.ServeMux {
+func NewServer(cfg Config) (*http.ServeMux, error) {
 	mux := http.NewServeMux()
 
-	iamURL, _ := url.Parse(cfg.IAMURL)
+	iamURL, err := url.Parse(cfg.IAMURL)
+	if err != nil {
+		return nil, fmt.Errorf("invalid IAM URL: %w", err)
+	}
 	iamProxy := httputil.NewSingleHostReverseProxy(iamURL)
 
-	compURL, _ := url.Parse(cfg.CompetitionURL)
+	compURL, err := url.Parse(cfg.CompetitionURL)
+	if err != nil {
+		return nil, fmt.Errorf("invalid competition URL: %w", err)
+	}
 	compProxy := httputil.NewSingleHostReverseProxy(compURL)
 
-	realtimeURL, _ := url.Parse(cfg.RealtimeURL)
+	realtimeURL, err := url.Parse(cfg.RealtimeURL)
+	if err != nil {
+		return nil, fmt.Errorf("invalid realtime URL: %w", err)
+	}
 	realtimeProxy := httputil.NewSingleHostReverseProxy(realtimeURL)
 
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "OK")
+		fmt.Fprint(w, "OK")
 	})
 
 	// WebSocket Routes -> Realtime
@@ -37,14 +48,22 @@ func NewServer(cfg Config) *http.ServeMux {
 		realtimeProxy.ServeHTTP(w, r)
 	})
 
-	// Service Routes -> IAM
+	// IAM registers every route under /api/v1/iam. Accept that canonical prefix
+	// and rewrite the two legacy prefixes used by older clients.
 	forwardToIAM := func(w http.ResponseWriter, r *http.Request) {
 		r.Host = iamURL.Host
 		iamProxy.ServeHTTP(w, r)
 	}
+	rewriteToIAM := func(from, to string) http.HandlerFunc {
+		return func(w http.ResponseWriter, r *http.Request) {
+			r.URL.Path = to + strings.TrimPrefix(r.URL.Path, from)
+			forwardToIAM(w, r)
+		}
+	}
 
-	mux.HandleFunc("/api/v1/auth/", forwardToIAM)
-	mux.HandleFunc("/api/v1/users/", forwardToIAM)
+	mux.HandleFunc("/api/v1/iam/", forwardToIAM)
+	mux.HandleFunc("/api/v1/auth/", rewriteToIAM("/api/v1/", "/api/v1/iam/"))
+	mux.HandleFunc("/api/v1/users/", rewriteToIAM("/api/v1/users/", "/api/v1/iam/user/v1/"))
 
 	// Service Routes -> Competition
 	mux.HandleFunc("/api/v1/competition/", func(w http.ResponseWriter, r *http.Request) {
@@ -52,11 +71,24 @@ func NewServer(cfg Config) *http.ServeMux {
 		compProxy.ServeHTTP(w, r)
 	})
 
-	return mux
+	return mux, nil
 }
 
-func Start(cfg Config) {
-	mux := NewServer(cfg)
-	log.Printf("Gateway listening on :%s", cfg.Port)
-	log.Fatal(http.ListenAndServe(":"+cfg.Port, mux))
+func Start(cfg Config) error {
+	mux, err := NewServer(cfg)
+	if err != nil {
+		return err
+	}
+
+	srv := &http.Server{
+		Addr:              ":" + cfg.Port,
+		Handler:           mux,
+		ReadHeaderTimeout: 10 * time.Second,
+		ReadTimeout:       30 * time.Second,
+		WriteTimeout:      60 * time.Second,
+		IdleTimeout:       120 * time.Second,
+	}
+
+	log.Printf("Gateway listening on %s", srv.Addr)
+	return srv.ListenAndServe()
 }

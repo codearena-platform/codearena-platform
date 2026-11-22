@@ -6,9 +6,9 @@ package projects
 import (
 	"strings"
 
-	"github.com/gofiber/fiber/v2"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/project"
+	"github.com/gofiber/fiber/v2"
 )
 
 // Middlewares provides project-based access control middleware functionality.
