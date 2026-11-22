@@ -31,9 +31,16 @@ The gateway exposes IAM under `/api/v1/iam/`. The legacy `/api/v1/auth/` prefix 
 | `SERVER_HOST`, `SERVER_PORT` | Bind address; defaults to `:3000` |
 | `DB_HOST` | MongoDB connection URI |
 | `REDIS_HOST` | Redis `host:port` |
-| `JWT_SECRET` | **Required**; signing key for access tokens |
-| `ENCRYPTER_KEY` | **Required**; 32-byte key as 64 hex characters |
-| `IAM_ALLOW_INSECURE` | Only for local development; when `true`, authenticated routes pass through if no IAM client is configured |
+| `JWT_SECRET` | **Required**; HS256 signing key for access tokens |
+| `ENCRYPTER_KEY` | **Required** in production; 32-byte key as 64 hex characters |
+| `DEPLOYMENT_ENVIRONMENT` | Set to `production` to enable fail-closed configuration checks |
+| `IAM_ALLOW_INSECURE` | Local-only; skips token verification in competition routes |
+| `IAM_MIGRATION_DRY_RUN` | When `true`, inspect pending migrations without applying changes |
+| `IAM_MIGRATION_ROLLBACK` | Version of a migration to roll back on startup (e.g. `001`) |
+
+### Database migrations
+
+Migrations are applied on IAM startup. Each migration's data changes and its record are committed in one MongoDB transaction, and the record includes a checksum that detects edits to already-applied migrations. Production requires a MongoDB replica set (or mongos); a standalone `mongod` is only supported for local development and logs a warning. Migration `001` converts legacy policies in place, keeps a backup of the original value, and restores it on rollback.
 
 ### Competition
 
@@ -43,6 +50,8 @@ The gateway exposes IAM under `/api/v1/iam/`. The legacy `/api/v1/auth/` prefix 
 | `MONGO_URI` | MongoDB connection string for replays |
 | `SIMULATION_URL` | gRPC address of the simulation engine (default `simulation:50051`) |
 | `ALLOW_IN_MEMORY_FALLBACK` | Local-only escape hatch for missing databases |
+| `IAM_URL` | Base URL used to verify bearer tokens (default `http://iam:7000`) |
+| `MATCH_RESULT_SERVICE_EMAIL` | Optional; restrict result callbacks to this IAM service account |
 
 ### Gateway
 
@@ -51,7 +60,6 @@ The gateway exposes IAM under `/api/v1/iam/`. The legacy `/api/v1/auth/` prefix 
 ## Known gaps before production
 
 - The gateway is exposed over plaintext HTTP without an Ingress/TLS.
-- No authentication on competition mutation endpoints; `X-User-ID` is currently trusted and must be replaced with verified token claims.
-- Several IAM authorization issues remain (project scoping, OAuth code/client binding, PKCE validation, token cache invalidation).
+- Project scoping for IAM/competition resources is still incomplete.
+- Competition persistence and ELO scoring still need the fixes tracked in the repository issues.
 - The `realtime` and `simulation` services referenced by compose are not defined here.
-- OAuth token refresh, Mongo field names and Postgres schema need the fixes tracked in the repository issues.

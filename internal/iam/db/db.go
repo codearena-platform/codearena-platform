@@ -5,8 +5,12 @@ package db
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"os"
+	"strings"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
@@ -59,8 +63,15 @@ type DbQuerier interface {
 	UpdateMany(ctx context.Context, col DbCollection, filter interface{}, update interface{}, opts ...*options.UpdateOptions) (*mongo.UpdateResult, error)
 }
 
-// DbClient defines the interface for database client operations.
-// It handles database connection lifecycle and context management.
+// TransactionalDB is implemented by database backends that can run a group of
+// writes atomically. Migrations use it so the data transformation and its
+// record are committed together; backends without support fall back to
+// sequential execution with a warning.
+type TransactionalDB interface {
+	DB
+	WithTransaction(ctx context.Context, fn func(ctx context.Context) error) error
+}
+
 // DbClient defines the interface for database client operations.
 // It handles database connection lifecycle and context management.
 type DbClient interface {
@@ -139,6 +150,50 @@ func NewMongoConnection(url string) (*MongoConnection, error) {
 // Returns an error if the disconnect operation fails.
 func (m *MongoConnection) Disconnect(ctx context.Context) error {
 	return m.client.Disconnect(ctx)
+}
+
+var _ TransactionalDB = (*MongoConnection)(nil)
+
+// WithTransaction runs fn in a MongoDB transaction. Every DB operation in fn
+// must use the context it receives so the driver routes it through the session.
+func (m *MongoConnection) WithTransaction(ctx context.Context, fn func(ctx context.Context) error) error {
+	// MongoDB transactions require a replica set or mongos. Local development
+	// often uses a standalone mongod, so degrade explicitly there, but never in
+	// production where atomic migrations are a hard requirement.
+	var topology struct {
+		SetName string `bson:"setName"`
+		Msg     string `bson:"msg"`
+	}
+	if err := m.client.Database("admin").RunCommand(ctx, bson.D{{Key: "hello", Value: 1}}).Decode(&topology); err != nil {
+		return fmt.Errorf("check database topology: %w", err)
+	}
+	if topology.SetName == "" && topology.Msg != "isdbgrid" {
+		if strings.EqualFold(os.Getenv("DEPLOYMENT_ENVIRONMENT"), "production") {
+			return errors.New("a MongoDB replica set is required for transactional migrations in production")
+		}
+		log.Warn("MongoDB standalone detected: running migration without a transaction (development only)")
+		return fn(ctx)
+	}
+
+	return m.client.UseSession(ctx, func(sc mongo.SessionContext) error {
+		if err := sc.StartTransaction(); err != nil {
+			return fmt.Errorf("start migration transaction: %w", err)
+		}
+		committed := false
+		defer func() {
+			if !committed {
+				_ = sc.AbortTransaction(sc)
+			}
+		}()
+		if err := fn(sc); err != nil {
+			return err
+		}
+		if err := sc.CommitTransaction(sc); err != nil {
+			return fmt.Errorf("commit migration transaction: %w", err)
+		}
+		committed = true
+		return nil
+	})
 }
 
 // FindOne executes a find operation that returns at most one document.

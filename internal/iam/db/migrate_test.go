@@ -10,6 +10,7 @@ import (
 	"github.com/codearena-platform/codearena-platform/internal/iam/utils/test"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -452,6 +453,162 @@ func TestGetMigrations(t *testing.T) {
 	assert.Len(t, migrations, 2)
 	assert.Equal(t, "001", migrations[0].Version)
 	assert.Equal(t, "002", migrations[1].Version)
+}
+
+type fakeTransactionalDB struct {
+	*test.MockDB
+	transactions int
+	commits      int
+	aborts       int
+}
+
+func (f *fakeTransactionalDB) WithTransaction(ctx context.Context, fn func(ctx context.Context) error) error {
+	f.transactions++
+	if err := fn(ctx); err != nil {
+		f.aborts++
+		return err
+	}
+	f.commits++
+	return nil
+}
+
+func withIsolatedMigrations(t *testing.T) {
+	t.Helper()
+	original := db.GetMigrations()
+	t.Cleanup(func() {
+		db.ResetMigrations()
+		for _, migration := range original {
+			db.RegisterMigration(migration)
+		}
+	})
+	db.ResetMigrations()
+}
+
+func TestCheckAndRunMigrations_UsesTransaction(t *testing.T) {
+	withIsolatedMigrations(t)
+	mockDB := &fakeTransactionalDB{MockDB: test.SetupMockDB()}
+	ctx := context.Background()
+	model := models.GetMigrationModel()
+
+	db.RegisterMigration(createTestMigration("001", "transactional", false))
+	mockDB.On("FindOne", ctx, model, bson.M{model.VersionKey: "001"}, mock.Anything).
+		Return(mongo.NewSingleResultFromDocument(bson.D{}, mongo.ErrNoDocuments, nil))
+	mockDB.On("InsertOne", ctx, model, mock.AnythingOfType("models.Migration"), mock.Anything).
+		Return(&mongo.InsertOneResult{InsertedID: "001"}, nil)
+
+	require.NoError(t, db.CheckAndRunMigrations(ctx, mockDB))
+	assert.Equal(t, 1, mockDB.transactions)
+	assert.Equal(t, 1, mockDB.commits)
+	assert.Equal(t, 0, mockDB.aborts)
+}
+
+func TestCheckAndRunMigrations_TransactionRollsBackOnFailure(t *testing.T) {
+	withIsolatedMigrations(t)
+	mockDB := &fakeTransactionalDB{MockDB: test.SetupMockDB()}
+	ctx := context.Background()
+	model := models.GetMigrationModel()
+
+	db.RegisterMigration(createTestMigration("001", "failing", true))
+	mockDB.On("FindOne", ctx, model, bson.M{model.VersionKey: "001"}, mock.Anything).
+		Return(mongo.NewSingleResultFromDocument(bson.D{}, mongo.ErrNoDocuments, nil))
+
+	err := db.CheckAndRunMigrations(ctx, mockDB)
+	assert.ErrorContains(t, err, "failed to apply migration 001")
+	assert.Equal(t, 1, mockDB.transactions)
+	assert.Equal(t, 1, mockDB.aborts)
+	mockDB.AssertNotCalled(t, "InsertOne")
+}
+
+func TestCheckAndRunMigrations_RecordsChecksumAndDetectsDrift(t *testing.T) {
+	withIsolatedMigrations(t)
+	ctx := context.Background()
+	model := models.GetMigrationModel()
+	migration := createTestMigration("001", "checksummed", false)
+	db.RegisterMigration(migration)
+
+	t.Run("records a checksum", func(t *testing.T) {
+		mockDB := test.SetupMockDB()
+		mockDB.On("FindOne", ctx, model, bson.M{model.VersionKey: "001"}, mock.Anything).
+			Return(mongo.NewSingleResultFromDocument(bson.D{}, mongo.ErrNoDocuments, nil))
+		mockDB.On("InsertOne", ctx, model, mock.MatchedBy(func(record models.Migration) bool {
+			return len(record.Checksum) == 64
+		}), mock.Anything).Return(&mongo.InsertOneResult{InsertedID: "001"}, nil)
+
+		require.NoError(t, db.CheckAndRunMigrations(ctx, mockDB))
+		mockDB.AssertExpectations(t)
+	})
+
+	t.Run("rejects a changed migration", func(t *testing.T) {
+		mockDB := test.SetupMockDB()
+		mockDB.On("FindOne", ctx, model, bson.M{model.VersionKey: "001"}, mock.Anything).
+			Return(mongo.NewSingleResultFromDocument(models.Migration{Checksum: "tampered"}, nil, nil))
+
+		err := db.CheckAndRunMigrations(ctx, mockDB)
+		assert.ErrorContains(t, err, "checksum mismatch")
+		mockDB.AssertNotCalled(t, "InsertOne")
+	})
+
+	t.Run("accepts legacy records without a checksum", func(t *testing.T) {
+		mockDB := test.SetupMockDB()
+		mockDB.On("FindOne", ctx, model, bson.M{model.VersionKey: "001"}, mock.Anything).
+			Return(mongo.NewSingleResultFromDocument(bson.D{}, nil, nil))
+
+		assert.NoError(t, db.CheckAndRunMigrations(ctx, mockDB))
+	})
+}
+
+func TestCheckAndRunMigrations_DryRun(t *testing.T) {
+	withIsolatedMigrations(t)
+	mockDB := test.SetupMockDB()
+	ctx := context.Background()
+	model := models.GetMigrationModel()
+
+	applied := false
+	db.RegisterMigration(db.MigrationInfo{
+		Version: "001",
+		Name:    "dry_run",
+		Up: func(context.Context, db.DB) error {
+			applied = true
+			return nil
+		},
+		Down: func(context.Context, db.DB) error { return nil },
+	})
+	mockDB.On("FindOne", ctx, model, bson.M{model.VersionKey: "001"}, mock.Anything).
+		Return(mongo.NewSingleResultFromDocument(bson.D{}, mongo.ErrNoDocuments, nil))
+
+	require.NoError(t, db.CheckAndRunMigrations(ctx, mockDB, db.WithDryRun(true)))
+	assert.False(t, applied)
+	mockDB.AssertNotCalled(t, "InsertOne")
+	mockDB.AssertNotCalled(t, "UpdateOne")
+}
+
+func TestRollbackMigration(t *testing.T) {
+	withIsolatedMigrations(t)
+	ctx := context.Background()
+	model := models.GetMigrationModel()
+
+	mockDB := &fakeTransactionalDB{MockDB: test.SetupMockDB()}
+	rolledBack := false
+	db.RegisterMigration(db.MigrationInfo{
+		Version: "001",
+		Name:    "rollback",
+		Up:      func(context.Context, db.DB) error { return nil },
+		Down: func(context.Context, db.DB) error {
+			rolledBack = true
+			return nil
+		},
+	})
+	mockDB.On("FindOne", ctx, model, bson.M{model.VersionKey: "001"}, mock.Anything).
+		Return(mongo.NewSingleResultFromDocument(bson.D{}, nil, nil))
+	mockDB.On("DeleteOne", ctx, model, bson.M{model.VersionKey: "001"}, mock.Anything).
+		Return(&mongo.DeleteResult{DeletedCount: 1}, nil)
+
+	require.NoError(t, db.RollbackMigration(ctx, mockDB, "001"))
+	assert.True(t, rolledBack)
+	assert.Equal(t, 1, mockDB.commits)
+
+	err := db.RollbackMigration(ctx, mockDB, "missing")
+	assert.ErrorContains(t, err, "not registered")
 }
 
 func TestResetMigrations(t *testing.T) {
