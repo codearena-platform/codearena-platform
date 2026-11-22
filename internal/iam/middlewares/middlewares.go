@@ -6,13 +6,22 @@ package middlewares
 
 import (
 	"context"
+	"errors"
 
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 )
 
-// GetProjects extracts the list of project IDs from the given context.
-// This function retrieves project IDs that were previously stored in the context
-// by the projects middleware, typically from the X-Project-Ids header.
+var (
+	// ErrProjectScopeMissing is returned when an authenticated request has no
+	// verified project scope.
+	ErrProjectScopeMissing = errors.New("no authorized project scope")
+	// ErrCrossTenantAccess is returned when a resource belongs to a project the
+	// caller is not scoped to.
+	ErrCrossTenantAccess = errors.New("resource belongs to another project")
+)
+
+// GetProjects extracts the verified project scope from the given context.
+// Values are derived from the authenticated identity by the auth middleware.
 //
 // Parameters:
 //   - ctx: The context containing project information
@@ -62,6 +71,41 @@ func GetMetadata(ctx context.Context) sdk.Metadata {
 		User:       GetUser(ctx),
 		ProjectIds: GetProjects(ctx),
 	}
+}
+
+// RequireProjectScope rejects authenticated requests without a verified
+// project scope. Requests without an authenticated user are internal service
+// calls and are allowed to operate across projects.
+func RequireProjectScope(ctx context.Context) error {
+	if GetUser(ctx) == nil {
+		return nil
+	}
+	if len(GetProjects(ctx)) == 0 {
+		return ErrProjectScopeMissing
+	}
+	return nil
+}
+
+// AuthorizeProject checks that an authenticated caller is scoped to the given
+// project. It must be called on by-ID reads and on writes that carry a project.
+func AuthorizeProject(ctx context.Context, projectID string) error {
+	if err := RequireProjectScope(ctx); err != nil {
+		return err
+	}
+	if GetUser(ctx) == nil {
+		// Internal service and event calls are allowed to cross projects.
+		return nil
+	}
+	if projectID == "" {
+		// Legacy unscoped documents are not specific to another tenant.
+		return nil
+	}
+	for _, allowed := range GetProjects(ctx) {
+		if allowed == projectID {
+			return nil
+		}
+	}
+	return ErrCrossTenantAccess
 }
 
 // AddMetadata stores user and project information into the context.

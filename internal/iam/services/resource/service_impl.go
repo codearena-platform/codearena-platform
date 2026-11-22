@@ -26,10 +26,21 @@ func (s service) Search(ctx context.Context, query sdk.ResourceQuery) (*sdk.Reso
 }
 
 func (s service) GetById(ctx context.Context, id string) (*sdk.Resource, error) {
-	return s.repo.GetById(ctx, id)
+	resource, err := s.repo.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	// Do not reveal whether an ID exists in another tenant.
+	if err := middlewares.AuthorizeProject(ctx, resource.ProjectId); err != nil {
+		return nil, sdk.ErrResourceNotFound
+	}
+	return resource, nil
 }
 
 func (s service) Create(ctx context.Context, resource *sdk.Resource) error {
+	if err := middlewares.AuthorizeProject(ctx, resource.ProjectId); err != nil {
+		return err
+	}
 	_, err := s.repo.Create(ctx, resource)
 	if err != nil {
 		return err
@@ -39,11 +50,14 @@ func (s service) Create(ctx context.Context, resource *sdk.Resource) error {
 }
 
 func (s service) Update(ctx context.Context, resource *sdk.Resource) error {
+	if err := middlewares.AuthorizeProject(ctx, resource.ProjectId); err != nil {
+		return err
+	}
 	return s.repo.Update(ctx, resource)
 }
 
 func (s service) Delete(ctx context.Context, id string) error {
-	vl, err := s.repo.GetById(ctx, id)
+	vl, err := s.GetById(ctx, id)
 	if err != nil {
 		return err
 	}

@@ -1,61 +1,36 @@
-// Package projects provides project-based access control middleware for the Go IAM system.
-// It handles extraction of project information from request headers and stores
-// it in the request context for authorization decisions.
+// Package projects provides project scoping metadata for the Go IAM system.
+// Project scopes are derived from the authenticated identity; request headers
+// are never accepted as a source of authority.
 package projects
 
 import (
-	"strings"
-
+	"github.com/codearena-platform/codearena-platform/internal/iam/middlewares"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/project"
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/log"
 )
 
-// Middlewares provides project-based access control middleware functionality.
-// It encapsulates the project service needed for project-related operations
-// and validates project access permissions.
+// Middlewares provides project-scoping middleware functionality.
 type Middlewares struct {
-	projectSvc project.Service // Project service for project operations
+	projectSvc project.Service
 }
 
 // NewMiddlewares creates a new project middleware instance.
-// It initializes the middleware with the project service required
-// for project-related operations and validations.
-//
-// Parameters:
-//   - projectSvc: Project service for project operations
-//
-// Returns:
-//   - *Middlewares: Configured project middleware instance
 func NewMiddlewares(projectSvc project.Service) *Middlewares {
-	return &Middlewares{
-		projectSvc: projectSvc,
-	}
+	return &Middlewares{projectSvc: projectSvc}
 }
 
-// Projects is a Fiber middleware that extracts project IDs from request headers.
-// It looks for the "X-Project-Ids" header containing a comma-separated list
-// of project IDs and stores them in the request context for authorization
-// decisions by downstream handlers.
-//
-// Header format: X-Project-Ids: project1,project2,project3
-//
-// Usage:
-//
-//	app.Use(projectMiddleware.Projects)
-//
-// Parameters:
-//   - c: Fiber context containing the HTTP request
-//
-// Returns:
-//   - error: Always returns nil (continues to next middleware)
+// Projects seeds the project scope from an already-authenticated user.
+// The legacy X-Project-Ids header is ignored: the authentication middleware
+// derives the authoritative scope from the verified identity and only uses the
+// header to narrow it.
 func (m Middlewares) Projects(c *fiber.Ctx) error {
-	headers := c.GetReqHeaders()
-	projectIds := []string{}
-	projectIdsCsv, ok := headers["X-Project-Ids"]
-	if ok && len(projectIdsCsv) > 0 {
-		projectIds = strings.Split(projectIdsCsv[0], ",")
+	if c.Get("X-Project-Ids") != "" {
+		log.Warn("X-Project-Ids is deprecated and no longer grants project access")
 	}
-	c.Context().SetUserValue(sdk.ProjectsTypeVal, projectIds)
+	if user := middlewares.GetUser(c.Context()); user != nil && user.ProjectId != "" {
+		c.Context().SetUserValue(sdk.ProjectsTypeVal, []string{user.ProjectId})
+	}
 	return c.Next()
 }

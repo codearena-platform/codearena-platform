@@ -10,7 +10,6 @@ import (
 	"github.com/codearena-platform/codearena-platform/internal/iam/entity"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -70,20 +69,22 @@ func (r *resourceRepository) GetById(ctx context.Context, id string) (*entity.Re
 
 func (r *resourceRepository) GetAll(ctx context.Context, query sdk.ResourceQuery) (*sdk.ResourceList, error) {
 	md := models.GetResourceModel()
-	filter := bson.A{}
+	// Tenant and enabled filters are mandatory; $or only narrows the result.
+	cond := bson.D{
+		{Key: md.EnabledKey, Value: true},
+		{Key: md.ProjectIdKey, Value: bson.D{{Key: "$in", Value: projectIDsForQuery(ctx, query.ProjectIds)}}},
+	}
 
+	filter := bson.A{}
 	if query.Name != "" {
-		filter = append(filter, bson.D{{Key: md.NameKey, Value: primitive.Regex{Pattern: fmt.Sprintf(".*%s.*", query.Name), Options: "i"}}})
+		filter = append(filter, bson.D{{Key: md.NameKey, Value: containsPattern(query.Name)}})
 	}
 	if query.Description != "" {
-		filter = append(filter, bson.D{{Key: md.DescriptionKey, Value: primitive.Regex{Pattern: fmt.Sprintf(".*%s.*", query.Description), Options: "i"}}})
+		filter = append(filter, bson.D{{Key: md.DescriptionKey, Value: containsPattern(query.Description)}})
 	}
 	if query.Key != "" {
-		filter = append(filter, bson.D{{Key: md.KeyKey, Value: primitive.Regex{Pattern: fmt.Sprintf(".*%s.*", query.Key), Options: "i"}}})
+		filter = append(filter, bson.D{{Key: md.KeyKey, Value: containsPattern(query.Key)}})
 	}
-
-	cond := bson.D{{Key: md.EnabledKey, Value: true}, {Key: md.ProjectIdKey, Value: bson.D{{Key: "$in", Value: query.ProjectIds}}}}
-
 	if len(filter) > 0 {
 		cond = append(cond, bson.E{Key: "$or", Value: filter})
 	}
