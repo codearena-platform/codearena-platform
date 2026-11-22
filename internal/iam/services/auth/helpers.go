@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gofiber/fiber/v2/log"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
+	"github.com/gofiber/fiber/v2/log"
 )
 
 func (s *service) cacheClientSecret(ctx context.Context, clientId string, secret string) {

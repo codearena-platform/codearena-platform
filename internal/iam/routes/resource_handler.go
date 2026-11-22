@@ -12,8 +12,9 @@ import (
 func (h *IAMHandler) RegisterResourceRoutes(router fiber.Router) {
 	v1 := router.Group("/resource/v1")
 	v1.Post("/", h.CreateResource)
-	v1.Get("/:id", h.GetResourceById)
+	// /search must be registered before /:id or Fiber treats "search" as an id.
 	v1.Get("/search", h.SearchResources)
+	v1.Get("/:id", h.GetResourceById)
 	v1.Put("/:id", h.UpdateResource)
 	v1.Delete("/:id", h.DeleteResource)
 }

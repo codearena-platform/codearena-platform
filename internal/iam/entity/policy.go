@@ -20,7 +20,7 @@ type PolicyDefinition struct {
 }
 
 type PolicyArgument struct {
-	Name        string                 `json:"name,omitempty"`
-	Description string                 `json:"description,omitempty"`
+	Name        string             `json:"name,omitempty"`
+	Description string             `json:"description,omitempty"`
 	DataType    constants.DataType `json:"data_type,omitempty"`
 }

@@ -7,6 +7,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/auth"
@@ -64,7 +65,14 @@ func NewMiddlewares(authSvc auth.Service, clientSvc client.Service) (*Middleware
 //   - error: nil on success, HTTP error response on authentication failure
 func (m *Middlewares) User(c *fiber.Ctx) error {
 	if m.AuthClient == nil {
-		// If the auth client is not set, we cannot authenticate the user
+		// Without an IAM client there is no way to validate a token. Fail closed
+		// unless the deployment explicitly opts into insecure development mode.
+		if os.Getenv("IAM_ALLOW_INSECURE") != "true" {
+			return c.Status(http.StatusUnauthorized).JSON(sdk.UserResponse{
+				Success: false,
+				Message: "authentication is not configured",
+			})
+		}
 		return c.Next()
 	}
 	// This middleware can be used to check if the user is authenticated
@@ -95,14 +103,18 @@ func (m *Middlewares) User(c *fiber.Ctx) error {
 // Returns:
 //   - error: nil on success, HTTP error response with dashboard format on failure
 func (m *Middlewares) DashboardUser(c *fiber.Ctx) error {
-	if m.AuthClient == nil {
-		// If the auth client is not set, we cannot authenticate the user
-		return c.Next()
-	}
 	res := &sdk.DashboardUserResponse{
 		Success: false,
 	}
-	res.Data.Setup.ClientAdded = m.AuthClient != nil
+	if m.AuthClient == nil {
+		if os.Getenv("IAM_ALLOW_INSECURE") != "true" {
+			res.Message = "authentication is not configured"
+			return c.Status(http.StatusUnauthorized).JSON(res)
+		}
+		res.Data.Setup.ClientAdded = false
+		return c.Next()
+	}
+	res.Data.Setup.ClientAdded = true
 	res.Data.Setup.ClientId = m.AuthClient.Id
 	// This middleware can be used to check if the user is authenticated
 	user, err := m.GetUser(c)

@@ -5,8 +5,8 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/constants"
+	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 )

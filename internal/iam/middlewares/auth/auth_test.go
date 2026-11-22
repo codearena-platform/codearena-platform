@@ -147,6 +147,7 @@ func TestMiddlewares_User_Success(t *testing.T) {
 }
 
 func TestMiddlewares_User_NoAuthClient(t *testing.T) {
+	t.Setenv("IAM_ALLOW_INSECURE", "true")
 	app, mockAuthSvc, mockClientSvc, middlewares := setupTestAppWithoutAuthClient()
 
 	// Create a test route
@@ -207,6 +208,7 @@ func TestMiddlewares_DashboardUser_Success(t *testing.T) {
 }
 
 func TestMiddlewares_DashboardUser_NoAuthClient(t *testing.T) {
+	t.Setenv("IAM_ALLOW_INSECURE", "true")
 	app, mockAuthSvc, mockClientSvc, middlewares := setupTestAppWithoutAuthClient()
 
 	app.Get("/dashboard", middlewares.DashboardUser, func(c *fiber.Ctx) error {
@@ -438,5 +440,29 @@ func BenchmarkMiddlewares_User(b *testing.B) {
 		if err != nil {
 			b.Fatal(err)
 		}
+	}
+}
+
+func TestMiddlewares_NoAuthClient_FailsClosedByDefault(t *testing.T) {
+	tests := []struct {
+		name       string
+		middleware func(*Middlewares) fiber.Handler
+	}{
+		{name: "User", middleware: func(m *Middlewares) fiber.Handler { return m.User }},
+		{name: "DashboardUser", middleware: func(m *Middlewares) fiber.Handler { return m.DashboardUser }},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			t.Setenv("IAM_ALLOW_INSECURE", "false")
+			app, _, _, middlewares := setupTestAppWithoutAuthClient()
+			app.Get("/test", tt.middleware(middlewares), func(c *fiber.Ctx) error {
+				return c.SendStatus(http.StatusOK)
+			})
+
+			resp, err := app.Test(httptest.NewRequest(http.MethodGet, "/test", nil))
+			assert.NoError(t, err)
+			assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
+		})
 	}
 }

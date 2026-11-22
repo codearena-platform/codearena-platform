@@ -1,2 +1,0 @@
-﻿FAIL	github.com/codearena-platform/codearena-platform/internal/iam/services/resource [build failed]
-FAIL

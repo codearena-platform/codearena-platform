@@ -10,8 +10,8 @@ import (
 	"net/url"
 	"time"
 
-	"github.com/gofiber/fiber/v2/log"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
+	"github.com/gofiber/fiber/v2/log"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	gauth "google.golang.org/api/oauth2/v2"

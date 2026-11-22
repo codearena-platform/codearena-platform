@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	jwtp "github.com/golang-jwt/jwt/v4"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
+	jwtp "github.com/golang-jwt/jwt/v4"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -611,11 +611,11 @@ func TestService_GenerateToken_EdgeCases(t *testing.T) {
 		service := NewService(secret)
 
 		claims := map[string]interface{}{
-			"user_id":    "123",
-			"special":    "!@#$%^&*()_+-=[]{}|;':\",./<>?`~",
-			"unicode":    "🔒🗝️🛡️",
-			"multibyte":  "café",
-			"json_like":  `{"nested": "object"}`,
+			"user_id":   "123",
+			"special":   "!@#$%^&*()_+-=[]{}|;':\",./<>?`~",
+			"unicode":   "🔒🗝️🛡️",
+			"multibyte": "café",
+			"json_like": `{"nested": "object"}`,
 		}
 
 		expiryTime := time.Now().Add(time.Hour).Unix()
@@ -717,7 +717,7 @@ func TestService_ValidateToken_TokenNotValid(t *testing.T) {
 
 	// Create a token manually with invalid structure
 	invalidClaims := jwtp.MapClaims{
-		"exp": "invalid-expiry", // Invalid expiry type
+		"exp":     "invalid-expiry", // Invalid expiry type
 		"user_id": "123",
 	}
 	token := jwtp.NewWithClaims(jwtp.SigningMethodHS256, invalidClaims)

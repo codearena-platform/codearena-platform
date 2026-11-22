@@ -7,8 +7,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/gofiber/fiber/v2/log"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
+	"github.com/gofiber/fiber/v2/log"
 	"golang.org/x/oauth2"
 )
 
@@ -120,8 +120,6 @@ func (g authProvider) GetIdentity(token string) ([]sdk.AuthIdentity, error) {
 		return nil, fmt.Errorf("error reading the response. %w", err)
 	}
 
-	fmt.Println(string(respBytes))
-
 	if resp.StatusCode != http.StatusOK {
 		return nil, fmt.Errorf("API error: %s", string(respBytes))
 	}
@@ -136,8 +134,6 @@ func (g authProvider) GetIdentity(token string) ([]sdk.AuthIdentity, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error unmarshalling the response. %s - %w", string(respBytes), err)
 	}
-
-	fmt.Println("GitHub User Info:", userInfo)
 
 	identities := []sdk.AuthIdentity{
 		{Type: sdk.AuthIdentityTypeEmail, Metadata: GitHubIdentityEmail{Email: userInfo.Email}},
