@@ -100,13 +100,18 @@ func (r *userRepository) GetAll(ctx context.Context, query sdk.UserQuery) (*sdk.
 	filter := bson.A{}
 	var users []models.User
 	if query.SearchQuery != "" {
+		pattern := containsPattern(query.SearchQuery)
 		filter = append(filter,
-			bson.D{{Key: md.NameKey, Value: bson.D{{Key: "$regex", Value: query.SearchQuery}, {Key: "$options", Value: "i"}}}},
-			bson.D{{Key: md.EmailKey, Value: bson.D{{Key: "$regex", Value: query.SearchQuery}, {Key: "$options", Value: "i"}}}},
-			bson.D{{Key: md.PhoneKey, Value: bson.D{{Key: "$regex", Value: query.SearchQuery}, {Key: "$options", Value: "i"}}}},
+			bson.D{{Key: md.NameKey, Value: pattern}},
+			bson.D{{Key: md.EmailKey, Value: pattern}},
+			bson.D{{Key: md.PhoneKey, Value: pattern}},
 		)
 	}
-	cond := bson.D{{Key: md.EnabledKey, Value: true}, {Key: md.ProjectIDKey, Value: bson.D{{Key: "$in", Value: query.ProjectIds}}}}
+	// Tenant and enabled filters are mandatory; $or only narrows the result.
+	cond := bson.D{
+		{Key: md.EnabledKey, Value: true},
+		{Key: md.ProjectIDKey, Value: bson.D{{Key: "$in", Value: projectIDsForQuery(ctx, query.ProjectIds)}}},
+	}
 
 	if len(query.RoleId) > 0 {
 		cond = append(cond, bson.E{Key: fmt.Sprintf("%s.%s", md.RolesIdKey, query.RoleId), Value: bson.D{{Key: "$exists", Value: true}}})
@@ -151,7 +156,9 @@ func (r *userRepository) GetAll(ctx context.Context, query sdk.UserQuery) (*sdk.
 
 func (r *userRepository) RemoveResourceFromAll(ctx context.Context, resourceKey string) error {
 	md := models.GetUserModel()
-	filter := bson.D{{Key: fmt.Sprintf("%s.%s", md.ResourcesKey, resourceKey), Value: bson.D{{Key: "$exists", Value: true}}}}
+	filter := withProjectScope(ctx, md.ProjectIDKey, bson.D{
+		{Key: fmt.Sprintf("%s.%s", md.ResourcesKey, resourceKey), Value: bson.D{{Key: "$exists", Value: true}}},
+	})
 	update := bson.D{{Key: "$unset", Value: bson.D{{Key: fmt.Sprintf("%s.%s", md.ResourcesKey, resourceKey), Value: ""}}}}
 
 	_, err := r.db.UpdateMany(ctx, md, filter, update)

@@ -11,7 +11,6 @@ import (
 	"github.com/codearena-platform/codearena-platform/internal/iam/entity"
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -79,17 +78,18 @@ func (r *roleRepository) GetById(ctx context.Context, id string) (*entity.Role, 
 
 func (r *roleRepository) GetAll(ctx context.Context, query sdk.RoleQuery) (*sdk.RoleList, error) {
 	md := models.GetRoleModel()
-	filter := bson.A{}
-
-	if query.SearchQuery != "" {
-		filter = append(filter, bson.D{{Key: md.NameKey, Value: primitive.Regex{Pattern: fmt.Sprintf(".*%s.*", query.SearchQuery), Options: "i"}}})
-		filter = append(filter, bson.D{{Key: md.DescriptionKey, Value: primitive.Regex{Pattern: fmt.Sprintf(".*%s.*", query.SearchQuery), Options: "i"}}})
+	// Tenant and enabled filters are mandatory. $or must be appended so a
+	// search never widens the query to other projects or disabled roles.
+	cond := bson.D{
+		{Key: md.EnabledKey, Value: true},
+		{Key: md.ProjectIdKey, Value: bson.D{{Key: "$in", Value: projectIDsForQuery(ctx, query.ProjectIds)}}},
 	}
 
-	cond := bson.D{{Key: md.EnabledKey, Value: true}, {Key: md.ProjectIdKey, Value: bson.D{{Key: "$in", Value: query.ProjectIds}}}}
-
-	if len(filter) > 0 {
-		cond = bson.D{{Key: "$or", Value: filter}}
+	if query.SearchQuery != "" {
+		cond = append(cond, bson.E{Key: "$or", Value: bson.A{
+			bson.D{{Key: md.NameKey, Value: containsPattern(query.SearchQuery)}},
+			bson.D{{Key: md.DescriptionKey, Value: containsPattern(query.SearchQuery)}},
+		}})
 	}
 
 	total, err := r.db.CountDocuments(ctx, md, cond)
@@ -127,9 +127,10 @@ func (r *roleRepository) GetAll(ctx context.Context, query sdk.RoleQuery) (*sdk.
 
 func (r *roleRepository) RemoveResourceFromAll(ctx context.Context, resourceKey string) error {
 	md := models.GetRoleModel()
-	_, err := r.db.UpdateMany(ctx, md, bson.D{
+	filter := withProjectScope(ctx, md.ProjectIdKey, bson.D{
 		{Key: fmt.Sprintf("%s.%s", md.ResourcesKey, resourceKey), Value: bson.D{{Key: "$exists", Value: true}}},
-	}, bson.D{{Key: "$unset", Value: bson.D{{Key: fmt.Sprintf("%s.%s", md.ResourcesKey, resourceKey), Value: ""}}}})
+	})
+	_, err := r.db.UpdateMany(ctx, md, filter, bson.D{{Key: "$unset", Value: bson.D{{Key: fmt.Sprintf("%s.%s", md.ResourcesKey, resourceKey), Value: ""}}}})
 	if err != nil {
 		return fmt.Errorf("failed to remove resource from roles: %w", err)
 	}

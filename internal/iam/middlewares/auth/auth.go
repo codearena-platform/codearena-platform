@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/codearena-platform/codearena-platform/internal/iam/sdk"
 	"github.com/codearena-platform/codearena-platform/internal/iam/services/auth"
@@ -73,6 +74,7 @@ func (m *Middlewares) User(c *fiber.Ctx) error {
 				Message: "authentication is not configured",
 			})
 		}
+		setInsecureProjects(c)
 		return c.Next()
 	}
 	// This middleware can be used to check if the user is authenticated
@@ -112,6 +114,7 @@ func (m *Middlewares) DashboardUser(c *fiber.Ctx) error {
 			return c.Status(http.StatusUnauthorized).JSON(res)
 		}
 		res.Data.Setup.ClientAdded = false
+		setInsecureProjects(c)
 		return c.Next()
 	}
 	res.Data.Setup.ClientAdded = true
@@ -126,6 +129,22 @@ func (m *Middlewares) DashboardUser(c *fiber.Ctx) error {
 
 	c.Context().SetUserValue(sdk.UserTypeVal, user)
 	return c.Next()
+}
+
+// setInsecureProjects is only used when IAM_ALLOW_INSECURE=true. The header is
+// never trusted when a verified token is available.
+func setInsecureProjects(c *fiber.Ctx) {
+	log.Warn("IAM_ALLOW_INSECURE=true: project scope taken from X-Project-Ids (development only)")
+	csv := c.Get("X-Project-Ids")
+	ids := []string{}
+	if csv != "" {
+		for _, id := range strings.Split(csv, ",") {
+			if trimmed := strings.TrimSpace(id); trimmed != "" {
+				ids = append(ids, trimmed)
+			}
+		}
+	}
+	c.Context().SetUserValue(sdk.ProjectsTypeVal, ids)
 }
 
 // GetUser extracts and validates the user from the Authorization header.
@@ -154,10 +173,28 @@ func (m *Middlewares) GetUser(c *fiber.Ctx) (*sdk.User, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch identity: %w", err)
 	}
-	projectIdsCsv := c.Get("X-Project-Ids")
-	if len(projectIdsCsv) == 0 {
-		c.Context().SetUserValue(sdk.ProjectsTypeVal, []string{user.ProjectId})
-		return user, nil
+	// The verified identity is the only source of project authority. The header
+	// may narrow the scope to a subset, but never add a project the user does
+	// not belong to.
+	allowed := []string{}
+	if user.ProjectId != "" {
+		allowed = append(allowed, user.ProjectId)
 	}
+	if csv := c.Get("X-Project-Ids"); csv != "" {
+		narrowed := []string{}
+		for _, requested := range strings.Split(csv, ",") {
+			for _, projectID := range allowed {
+				if strings.TrimSpace(requested) == projectID {
+					narrowed = append(narrowed, projectID)
+					break
+				}
+			}
+		}
+		if len(narrowed) == 0 {
+			return nil, errors.New("no authorized project scope in X-Project-Ids")
+		}
+		allowed = narrowed
+	}
+	c.Context().SetUserValue(sdk.ProjectsTypeVal, allowed)
 	return user, nil
 }

@@ -38,6 +38,10 @@ The gateway exposes IAM under `/api/v1/iam/`. The legacy `/api/v1/auth/` prefix 
 | `IAM_MIGRATION_DRY_RUN` | When `true`, inspect pending migrations without applying changes |
 | `IAM_MIGRATION_ROLLBACK` | Version of a migration to roll back on startup (e.g. `001`) |
 
+### Project scoping
+
+Authenticated IAM requests derive their project scope from the verified identity only. The legacy `X-Project-Ids` header no longer grants access; it can only narrow the verified scope to one of the caller's projects, and a header with no authorized project is rejected. The admin API enforces this on every request and additionally rejects `project_id` values in bodies and query strings outside the scope. By-ID reads return the corresponding "not found" error for cross-tenant IDs, and list queries always keep the tenant and enabled filters. `IAM_ALLOW_INSECURE=true` restores header-based scoping for local development only.
+
 ### Database migrations
 
 Migrations are applied on IAM startup. Each migration's data changes and its record are committed in one MongoDB transaction, and the record includes a checksum that detects edits to already-applied migrations. Production requires a MongoDB replica set (or mongos); a standalone `mongod` is only supported for local development and logs a warning. Migration `001` converts legacy policies in place, keeps a backup of the original value, and restores it on rollback.
@@ -60,6 +64,6 @@ Migrations are applied on IAM startup. Each migration's data changes and its rec
 ## Known gaps before production
 
 - The gateway is exposed over plaintext HTTP without an Ingress/TLS.
-- Project scoping for IAM/competition resources is still incomplete.
+- Project scoping in the competition service is still incomplete; IAM scoping is enforced by verified identity.
 - Competition persistence and ELO scoring still need the fixes tracked in the repository issues.
 - The `realtime` and `simulation` services referenced by compose are not defined here.

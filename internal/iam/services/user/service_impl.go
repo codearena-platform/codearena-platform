@@ -29,6 +29,9 @@ func NewService(repo repository.UserRepository, roleSvc role.Service) Service {
 }
 
 func (s *service) Create(ctx context.Context, user *sdk.User) error {
+	if err := middlewares.AuthorizeProject(ctx, user.ProjectId); err != nil {
+		return err
+	}
 	err := s.repo.Create(ctx, user)
 	if err != nil {
 		return err
@@ -38,6 +41,9 @@ func (s *service) Create(ctx context.Context, user *sdk.User) error {
 }
 
 func (s *service) Update(ctx context.Context, user *sdk.User) error {
+	if err := middlewares.AuthorizeProject(ctx, user.ProjectId); err != nil {
+		return err
+	}
 	err := s.repo.Update(ctx, user)
 	if err != nil {
 		return err
@@ -47,18 +53,33 @@ func (s *service) Update(ctx context.Context, user *sdk.User) error {
 }
 
 func (s *service) GetByEmail(ctx context.Context, email string, projectId string) (*sdk.User, error) {
+	if err := middlewares.AuthorizeProject(ctx, projectId); err != nil {
+		return nil, err
+	}
 	return s.repo.GetByEmail(ctx, email, projectId)
 }
 
 func (s *service) GetById(ctx context.Context, id string) (*sdk.User, error) {
-	return s.repo.GetById(ctx, id)
+	user, err := s.repo.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	// Do not reveal whether an ID exists in another tenant.
+	if err := middlewares.AuthorizeProject(ctx, user.ProjectId); err != nil {
+		return nil, sdk.ErrUserNotFound
+	}
+	return user, nil
 }
 
 func (s *service) GetByPhone(ctx context.Context, phone string, projectId string) (*sdk.User, error) {
+	if err := middlewares.AuthorizeProject(ctx, projectId); err != nil {
+		return nil, err
+	}
 	return s.repo.GetByPhone(ctx, phone, projectId)
 }
 
 func (s *service) GetAll(ctx context.Context, query sdk.UserQuery) (*sdk.UserList, error) {
+	query.ProjectIds = middlewares.GetProjects(ctx)
 	return s.repo.GetAll(ctx, query)
 }
 
@@ -129,7 +150,7 @@ func (s *service) RemoveRoleFromUser(ctx context.Context, userId, roleId string)
 }
 
 func (s *service) AddResourceToUser(ctx context.Context, userId string, request sdk.AddUserResourceRequest) error {
-	usr, err := s.repo.GetById(ctx, userId)
+	usr, err := s.GetById(ctx, userId)
 	if err != nil {
 		return err
 	}
@@ -147,7 +168,7 @@ func (s *service) AddResourceToUser(ctx context.Context, userId string, request 
 }
 
 func (s *service) AddPolicyToUser(ctx context.Context, userId string, policies map[string]sdk.UserPolicy) error {
-	usr, err := s.repo.GetById(ctx, userId)
+	usr, err := s.GetById(ctx, userId)
 	if err != nil {
 		return err
 	}
@@ -165,7 +186,7 @@ func (s *service) AddPolicyToUser(ctx context.Context, userId string, policies m
 }
 
 func (s *service) RemovePolicyFromUser(ctx context.Context, userId string, policyIds []string) error {
-	usr, err := s.repo.GetById(ctx, userId)
+	usr, err := s.GetById(ctx, userId)
 	if err != nil {
 		return err
 	}

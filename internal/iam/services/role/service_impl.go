@@ -23,10 +23,16 @@ func NewService(repo repository.RoleRepository) Service {
 	}
 }
 func (s *service) Create(ctx context.Context, role *sdk.Role) error {
+	if err := middlewares.AuthorizeProject(ctx, role.ProjectId); err != nil {
+		return err
+	}
 	return s.repo.Create(ctx, role)
 }
 
 func (s *service) Update(ctx context.Context, role *sdk.Role) error {
+	if err := middlewares.AuthorizeProject(ctx, role.ProjectId); err != nil {
+		return err
+	}
 	err := s.repo.Update(ctx, role)
 	if err != nil {
 		return fmt.Errorf("failed to update role: %w", err)
@@ -36,7 +42,15 @@ func (s *service) Update(ctx context.Context, role *sdk.Role) error {
 }
 
 func (s *service) GetById(ctx context.Context, id string) (*sdk.Role, error) {
-	return s.repo.GetById(ctx, id)
+	role, err := s.repo.GetById(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	// Do not reveal whether an ID exists in another tenant.
+	if err := middlewares.AuthorizeProject(ctx, role.ProjectId); err != nil {
+		return nil, sdk.ErrRoleNotFound
+	}
+	return role, nil
 }
 
 func (s *service) GetAll(ctx context.Context, query sdk.RoleQuery) (*sdk.RoleList, error) {

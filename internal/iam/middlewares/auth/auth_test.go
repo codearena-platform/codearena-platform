@@ -1,7 +1,9 @@
 package auth
 
 import (
+	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -465,4 +467,51 @@ func TestMiddlewares_NoAuthClient_FailsClosedByDefault(t *testing.T) {
 			assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 		})
 	}
+}
+
+func TestMiddlewares_User_ProjectScopeComesFromVerifiedIdentity(t *testing.T) {
+	app, mockAuthSvc, _, middlewares := setupTestAppWithAuthClient()
+	user := createTestUser()
+	user.ProjectId = "project-a"
+	mockAuthSvc.On("GetIdentity", mock.Anything, "valid-token", mock.Anything).Return(user, nil)
+
+	app.Get("/scope", middlewares.User, func(c *fiber.Ctx) error {
+		projects, _ := c.Context().UserValue(sdk.ProjectsTypeVal).([]string)
+		return c.JSON(projects)
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/scope", nil)
+	req.Header.Set("Authorization", "Bearer valid-token")
+	// A client cannot expand its scope with the legacy header; unknown values
+	// are ignored because only the verified identity grants access.
+	req.Header.Set("X-Project-Ids", "project-a,project-b")
+
+	resp, err := app.Test(req)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+	body, err := io.ReadAll(resp.Body)
+	assert.NoError(t, err)
+	var projects []string
+	assert.NoError(t, json.Unmarshal(body, &projects))
+	assert.Equal(t, []string{"project-a"}, projects)
+}
+
+func TestMiddlewares_User_RejectsUnauthorizedScopeHeader(t *testing.T) {
+	app, mockAuthSvc, _, middlewares := setupTestAppWithAuthClient()
+	user := createTestUser()
+	user.ProjectId = "project-a"
+	mockAuthSvc.On("GetIdentity", mock.Anything, "valid-token", mock.Anything).Return(user, nil)
+
+	app.Get("/scope", middlewares.User, func(c *fiber.Ctx) error {
+		return c.SendStatus(http.StatusOK)
+	})
+
+	req := httptest.NewRequest(http.MethodGet, "/scope", nil)
+	req.Header.Set("Authorization", "Bearer valid-token")
+	req.Header.Set("X-Project-Ids", "project-b")
+
+	resp, err := app.Test(req)
+	assert.NoError(t, err)
+	assert.Equal(t, http.StatusUnauthorized, resp.StatusCode)
 }
