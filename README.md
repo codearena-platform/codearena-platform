@@ -57,6 +57,8 @@ Migrations are applied on IAM startup. Each migration's data changes and its rec
 | `IAM_URL` | Base URL used to verify bearer tokens (default `http://iam:7000`) |
 | `MATCH_RESULT_SERVICE_EMAIL` | Optional; restrict result callbacks to this IAM service account |
 
+Competition Postgres schema is managed by versioned, idempotent migrations applied at startup from `internal/competition/db/postgres/migrations.go`. Each migration is applied and recorded in one transaction; migration 1 creates the core tables and migration 2 adds hubs, memberships and `tournaments.hub_id`. Rollback is manual: stop the service, restore a database backup taken before the upgrade, and restart with the previous image. Do not edit an already-applied migration; add a new version instead.
+
 ### Gateway
 
 `PORT`, `IAM_URL`, `COMPETITION_URL`, `REALTIME_URL`.
@@ -65,5 +67,5 @@ Migrations are applied on IAM startup. Each migration's data changes and its rec
 
 - The gateway is exposed over plaintext HTTP without an Ingress/TLS.
 - Project scoping in the competition service is still incomplete; IAM scoping is enforced by verified identity.
-- Competition persistence and ELO scoring still need the fixes tracked in the repository issues.
+- Competition MongoDB history queries and Postgres schema are aligned for v1, but cross-service completion is not transactional (ratings, scores and standings can be retried via match status).
 - The `realtime` and `simulation` services referenced by compose are not defined here.

@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"hash/fnv"
 	"time"
 
 	"github.com/codearena-platform/codearena-platform/internal/competition/services/entity"
@@ -65,8 +66,8 @@ func (u *BotUsecase) SubmitBot(ctx context.Context, userID, botName, chassis, so
 		ID:        uuid.New().String(),
 		BotID:     botID,
 		Version:   "v1",
-		SourceURL: "source_attached",                           // In a real system, we'd upload to S3 here
-		Hash:      fmt.Sprintf("%d", newSignature.HashTree[0]), // simple hash representation
+		SourceURL: "source_attached", // In a real system, we'd upload to S3 here
+		Hash:      signatureHash(newSignature),
 		CreatedAt: time.Now().Unix(),
 	}
 
@@ -75,4 +76,17 @@ func (u *BotUsecase) SubmitBot(ctx context.Context, userID, botName, chassis, so
 	}
 
 	return bot, nil
+}
+
+// signatureHash produces a stable version hash without assuming the
+// fingerprint has at least one hash (very short/empty sources produce none).
+func signatureHash(signature entity.BotSignature) string {
+	if len(signature.HashTree) == 0 {
+		return ""
+	}
+	hasher := fnv.New64a()
+	for _, value := range signature.HashTree {
+		_, _ = fmt.Fprintf(hasher, "%08x", value)
+	}
+	return fmt.Sprintf("%x", hasher.Sum64())
 }
