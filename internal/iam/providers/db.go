@@ -3,6 +3,7 @@ package providers
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"github.com/codearena-platform/codearena-platform/internal/iam/config"
 	"github.com/codearena-platform/codearena-platform/internal/iam/db"
@@ -30,8 +31,16 @@ func NewDBConnection(cnf config.AppConfig) (db.DB, error) {
 	if err != nil {
 		return nil, fmt.Errorf("error connecting to db: %w", err)
 	}
-	// apply migrations
-	if err := db.CheckAndRunMigrations(context.Background(), conn); err != nil {
+	ctx := context.Background()
+	// Explicit rollback takes precedence: operators can revert a bad release
+	// without editing code.
+	if version := os.Getenv("IAM_MIGRATION_ROLLBACK"); version != "" {
+		if err := db.RollbackMigration(ctx, conn, version); err != nil {
+			return nil, fmt.Errorf("error rolling back migration %s: %w", version, err)
+		}
+	}
+	// IAM_MIGRATION_DRY_RUN=true inspects pending migrations without writes.
+	if err := db.CheckAndRunMigrations(ctx, conn, db.WithDryRun(os.Getenv("IAM_MIGRATION_DRY_RUN") == "true")); err != nil {
 		return nil, fmt.Errorf("error running migrations: %w", err)
 	}
 	return conn, nil
