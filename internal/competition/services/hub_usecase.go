@@ -47,6 +47,25 @@ func (u *HubUsecase) CreateHub(name, ownerID, description string, hubType entity
 	return hub, nil
 }
 
+// GetHub returns a hub so callers can enforce owner-only operations.
+func (u *HubUsecase) GetHub(id string) (*entity.Hub, error) {
+	return u.hubRepo.GetByID(id)
+}
+
+// IsMember reports whether the user belongs to the hub.
+func (u *HubUsecase) IsMember(hubID, userID string) (bool, error) {
+	memberships, err := u.hubRepo.GetMemberships(hubID)
+	if err != nil {
+		return false, err
+	}
+	for _, m := range memberships {
+		if m.UserID == userID {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
 func (u *HubUsecase) AddMember(hubID, userID, role string) error {
 	membership := &entity.HubMembership{
 		HubID:    hubID,

@@ -3,9 +3,9 @@ package routes
 import (
 	"context"
 	"log"
-	"net"
 
 	pb "github.com/codearena-platform/codearena-core/pkg/api/v1"
+	compAuth "github.com/codearena-platform/codearena-platform/internal/competition/auth"
 	"github.com/codearena-platform/codearena-platform/internal/competition/services"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -50,9 +50,13 @@ func (s *MatchGRPCServer) CreateMatch(ctx context.Context, config *pb.ArenaConfi
 }
 
 func (s *MatchGRPCServer) RegisterBot(ctx context.Context, req *pb.RegisterBotRequest) (*pb.RegisterBotResponse, error) {
-	log.Printf("Competition: Registering bot: %s for user: %s", req.Name, req.UserId)
+	identity, err := compAuth.IdentityFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("Competition: Registering bot: %s for authenticated user: %s", req.Name, identity.ID)
 
-	bot, version, err := s.service.RegisterBot(req.UserId, req.Name, req.Version, req.SourceCode, req.Language)
+	bot, version, err := s.service.RegisterBot(identity.ID, req.Name, req.Version, req.SourceCode, req.Language)
 	if err != nil {
 		return &pb.RegisterBotResponse{
 			Success: false,
@@ -66,19 +70,4 @@ func (s *MatchGRPCServer) RegisterBot(ctx context.Context, req *pb.RegisterBotRe
 		Success:   true,
 		Message:   "Bot registered successfully",
 	}, nil
-}
-
-func StartMatchServer(addr string, u *services.MatchUsecase) {
-	lis, err := net.Listen("tcp", addr)
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
-	s := grpc.NewServer()
-	srv := &MatchGRPCServer{service: u}
-	pb.RegisterMatchServiceServer(s, srv)
-
-	log.Printf("Match gRPC Server listening at %v", lis.Addr())
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
 }

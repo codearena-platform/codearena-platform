@@ -6,6 +6,7 @@ import (
 	"net"
 	"os"
 
+	compAuth "github.com/codearena-platform/codearena-platform/internal/competition/auth"
 	"github.com/codearena-platform/codearena-platform/internal/competition/db/mongo"
 	"github.com/codearena-platform/codearena-platform/internal/competition/db/postgres"
 	"github.com/codearena-platform/codearena-platform/internal/competition/routes"
@@ -105,14 +106,18 @@ func main() {
 	hubUsecase := services.NewHubUsecase(hubRepo, tournamentRepo)
 	// metricsService := services.NewMetricsService(matchRepo) // Planned but initialized inside scoreboard if needed
 
+	// Tokens are verified through IAM; never trust caller-supplied identity fields.
+	iamURL := os.Getenv("IAM_URL")
+	verifier := compAuth.NewIAMVerifier(iamURL)
+
 	// Run gRPC Server
-	go StartMatchServer(":50052", simAddr, matchUsecase)
+	go StartMatchServer(":50052", simAddr, matchUsecase, verifier)
 
 	// Run HTTP Server
-	StartHTTPServer(":7001", matchUsecase, tournamentUsecase, leagueUsecase, scoreboardService, historyUsecase, analyticsUsecase, hubUsecase, botUsecase)
+	StartHTTPServer(":7001", verifier, matchUsecase, tournamentUsecase, leagueUsecase, scoreboardService, historyUsecase, analyticsUsecase, hubUsecase, botUsecase)
 }
 
-func StartHTTPServer(addr string, mu *services.MatchUsecase, tu *services.TournamentUsecase, lu *services.LeagueUsecase, ss *services.ScoreboardService, hu *services.HistoryUsecase, au *services.AnalyticsUsecase, hbu *services.HubUsecase, bu *services.BotUsecase) {
+func StartHTTPServer(addr string, verifier compAuth.Verifier, mu *services.MatchUsecase, tu *services.TournamentUsecase, lu *services.LeagueUsecase, ss *services.ScoreboardService, hu *services.HistoryUsecase, au *services.AnalyticsUsecase, hbu *services.HubUsecase, bu *services.BotUsecase) {
 	app := fiber.New(fiber.Config{
 		AppName: "CodeArena Competition Manager v1.0.0",
 	})
@@ -125,18 +130,18 @@ func StartHTTPServer(addr string, mu *services.MatchUsecase, tu *services.Tourna
 		})
 	})
 
-	routes.RegisterCompetitionRoutes(app, mu, tu, lu, ss, hu, au, hbu, bu)
+	routes.RegisterCompetitionRoutes(app, verifier, mu, tu, lu, ss, hu, au, hbu, bu)
 
 	log.Printf("Competition HTTP Server listening at %s", addr)
 	log.Fatal(app.Listen(addr))
 }
 
-func StartMatchServer(addr string, simAddr string, u *services.MatchUsecase) {
+func StartMatchServer(addr string, simAddr string, u *services.MatchUsecase, verifier compAuth.Verifier) {
 	lis, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
-	s := grpc.NewServer()
+	s := grpc.NewServer(grpc.UnaryInterceptor(compAuth.UnaryInterceptor(verifier)))
 	srv := routes.NewMatchGRPCServer(u, simAddr)
 	pb.RegisterMatchServiceServer(s, srv)
 
